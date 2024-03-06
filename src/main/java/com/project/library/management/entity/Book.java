@@ -32,6 +32,11 @@ public class Book {
     @Column(nullable = false)
     private int quantityAvailable;
 
+
+    private boolean isActive;
+
+
+
     @ManyToOne
     @JoinColumn(name = "publisher_id", nullable = false)
     private Publisher publisher;
