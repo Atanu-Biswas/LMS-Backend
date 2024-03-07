@@ -1,15 +1,18 @@
 package com.project.library.management.controller;
 
 
+import com.project.library.management.dto.LoginDTO;
+import com.project.library.management.dto.UserDTO;
 import com.project.library.management.entity.AuthenticationResponse;
-import com.project.library.management.entity.User;
 import com.project.library.management.service.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/auth")
 public class AuthenticationController {
     private final AuthenticationService authService;
 
@@ -20,7 +23,7 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody User request
+            @RequestBody UserDTO request
     ) {
 
         return ResponseEntity.ok(authService.register(request));
@@ -28,8 +31,11 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(
-            @RequestBody User request
+            @RequestBody LoginDTO request
     ) {
+
         return ResponseEntity.ok(authService.authenticate(request));
+//        return ResponseEntity.ok(null);
     }
+
 }

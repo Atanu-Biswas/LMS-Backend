@@ -1,6 +1,10 @@
 package com.project.library.management.entity;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public enum Role {
-    USER,
-    ADMIN
+    USER("USER"),
+    ADMIN("ADMIN");
+    private final String role;
 }

@@ -1,5 +1,7 @@
 package com.project.library.management.service;
 
+import com.project.library.management.dto.LoginDTO;
+import com.project.library.management.dto.UserDTO;
 import com.project.library.management.entity.AuthenticationResponse;
 import com.project.library.management.entity.Role;
 import com.project.library.management.entity.User;
@@ -29,7 +31,7 @@ public class AuthenticationService {
 
 
 
-    public AuthenticationResponse register(User request) {
+    public AuthenticationResponse register(UserDTO request) {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setName(request.getName());
@@ -37,7 +39,7 @@ public class AuthenticationService {
         user.setAddress(request.getAddress());
         user.setMobileNo(request.getMobileNo());
 
-        System.out.println("User: " + user);
+
         user.setRole(Role.USER);
         user = userRepository.save(user);
 
@@ -46,7 +48,7 @@ public class AuthenticationService {
 
         return new AuthenticationResponse(token);
     }
-    public AuthenticationResponse authenticate(User request){
+    public AuthenticationResponse authenticate(LoginDTO request){
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
