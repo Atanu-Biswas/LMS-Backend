@@ -65,4 +65,14 @@ public class AuthenticationService {
         return new AuthenticationResponse(token);
 
     }
+
+	public boolean usernameExists(String usernameToCheck) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+
+
+
 }
