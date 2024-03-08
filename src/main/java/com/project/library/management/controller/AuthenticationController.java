@@ -2,6 +2,7 @@ package com.project.library.management.controller;
 
 
 import com.project.library.management.dto.LoginDTO;
+import com.project.library.management.dto.RefreshTokenRequestDTO;
 import com.project.library.management.dto.UserDTO;
 import com.project.library.management.entity.AuthenticationResponse;
 import com.project.library.management.service.AuthenticationService;
@@ -14,12 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationController {
+    public AuthenticationController(AuthenticationService authService) {
+        this.authService = authService;
+
+    }
+
     private final AuthenticationService authService;
 
-    public AuthenticationController(AuthenticationService authService) {
 
-        this.authService = authService;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
@@ -35,7 +38,15 @@ public class AuthenticationController {
     ) {
 
         return ResponseEntity.ok(authService.authenticate(request));
-//        return ResponseEntity.ok(null);
+
+    }
+
+    @PostMapping("/refreshToken")
+    public ResponseEntity<?> refreshToken(
+            @RequestBody RefreshTokenRequestDTO request
+    ) {
+        authService.refreshToken(request);
+        return ResponseEntity.ok().build();
     }
 
 }
