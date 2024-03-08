@@ -29,10 +29,7 @@ public class BookRequest {
     private int weeksRequested;
 
     @Column(nullable = false)
-    private String status;
-
-
-
+    private String status = "PENDING";
     // Getters and setters omitted for brevity
 }
 

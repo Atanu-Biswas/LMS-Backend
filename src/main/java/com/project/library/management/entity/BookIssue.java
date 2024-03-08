@@ -31,6 +31,8 @@ public class BookIssue {
     @Column(nullable = false)
     private Date returnDate;
 
+    private String fine = "0";
+
 
 
    // Getters and setters omitted for brevity
