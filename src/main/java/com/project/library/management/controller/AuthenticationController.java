@@ -3,6 +3,7 @@ package com.project.library.management.controller;
 
 import com.project.library.management.dto.LoginDTO;
 import com.project.library.management.dto.RefreshTokenRequestDTO;
+import com.project.library.management.dto.Temp;
 import com.project.library.management.dto.UserDTO;
 import com.project.library.management.entity.AuthenticationResponse;
 import com.project.library.management.service.AuthenticationService;
@@ -33,20 +34,22 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(
+    public ResponseEntity<Temp> login(
             @RequestBody LoginDTO request
     ) {
-
-        return ResponseEntity.ok(authService.authenticate(request));
+        Temp temp = new Temp();
+        temp.setAuthenticationResponse(authService.authenticate(request));
+        temp.setRole(authService.getUserRole(request.getUsername()));
+        return ResponseEntity.ok(temp);
 
     }
 
     @PostMapping("/refreshToken")
-    public ResponseEntity<?> refreshToken(
+    public ResponseEntity<AuthenticationResponse> refreshToken(
             @RequestBody RefreshTokenRequestDTO request
     ) {
-        authService.refreshToken(request);
-        return ResponseEntity.ok().build();
+        AuthenticationResponse authenticationResponse = authService.refreshToken(request);
+        return ResponseEntity.ok(authenticationResponse);
     }
 
 }

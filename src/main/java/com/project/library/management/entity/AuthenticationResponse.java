@@ -6,13 +6,11 @@ import lombok.Data;
 public class AuthenticationResponse {
     private String token;
     private String refreshToken;
-    private String role;
-
-
-    public AuthenticationResponse(String token, String refreshToken, String role) {
+    public AuthenticationResponse(String token, String refreshToken) {
         this.token = token;
         this.refreshToken = refreshToken;
     }
+
 
 
 }

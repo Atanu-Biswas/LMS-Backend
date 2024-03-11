@@ -2,6 +2,7 @@ package com.project.library.management.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "book")
+@Order(2)
 public class Book {
 
     @Id
