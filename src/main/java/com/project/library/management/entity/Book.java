@@ -5,10 +5,13 @@ import lombok.Data;
 
 import java.util.List;
 
+import org.springframework.core.annotation.Order;
+
 
 @Data
 @Entity
 @Table(name = "book")
+@Order(2)
 public class Book {
 
     @Id

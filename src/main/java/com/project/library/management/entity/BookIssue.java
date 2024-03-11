@@ -5,9 +5,12 @@ import lombok.Data;
 
 import java.util.Date;
 
+import org.springframework.core.annotation.Order;
+
 @Data
 @Entity
 @Table(name = "book_issue")
+@Order(3)
 public class BookIssue {
 
     @Id

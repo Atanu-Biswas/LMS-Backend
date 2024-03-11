@@ -35,4 +35,34 @@ public class BookRequestService {
         bookRequestRepository.save(request);
         return true;
     }
+
+    public boolean cancelRequest(Long requestId) {
+        BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
+        if (request!=null && request.getStatus().equals("PENDING")) {
+            request.setStatus("CANCELLED");
+            bookRequestRepository.save(request);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean acceptRequest(Long requestId) {
+        BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
+        if (request!=null && request.getStatus().equals("PENDING")) {
+            request.setStatus("ACCEPTED");
+            bookRequestRepository.save(request);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean declineRequest(Long requestId) {
+        BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
+        if (request!=null && request.getStatus().equals("PENDING")) {
+            request.setStatus("REJECTED");
+            bookRequestRepository.save(request);
+            return true;
+        }
+        return false;
+    }
 }

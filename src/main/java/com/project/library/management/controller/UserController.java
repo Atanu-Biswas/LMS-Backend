@@ -25,11 +25,16 @@ public class UserController {
     protected ResponseEntity<Boolean> isUsernameAvailable(@Param("username") String username) {
         return ResponseEntity.ok(userService.isUsernameAvailable(username));
     }
-    @PostMapping("/request-book")
+    @PostMapping("/issue-request")
     public ResponseEntity<String> issueBookRequest(@RequestBody BookRequestDTO bookRequestDTO, HttpServletRequest request) {
         String username = request.getUserPrincipal().getName();
         boolean isIssueSuccessful = bookRequestService.issueRequest(username, bookRequestDTO);
         return ResponseEntity.ok(isIssueSuccessful ? "Book Requested Successfully!!!" : "Book Request Unsuccessfull!!!");
     }
+    @GetMapping("/cancel-request")
+    public ResponseEntity<String> declineBookRequest(@Param("requestId") Long requestId){
+        boolean isRequestCancelled = bookRequestService.cancelRequest(requestId);
+        return ResponseEntity.ok(isRequestCancelled ? "Book Request Cancelled!!!" : "Book Request Retained!!!");
 
+    }
 }
