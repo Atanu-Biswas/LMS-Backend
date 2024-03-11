@@ -14,24 +14,20 @@ import org.springframework.stereotype.Service;
 public class BookService {
   private final BookRepository bookRepository;
   private final PublisherService publisherService;
-  
-  public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException {
-   Publisher publisher=publisherService.getPublisherById(bookDTO.getPublisherId());
-   System.out.println("publisher: "+publisher);
-   Book book = new Book();
-   book.setAuthor(bookDTO.getAuthor());
-   book.setTitle(bookDTO.getTitle());
-   book.setImageUrl(bookDTO.getImageUrl());
-   book.setIsbn(bookDTO.getIsbn());
-   book.setPrintYear(bookDTO.getPrintYear());
-   book.setQuantityAvailable(bookDTO.getQuantityAvailable());
-   book.setActive(bookDTO.isActive());
-   book.setPublisher(publisher);
-   System.out.println("book: "+book);
-  // bookRepository.save(book);
-   bookRepository.save(book);
-   System.out.println("book: "+book);
-   return true;
+
+ public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException {
+  Publisher publisher=publisherService.getPublisherById(bookDTO.getPublisherId());
+  Book book = new Book();
+  book.setAuthor(bookDTO.getAuthor());
+  book.setTitle(bookDTO.getTitle());
+  book.setImageUrl(bookDTO.getImageUrl());
+  book.setIsbn(bookDTO.getIsbn());
+  book.setPrintYear(bookDTO.getPrintYear());
+  book.setQuantityAvailable(bookDTO.getQuantityAvailable());
+  book.setActive(bookDTO.isActive());
+  book.setPublisher(publisher);
+  bookRepository.save(book);
+  return true;
  }
    public BookDTO getBookByName(String name){
     Book book=bookRepository.findBookByTitle(name);

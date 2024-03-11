@@ -1,6 +1,7 @@
 package com.project.library.management.controller;
 
 import com.project.library.management.dto.BookDTO;
+import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.service.BookRequestService;
 import com.project.library.management.service.BookService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@AllArgsConstructor
+
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminController {
@@ -24,11 +25,13 @@ public class AdminController {
         return ResponseEntity.ok("Hello from admin only url");
     }
     @GetMapping("/accept-request")
+    //working
     protected ResponseEntity<String> acceptRequest(@Param("requestId") Long requestId) {
         boolean isRequestAccepted = bookRequestService.acceptRequest(requestId);
         return ResponseEntity.ok(isRequestAccepted ? "Book Request Accepted!!!" : "Book Request still Pending!!!");
     }
     @GetMapping("/decline-request")
+    //working
     protected ResponseEntity<String> declineRequest(@Param("requestId") Long requestId) {
         boolean isRequestDeclined = bookRequestService.declineRequest(requestId);
         return ResponseEntity.ok(isRequestDeclined ? "Book Request Rejected!!!" : "Book Request still Pending!!!");
@@ -38,6 +41,7 @@ public class AdminController {
 
 
     @PostMapping("/addBook")
+    //working
     protected ResponseEntity<String> addBook(@RequestBody BookDTO bookDTO) throws PublisherNotFoundException {
      System.out.println("bookDTO: "+bookDTO);
         bookService.addBook(bookDTO);
@@ -45,6 +49,7 @@ public class AdminController {
     }
 
     @GetMapping("/getBookByName/{name}" )
+    //working
     protected ResponseEntity<BookDTO> getBookByName(@PathVariable("name") String name){
        BookDTO book=bookService.getBookByName(name);
        return ResponseEntity.of(Optional.of(book));
