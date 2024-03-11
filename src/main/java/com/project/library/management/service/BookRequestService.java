@@ -9,7 +9,7 @@ import com.project.library.management.entity.Book;
 import com.project.library.management.entity.BookRequest;
 import com.project.library.management.entity.User;
 import com.project.library.management.repository.BookRequestRepository;
-import com.project.library.management.repository.BookRespository;
+import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BookRequestService {
     private final BookRequestRepository bookRequestRepository;
-    private final BookRespository bookRespository;
+    private final BookRepository bookRespository;
     private final UserRepository userRepository;
 
     public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) {
