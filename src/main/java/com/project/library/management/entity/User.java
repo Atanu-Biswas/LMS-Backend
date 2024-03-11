@@ -13,7 +13,6 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "users")
-@Order(2)
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

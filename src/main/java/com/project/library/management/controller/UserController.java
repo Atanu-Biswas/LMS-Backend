@@ -32,4 +32,10 @@ public class UserController {
         boolean isIssueSuccessful = bookRequestService.issueRequest(username, bookRequestDTO);
         return ResponseEntity.ok(isIssueSuccessful ? "Book Requested Successfully!!!" : "Book Request Unsuccessfull!!!");
     }
+    @GetMapping("/cancel-request")
+    public ResponseEntity<String> declineBookRequest(@Param("requestId") Long requestId){
+        boolean isRequestCancelled = bookRequestService.cancelRequest(requestId);
+        return ResponseEntity.ok(isRequestCancelled ? "Book Request Cancelled!!!" : "Book Request Retained!!!");
+
+    }
 }

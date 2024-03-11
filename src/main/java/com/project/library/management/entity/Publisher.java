@@ -7,10 +7,11 @@ import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
+import org.springframework.core.annotation.Order;
+
 @Data
 @Entity
 @Table(name = "publisher")
-@Order(0)
 public class Publisher {
 
     @Id
@@ -25,7 +26,7 @@ public class Publisher {
     private String phoneNo;
 
     @OneToMany(mappedBy = "publisher")
-    @ToString.Exclude private List<Book> books;
+    private List<Book> books;
 
 
 
