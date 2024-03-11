@@ -1,11 +1,6 @@
 package com.project.library.management.service;
 
 
-
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.project.library.management.dto.BookDTO;
 import com.project.library.management.entity.Book;
 import com.project.library.management.entity.Publisher;
@@ -22,6 +17,7 @@ public class BookService {
   
   public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException {
    Publisher publisher=publisherService.getPublisherById(bookDTO.getPublisherId());
+   System.out.println("publisher: "+publisher);
    Book book = new Book();
    book.setAuthor(bookDTO.getAuthor());
    book.setTitle(bookDTO.getTitle());
@@ -31,11 +27,14 @@ public class BookService {
    book.setQuantityAvailable(bookDTO.getQuantityAvailable());
    book.setActive(bookDTO.isActive());
    book.setPublisher(publisher);
+   System.out.println("book: "+book);
+  // bookRepository.save(book);
    bookRepository.save(book);
+   System.out.println("book: "+book);
    return true;
  }
    public BookDTO getBookByName(String name){
-    Book book=bookRepository.findBookBytitle(name);
+    Book book=bookRepository.findBookByTitle(name);
     //Publisher publisher=publisherService.getPublisherById(book.getPublisher().getPublisherId());
     BookDTO bookDTO=new BookDTO();
     bookDTO.setAuthor(book.getAuthor());

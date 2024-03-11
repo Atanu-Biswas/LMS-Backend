@@ -1,18 +1,13 @@
 package com.project.library.management.controller;
 
-import java.util.Optional;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import com.project.library.management.dto.BookDTO;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.service.BookService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 
 @RestController
@@ -21,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 public class AdminController {
     private final BookService bookService;
+
 
     @GetMapping("/test")
     protected ResponseEntity<String> test() {
@@ -32,7 +28,8 @@ public class AdminController {
 
     @PostMapping("/addBook")
     protected ResponseEntity<String> addBook(@RequestBody BookDTO bookDTO) throws PublisherNotFoundException {
-     boolean isbookAddedSuccessfully= bookService.addBook(bookDTO);
+     System.out.println("bookDTO: "+bookDTO);
+        bookService.addBook(bookDTO);
       return ResponseEntity.ok("book is added successfully");
     }
 

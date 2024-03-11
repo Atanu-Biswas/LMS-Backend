@@ -2,12 +2,15 @@ package com.project.library.management.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
 @Data
 @Entity
 @Table(name = "publisher")
+@Order(0)
 public class Publisher {
 
     @Id
@@ -22,7 +25,7 @@ public class Publisher {
     private String phoneNo;
 
     @OneToMany(mappedBy = "publisher")
-    private List<Book> books;
+    @ToString.Exclude private List<Book> books;
 
 
 

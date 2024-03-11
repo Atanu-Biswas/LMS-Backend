@@ -2,12 +2,14 @@ package com.project.library.management.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.core.annotation.Order;
 
 import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "book_issue")
+@Order(5)
 public class BookIssue {
 
     @Id

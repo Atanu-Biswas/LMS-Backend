@@ -28,10 +28,8 @@ public class UserController {
     @PostMapping("/request-book")
     public ResponseEntity<String> issueBookRequest(@RequestBody BookRequestDTO bookRequestDTO, HttpServletRequest request) {
         String username = request.getUserPrincipal().getName();
+        System.out.println("username: "+username);
         boolean isIssueSuccessful = bookRequestService.issueRequest(username, bookRequestDTO);
         return ResponseEntity.ok(isIssueSuccessful ? "Book Requested Successfully!!!" : "Book Request Unsuccessfull!!!");
     }
-
-    
-
 }
