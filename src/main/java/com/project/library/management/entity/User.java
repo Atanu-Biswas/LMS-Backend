@@ -2,20 +2,31 @@ package com.project.library.management.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
+import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 @Data
 @Entity
 @Table(name = "users")
+@Order(1)
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+
+
+
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+
     private String userId;
 
     @Column(nullable = false)
@@ -41,6 +52,9 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<BookRequest> bookRequests;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude private Collection<RefreshToken> refreshToken = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

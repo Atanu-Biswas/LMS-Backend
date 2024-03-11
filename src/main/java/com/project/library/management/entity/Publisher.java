@@ -2,7 +2,9 @@ package com.project.library.management.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import lombok.ToString;
+
 import org.springframework.core.annotation.Order;
 
 import java.util.List;
@@ -12,6 +14,7 @@ import org.springframework.core.annotation.Order;
 @Data
 @Entity
 @Table(name = "publisher")
+@Order(1)
 public class Publisher {
 
     @Id

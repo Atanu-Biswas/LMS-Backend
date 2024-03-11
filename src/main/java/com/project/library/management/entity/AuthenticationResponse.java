@@ -5,12 +5,12 @@ import lombok.Data;
 @Data
 public class AuthenticationResponse {
     private String token;
-
-
-    public AuthenticationResponse(String token) {
+    private String refreshToken;
+    public AuthenticationResponse(String token, String refreshToken) {
         this.token = token;
-
+        this.refreshToken = refreshToken;
     }
+
 
 
 }
