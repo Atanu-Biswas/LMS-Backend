@@ -32,7 +32,7 @@ public class BookIssue {
     @Column(nullable = false)
     private Date dueDate;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Date returnDate;
 
     private String fine = "0";

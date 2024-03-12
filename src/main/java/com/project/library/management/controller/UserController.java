@@ -1,11 +1,18 @@
 package com.project.library.management.controller;
 
+import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.BookRequestDTO;
+import com.project.library.management.exception.AuthorNotFoundException;
+import com.project.library.management.exception.BookNotFoundException;
 import com.project.library.management.service.BookRequestService;
+import com.project.library.management.service.BookService;
 import com.project.library.management.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final BookRequestService bookRequestService;
+    private final BookService bookService;
     @GetMapping("/test")
     protected ResponseEntity<String> test() {
         return ResponseEntity.ok("Hello from user only url");
@@ -40,5 +48,18 @@ public class UserController {
         boolean isRequestCancelled = bookRequestService.cancelRequest(requestId);
         return ResponseEntity.ok(isRequestCancelled ? "Book Request Cancelled!!!" : "Book Request Retained!!!");
 
+    }
+
+     @GetMapping("/getBookByName/{name}" )
+    protected ResponseEntity<BookDTO> getBookByName (@PathVariable("name") String name) throws BookNotFoundException {
+       BookDTO book=bookService.getBookByName(name);
+       return ResponseEntity.of(Optional.of(book));
+    }
+    
+    @GetMapping("/getBookByAuthorName/{author}" )
+    protected ResponseEntity<List<BookDTO>> getBooksByAuthorName (@PathVariable("author") String author) throws AuthorNotFoundException {
+      List <BookDTO> book=bookService.getBooksByAuthor(author);
+     
+       return ResponseEntity.ok(book);
     }
 }
