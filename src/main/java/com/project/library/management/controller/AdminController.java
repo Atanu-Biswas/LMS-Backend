@@ -2,14 +2,12 @@ package com.project.library.management.controller;
 
 import com.project.library.management.dto.BookDTO;
 import com.project.library.management.exception.PublisherNotFoundException;
+import com.project.library.management.service.BookIssueService;
 import com.project.library.management.service.BookRequestService;
 import com.project.library.management.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -26,6 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AdminController {
     private final BookRequestService bookRequestService;
+    private final BookIssueService bookIssueService;
     private final BookService bookService;
 
 
@@ -62,6 +61,15 @@ public class AdminController {
     protected ResponseEntity<BookDTO> getBookByName(@PathVariable("name") String name){
        BookDTO book=bookService.getBookByName(name);
        return ResponseEntity.of(Optional.of(book));
+    }
+
+    //Accept return end point
+    @PostMapping("/accept-return")
+    protected ResponseEntity<String> acceptReturn(@RequestParam("issueId") Long issueId){
+
+        boolean isReturnAccepted = bookIssueService.acceptReturn(issueId);
+        
+        return ResponseEntity.ok(isReturnAccepted ? "Book return is successfully accepted" : "Book return is unsuccessful!!!");
     }
 
 }
