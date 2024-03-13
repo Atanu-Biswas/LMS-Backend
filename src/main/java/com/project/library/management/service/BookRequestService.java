@@ -3,6 +3,7 @@ package com.project.library.management.service;
 import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.BookIssueDTO;
 import com.project.library.management.dto.BookRequestDTO;
+import com.project.library.management.dto.ManageBookRequestDTO;
 import com.project.library.management.entity.Book;
 import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.BookRequest;
@@ -14,8 +15,10 @@ import com.project.library.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -87,5 +90,22 @@ public class BookRequestService {
             return true;
         }
         return false;
+    }
+
+    public List<ManageBookRequestDTO> getLast10BookRequests() {
+        List<BookRequest> last10Requests = bookRequestRepository.findTop10ByOrderByRequestDateDesc();
+        return convertToDTOs(last10Requests);
+    }
+
+    private List<ManageBookRequestDTO> convertToDTOs(List<BookRequest> bookRequests) {
+        List<ManageBookRequestDTO> dtos = new ArrayList<>();
+        for (BookRequest request : bookRequests) {
+            ManageBookRequestDTO dto = new ManageBookRequestDTO();
+            dto.setUsername(request.getUser().getUsername());
+            dto.setBookTitle(request.getBook().getTitle());
+            dto.setRequestDate(request.getRequestDate());
+            dtos.add(dto);
+        }
+        return dtos;
     }
 }
