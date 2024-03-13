@@ -1,14 +1,13 @@
 package com.project.library.management.service;
 
 
-import org.springframework.stereotype.Service;
-
 import com.project.library.management.dto.PublisherDTO;
 import com.project.library.management.entity.Publisher;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.repository.PublisherRepository;
-
+import org.springframework.transaction.annotation.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
@@ -16,6 +15,12 @@ public class PublisherService {
 
 
     private final PublisherRepository publisherRepository;
+
+
+    public Publisher getPublisherById(Long Id) throws PublisherNotFoundException {
+        return publisherRepository.findById(Id).orElseThrow(PublisherNotFoundException::new);
+    }
+
 
     public Publisher addPublisher(PublisherDTO publisherDTO){
         Publisher publisher = new Publisher();
@@ -46,7 +51,7 @@ public class PublisherService {
         publisherRepository.save(publisher);
     }
 
-
+    @Transactional
     public void deletePublisher(Long publisherId){
         publisherRepository.deleteById(publisherId);
     }

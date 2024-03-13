@@ -1,30 +1,24 @@
 package com.project.library.management.controller;
 
-import java.util.Optional;
-
-import org.springframework.data.repository.query.Param;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.PublisherDTO;
-
+import com.project.library.management.exception.BookIdNotFoundException;
+import com.project.library.management.exception.PublisherNotFoundException;
+import com.project.library.management.service.BookRequestService;
+import com.project.library.management.service.BookService;
 import com.project.library.management.service.PublisherService;
-
 import lombok.AllArgsConstructor;
+import org.springframework.data.repository.query.Param;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/admin")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class AdminController {
     private final BookRequestService bookRequestService;
     private final BookService bookService;
@@ -59,8 +53,9 @@ public class AdminController {
         return ResponseEntity.ok("book is added successfully");
     }
 
-    @PostMapping("/enableDisable/{id}")
-    protected ResponseEntity<String> enableDisableBook(@PathVariable("id") Long id) throws BookIdNotFoundException{
+    @PostMapping("/enableDisable")
+    //WORKING
+    protected ResponseEntity<String> enableDisableBook(@Param("id") Long id) throws BookIdNotFoundException {
         boolean isBookDisabled=bookService.enableDisableBook(id);
         return ResponseEntity.ok(isBookDisabled ?"Book Is Disabled" :"Book Is Enabled");
     }
@@ -68,6 +63,7 @@ public class AdminController {
 
 
     @PostMapping("/publisher")
+//    working
     protected ResponseEntity<String> addPublisher(@RequestBody PublisherDTO publisherDTO){
 
         publisherService.addPublisher(publisherDTO);
@@ -76,6 +72,7 @@ public class AdminController {
     }
 
     @GetMapping("/publisher")
+//    working
     protected ResponseEntity<PublisherDTO> getPublisher(@Param("id") Long id){
 
         PublisherDTO publisherDTO = publisherService.getPublisher(id);
@@ -84,6 +81,7 @@ public class AdminController {
     }
 
     @PutMapping("/publisher")
+    //working
     protected ResponseEntity<String> updatePublisher(@RequestBody PublisherDTO publisherDTO, @Param("id") Long id){
 
         publisherService.updatePublisher(publisherDTO,id);
@@ -92,7 +90,8 @@ public class AdminController {
     }
 
     @DeleteMapping("/publisher")
-    protected ResponseEntity<String> deletePublisher(@RequestParam Long publisherId){
+    //working
+    protected ResponseEntity<String> deletePublisher(@Param("publisherId") Long publisherId){
         System.out.println("Id "+publisherId);
         publisherService.deletePublisher(publisherId);
 

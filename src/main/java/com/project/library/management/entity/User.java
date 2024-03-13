@@ -21,12 +21,8 @@ import java.util.List;
 @Order(1)
 public class User implements UserDetails {
     @Id
-
-
-
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-
     private String userId;
 
     @Column(nullable = false)

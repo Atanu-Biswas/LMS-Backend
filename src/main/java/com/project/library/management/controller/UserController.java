@@ -7,16 +7,14 @@ import com.project.library.management.exception.BookNotFoundException;
 import com.project.library.management.service.BookRequestService;
 import com.project.library.management.service.BookService;
 import com.project.library.management.service.UserService;
-
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
@@ -50,14 +48,14 @@ public class UserController {
 
     }
 
-     @GetMapping("/getBookByName/{name}" )
-    protected ResponseEntity<BookDTO> getBookByName (@PathVariable("name") String name) throws BookNotFoundException {
+     @GetMapping("/getBookByName" )
+    protected ResponseEntity<BookDTO> getBookByName (@Param("name") String name) throws BookNotFoundException {
        BookDTO book=bookService.getBookByName(name);
        return ResponseEntity.of(Optional.of(book));
     }
     
-    @GetMapping("/getBookByAuthorName/{author}" )
-    protected ResponseEntity<List<BookDTO>> getBooksByAuthorName (@PathVariable("author") String author) throws AuthorNotFoundException {
+    @GetMapping("/getBookByAuthorName" )
+    protected ResponseEntity<List<BookDTO>> getBooksByAuthorName (@Param("author") String author) throws AuthorNotFoundException {
       List <BookDTO> book=bookService.getBooksByAuthor(author);
      
        return ResponseEntity.ok(book);

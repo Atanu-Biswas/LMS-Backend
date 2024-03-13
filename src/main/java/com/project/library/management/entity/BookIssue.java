@@ -6,8 +6,6 @@ import org.springframework.core.annotation.Order;
 
 import java.util.Date;
 
-import org.springframework.core.annotation.Order;
-
 @Data
 @Entity
 @Table(name = "book_issue")
@@ -35,9 +33,10 @@ public class BookIssue {
     @Column(nullable = true)
     private Date returnDate;
 
-    private String fine = "0";
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Fine fineStatus;
 
-
-
+    private int fine = 0;
    // Getters and setters omitted for brevity
 }
