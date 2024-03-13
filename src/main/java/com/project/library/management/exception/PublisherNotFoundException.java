@@ -1,7 +1,7 @@
 package com.project.library.management.exception;
 
-public class PublisherNotFoundException extends Exception {
+public class PublisherNotFoundException extends RuntimeException{
     public PublisherNotFoundException() {
-        super("Publisher not found!!!");
+        super("Publisher Not Found Exception");
     }
 }

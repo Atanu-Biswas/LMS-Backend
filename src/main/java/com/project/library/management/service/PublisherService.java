@@ -3,7 +3,7 @@ package com.project.library.management.service;
 
 import org.springframework.stereotype.Service;
 
-
+import com.project.library.management.dto.PublisherDTO;
 import com.project.library.management.entity.Publisher;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.repository.PublisherRepository;
@@ -13,10 +13,41 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class PublisherService {
+
+
     private final PublisherRepository publisherRepository;
-    
-    public Publisher getPublisherById(Long Id) throws PublisherNotFoundException {
-        return publisherRepository.findById(Id).orElseThrow(PublisherNotFoundException::new);
+
+    public Publisher addPublisher(PublisherDTO publisherDTO){
+        Publisher publisher = new Publisher();
+        publisher.setName(publisherDTO.getName());
+        publisher.setEmail(publisherDTO.getEmail());
+        publisher.setPhoneNo(publisherDTO.getPhoneNo());
+
+        Publisher savedPublisher = publisherRepository.save(publisher);
+        return savedPublisher;
     }
 
+    public PublisherDTO getPublisher(Long publisherId) throws PublisherNotFoundException{
+        Publisher publisher= publisherRepository.findByPublisherId(publisherId).orElseThrow(()->new PublisherNotFoundException());
+        PublisherDTO publisherDTO = new PublisherDTO();
+        publisherDTO.setName(publisher.getName());
+        publisherDTO.setPhoneNo(publisher.getPhoneNo());
+        publisherDTO.setEmail(publisher.getEmail());
+
+        return publisherDTO;
+    }
+
+    public void updatePublisher(PublisherDTO publisherDTO, Long id) {
+        Publisher publisher = publisherRepository.findByPublisherId(id).orElseThrow(PublisherNotFoundException::new);
+        publisher.setName(publisherDTO.getName());
+        publisher.setEmail(publisherDTO.getEmail());
+        publisher.setPhoneNo(publisherDTO.getPhoneNo());
+
+        publisherRepository.save(publisher);
+    }
+
+
+    public void deletePublisher(Long publisherId){
+        publisherRepository.deleteById(publisherId);
+    }
 }
