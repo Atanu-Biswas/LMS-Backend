@@ -6,8 +6,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.project.library.management.entity.BookIssue;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface BookIssueRepository extends JpaRepository<BookIssue, Long> {
-    @Query("SELECT bi FROM BookIssue bi WHERE bi.user.username = :username")
-    List<BookIssue> findByUsername(String username);
+import java.util.List;
+
+
+public interface BookIssueRepository extends JpaRepository<BookIssue, Integer>{
+    @Query("SELECT b FROM BookIssue b WHERE b.user.username=:username AND b.fineStatus='UNPAID'")
+    List<BookIssue> calculateFinesByUserName(@Param("username") String username);
+
 }
