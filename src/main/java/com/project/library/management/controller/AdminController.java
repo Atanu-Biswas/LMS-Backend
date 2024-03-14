@@ -4,6 +4,7 @@ import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.PublisherDTO;
 import com.project.library.management.exception.BookIdNotFoundException;
 import com.project.library.management.exception.PublisherNotFoundException;
+import com.project.library.management.exception.SQLException;
 import com.project.library.management.service.BookRequestService;
 import com.project.library.management.service.BookService;
 import com.project.library.management.service.PublisherService;
@@ -64,7 +65,7 @@ public class AdminController {
 
     @PostMapping("/publisher")
 //    working
-    protected ResponseEntity<String> addPublisher(@RequestBody PublisherDTO publisherDTO){
+    protected ResponseEntity<String> addPublisher(@RequestBody PublisherDTO publisherDTO) throws SQLException{
 
         publisherService.addPublisher(publisherDTO);
 
@@ -73,7 +74,7 @@ public class AdminController {
 
     @GetMapping("/publisher")
 //    working
-    protected ResponseEntity<PublisherDTO> getPublisher(@Param("id") Long id){
+    protected ResponseEntity<PublisherDTO> getPublisher(@Param("id") Long id) throws PublisherNotFoundException{
 
         PublisherDTO publisherDTO = publisherService.getPublisher(id);
 
@@ -82,7 +83,7 @@ public class AdminController {
 
     @PutMapping("/publisher")
     //working
-    protected ResponseEntity<String> updatePublisher(@RequestBody PublisherDTO publisherDTO, @Param("id") Long id){
+    protected ResponseEntity<String> updatePublisher(@RequestBody PublisherDTO publisherDTO, @Param("id") Long id) throws PublisherNotFoundException{
 
         publisherService.updatePublisher(publisherDTO,id);
 
@@ -91,7 +92,7 @@ public class AdminController {
 
     @DeleteMapping("/publisher")
     //working
-    protected ResponseEntity<String> deletePublisher(@Param("publisherId") Long publisherId){
+    protected ResponseEntity<String> deletePublisher(@Param("publisherId") Long publisherId) throws PublisherNotFoundException{
         System.out.println("Id "+publisherId);
         publisherService.deletePublisher(publisherId);
 
