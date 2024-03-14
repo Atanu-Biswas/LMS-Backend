@@ -3,6 +3,7 @@ package com.project.library.management.controller;
 import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.ManageBookRequestDTO;
 import com.project.library.management.dto.PublisherDTO;
+import com.project.library.management.dto.UserDTO;
 import com.project.library.management.entity.Book;
 import com.project.library.management.entity.BookRequest;
 import com.project.library.management.exception.BookIdNotFoundException;
@@ -11,6 +12,7 @@ import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.service.BookRequestService;
 import com.project.library.management.service.BookService;
 import com.project.library.management.service.PublisherService;
+import com.project.library.management.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,7 @@ public class AdminController {
     private final BookRequestService bookRequestService;
     private final BookRequestRepository bookRequestRepository;
     private final BookService bookService;
+    private final UserService userService;
 
 
     private final PublisherService publisherService;
@@ -113,5 +116,10 @@ public class AdminController {
     public ResponseEntity<List<ManageBookRequestDTO>> getLast10BookRequests() {
         List<ManageBookRequestDTO> last10Requests = bookRequestService.getLast10BookRequests();
         return ResponseEntity.ok(last10Requests);
+    }
+    @GetMapping("/view-user")
+    public ResponseEntity<UserDTO> viewUserByUsername(@RequestParam String username) {
+        UserDTO userDTO = userService.getUserByUsername(username);
+        return ResponseEntity.ok(userDTO);
     }
 }
