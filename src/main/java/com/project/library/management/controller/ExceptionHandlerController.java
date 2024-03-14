@@ -18,11 +18,11 @@ import com.project.library.management.exception.PublisherNotFoundException;
 @ControllerAdvice
 public class ExceptionHandlerController {
     @ExceptionHandler(value = PublisherNotFoundException.class)
-    protected ResponseEntity<ErrorDTO> handleInvalidCredentialsException() {
+    protected ResponseEntity<ErrorDTO> handleInvalidCredentialsException(PublisherNotFoundException e) {
         return new ResponseEntity<>(
                 ErrorDTO
                         .builder()
-                        .message("Publisher Not Found Exception")
+                        .message(e.getMessage())
                         .timestamp(new Date())
                         .build(),
                 HttpStatus.BAD_REQUEST);
