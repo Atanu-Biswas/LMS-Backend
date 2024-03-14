@@ -16,12 +16,6 @@ public class PublisherService {
 
     private final PublisherRepository publisherRepository;
 
-
-    public Publisher getPublisherById(Long Id) throws PublisherNotFoundException {
-        return publisherRepository.findById(Id).orElseThrow(PublisherNotFoundException::new);
-    }
-
-
     public Publisher addPublisher(PublisherDTO publisherDTO){
         Publisher publisher = new Publisher();
         publisher.setName(publisherDTO.getName());

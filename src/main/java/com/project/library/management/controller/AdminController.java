@@ -5,7 +5,9 @@ import com.project.library.management.dto.ManageBookRequestDTO;
 import com.project.library.management.dto.PublisherDTO;
 import com.project.library.management.entity.Book;
 import com.project.library.management.entity.BookRequest;
+import com.project.library.management.exception.AuthorNotFoundException;
 import com.project.library.management.exception.BookIdNotFoundException;
+import com.project.library.management.exception.BookNotFoundException;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.service.BookIssueService;
 import com.project.library.management.repository.BookRequestRepository;
@@ -67,12 +69,7 @@ public class AdminController {
         return ResponseEntity.ok("book is added successfully");
     }
 
-//    @PutMapping("update")
-//    protected ResponseEntity<String> updateBook(@Param("id")long id){
-//        Book updatedBook= BookDTO.findById(id).get();
-//    }
-
-    @PostMapping("/enableDisable")
+    @PostMapping("/enable-disable-book")
     //WORKING
     protected ResponseEntity<String> enableDisableBook(@Param("id") Long id) throws BookIdNotFoundException {
         boolean isBookDisabled=bookService.enableDisableBook(id);
@@ -145,5 +142,23 @@ public class AdminController {
     public ResponseEntity<String> updateBook(@Param("bookId") Long bookId, @RequestBody BookDTO updateBookRequest) {
         bookService.updateBook(bookId, updateBookRequest);
         return ResponseEntity.ok("Book updated successfully");
+    }
+     @GetMapping("/get-book-by-title" )
+    protected ResponseEntity<List<BookDTO>> getBookByName (@Param("title") String title) throws BookNotFoundException {
+        List<BookDTO> bookDTOs=bookService.getBookByTitle(title);
+        return ResponseEntity.ok(bookDTOs);
+    }
+
+    @GetMapping("/get-book-by-authorName" )
+    protected ResponseEntity<List<BookDTO>> getBooksByAuthorName (@Param("authorName") String authorName) throws AuthorNotFoundException {
+      List <BookDTO> bookDTOs=bookService.getBooksByAuthor(authorName);
+
+       return ResponseEntity.ok(bookDTOs);
+    }
+    @GetMapping("/get-book-by-publisherName" )
+    protected ResponseEntity<List<BookDTO>> getBooksByPublisherName (@Param("publisherName") String publisherName) throws AuthorNotFoundException {
+      List <BookDTO> book=bookService.getBooksByPublisher(publisherName);
+
+       return ResponseEntity.ok(book);
     }
 }

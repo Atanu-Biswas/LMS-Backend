@@ -8,6 +8,8 @@ import com.project.library.management.exception.BookIdNotFoundException;
 import com.project.library.management.exception.BookNotFoundException;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.repository.BookRepository;
+import com.project.library.management.repository.PublisherRepository;
+
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
@@ -21,10 +23,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BookService {
   private final BookRepository bookRepository;
+  private final PublisherRepository publisherRepository;
   private final PublisherService publisherService;
 
   public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException {
-    Publisher publisher = publisherService.getPublisherById(bookDTO.getPublisherId());
+    Publisher publisher = publisherRepository.findPublisherById(bookDTO.getPublisherId());
     Book book = new Book();
     book.setAuthor(bookDTO.getAuthor());
     book.setTitle(bookDTO.getTitle());
@@ -38,13 +41,16 @@ public class BookService {
     return true;
   }
 
-   public BookDTO getBookByName  (String name) throws BookNotFoundException{
-    Book book=bookRepository.findBookByTitle(name);
-    //Publisher publisher=publisherService.getPublisherById(book.getPublisher().getPublisherId());
-    if (book == null) {
+  public List<BookDTO> getBookByTitle(String name) throws BookNotFoundException {
+    List<Book> books = bookRepository.findBookByTitle(name);
+    // Publisher
+    // publisher=publisherService.getPublisherById(book.getPublisher().getPublisherId());
+    if (books.isEmpty()) {
       throw new BookNotFoundException("Book with title '" + name + "' not found");
-  }
-    BookDTO bookDTO=new BookDTO();
+    }
+    List<BookDTO> bookDTOs = new ArrayList<>();
+    for (Book book : books) {
+    BookDTO bookDTO = new BookDTO();
     bookDTO.setAuthor(book.getAuthor());
     bookDTO.setTitle(book.getTitle());
     bookDTO.setImageUrl(book.getImageUrl());
@@ -53,30 +59,57 @@ public class BookService {
     bookDTO.setQuantityAvailable(book.getQuantityAvailable());
     bookDTO.setActive(bookDTO.isActive());
     bookDTO.setPublisherId(book.getPublisher().getPublisherId());
-    return bookDTO;
-   }
+    bookDTOs.add(bookDTO);
+  }
 
-   public List<BookDTO> getBooksByAuthor  (String author) throws AuthorNotFoundException{
-   
-    List<Book> books =  bookRepository.findByAuthorIgnoreCase(author);
+  return bookDTOs;
+  }
 
-   
-     if (books.isEmpty()) {
-        throw new AuthorNotFoundException("No books found for author '" + author + "'");
+  public List<BookDTO> getBooksByAuthor(String author) throws AuthorNotFoundException {
+
+    List<Book> books = bookRepository.findByAuthorIgnoreCase(author);
+
+    if (books.isEmpty()) {
+      throw new AuthorNotFoundException("No books found for author '" + author + "'");
     }
 
     List<BookDTO> bookDTOs = new ArrayList<>();
     for (Book book : books) {
-        BookDTO bookDTO = new BookDTO();
-        bookDTO.setAuthor(book.getAuthor());
-        bookDTO.setTitle(book.getTitle());
-        bookDTO.setImageUrl(book.getImageUrl());
-        bookDTO.setIsbn(book.getIsbn());
-        bookDTO.setPrintYear(book.getPrintYear());
-        bookDTO.setQuantityAvailable(book.getQuantityAvailable());
-        bookDTO.setActive(book.isActive());
-        bookDTO.setPublisherId(book.getPublisher().getPublisherId());
-        bookDTOs.add(bookDTO);
+      BookDTO bookDTO = new BookDTO();
+      bookDTO.setAuthor(book.getAuthor());
+      bookDTO.setTitle(book.getTitle());
+      bookDTO.setImageUrl(book.getImageUrl());
+      bookDTO.setIsbn(book.getIsbn());
+      bookDTO.setPrintYear(book.getPrintYear());
+      bookDTO.setQuantityAvailable(book.getQuantityAvailable());
+      bookDTO.setActive(book.isActive());
+      bookDTO.setPublisherId(book.getPublisher().getPublisherId());
+      bookDTOs.add(bookDTO);
+    }
+
+    return bookDTOs;
+  }
+
+  public List<BookDTO> getBooksByPublisher(String publisherName) throws PublisherNotFoundException {
+
+    List<Book> books = bookRepository.findByPublisher(publisherName);
+
+    if (books.isEmpty()) {
+      throw new PublisherNotFoundException("No books found for publisher '" + publisherName + "'");
+    }
+
+    List<BookDTO> bookDTOs = new ArrayList<>();
+    for (Book book : books) {
+      BookDTO bookDTO = new BookDTO();
+      bookDTO.setAuthor(book.getAuthor());
+      bookDTO.setTitle(book.getTitle());
+      bookDTO.setImageUrl(book.getImageUrl());
+      bookDTO.setIsbn(book.getIsbn());
+      bookDTO.setPrintYear(book.getPrintYear());
+      bookDTO.setQuantityAvailable(book.getQuantityAvailable());
+      bookDTO.setActive(book.isActive());
+      bookDTO.setPublisherId(book.getPublisher().getPublisherId());
+      bookDTOs.add(bookDTO);
     }
     
     return bookDTOs;
@@ -111,4 +144,5 @@ public class BookService {
 
         bookRepository.save(book);
     }
+  }
 }

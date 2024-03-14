@@ -54,10 +54,10 @@ public class UserController {
 
     }
 
-     @GetMapping("/getBookByName" )
-    protected ResponseEntity<BookDTO> getBookByName (@Param("name") String name) throws BookNotFoundException {
-       BookDTO book=bookService.getBookByName(name);
-       return ResponseEntity.of(Optional.of(book));
+     @GetMapping("/get-book-by-title" )
+    protected ResponseEntity<List<BookDTO>> getBookByName (@Param("title") String title) throws BookNotFoundException {
+        List<BookDTO> bookDTOs=bookService.getBookByTitle(title);
+       return ResponseEntity.ok(bookDTOs);
     }
 
     @GetMapping("/getBookByAuthorName")
@@ -67,6 +67,11 @@ public class UserController {
         return ResponseEntity.ok(book);
 
     @GetMapping("/getBookByAuthorName" )
+    protected ResponseEntity<List<BookDTO>> getBooksByAuthorName (@Param("author") String author) throws AuthorNotFoundException {
+      List <BookDTO> book=bookService.getBooksByAuthor(author);
+
+
+    @GetMapping("/get-book-by-authorName" )
     protected ResponseEntity<List<BookDTO>> getBooksByAuthorName (@Param("author") String author) throws AuthorNotFoundException {
       List <BookDTO> book=bookService.getBooksByAuthor(author);
 
