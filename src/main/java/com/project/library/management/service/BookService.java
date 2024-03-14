@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -100,4 +101,14 @@ public class BookService {
 
     return !isEnable;
    }
+
+    public void updateBook(Long bookId, BookDTO updateBookRequest) {
+        Book book = bookRepository.findByBookId(bookId);
+
+        // Update book properties based on DTO values
+        book.setTitle(updateBookRequest.getTitle());
+        book.setAuthor(updateBookRequest.getAuthor());
+
+        bookRepository.save(book);
+    }
 }

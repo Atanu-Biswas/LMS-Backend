@@ -36,27 +36,25 @@ public class AdminController {
     }
 
     @GetMapping("/accept-request")
-    //working
+    // working
     protected ResponseEntity<String> acceptRequest(@Param("requestId") Long requestId) {
         boolean isRequestAccepted = bookRequestService.acceptRequest(requestId);
         return ResponseEntity.ok(isRequestAccepted ? "Book Request Accepted!!!" : "Book Request still Pending!!!");
     }
+
     @GetMapping("/decline-request")
-    //working
+    // working
     protected ResponseEntity<String> declineRequest(@Param("requestId") Long requestId) {
         boolean isRequestDeclined = bookRequestService.declineRequest(requestId);
         return ResponseEntity.ok(isRequestDeclined ? "Book Request Rejected!!!" : "Book Request still Pending!!!");
     }
 
-
-
-
     @PostMapping("/addBook")
-    //working
+    // working
     protected ResponseEntity<String> addBook(@RequestBody BookDTO bookDTO) throws PublisherNotFoundException {
-     System.out.println("bookDTO: "+bookDTO);
+        System.out.println("bookDTO: " + bookDTO);
         bookService.addBook(bookDTO);
-      return ResponseEntity.ok("book is added successfully");
+        return ResponseEntity.ok("book is added successfully");
     }
 
     @PostMapping("/enableDisable")
@@ -112,4 +110,9 @@ public class AdminController {
         return ResponseEntity.ok(isReturnAccepted ? "Book return is successfully accepted" : "Book return is unsuccessful!!!");
     }
 
+    @PutMapping("/updateBook")
+    public ResponseEntity<String> updateBook(@Param("bookId") Long bookId, @RequestBody BookDTO updateBookRequest) {
+        bookService.updateBook(bookId, updateBookRequest);
+        return ResponseEntity.ok("Book updated successfully");
+    }
 }
