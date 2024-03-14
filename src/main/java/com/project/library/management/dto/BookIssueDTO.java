@@ -9,9 +9,22 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class BookIssueDTO {
+
+    private Long issueId;
+
+    private Long bookId;
+
+    private String userId;
+
     private Date issueDate;
+
     private Date dueDate;
+
+    private Date returnDate;
+
+    private String fine = "0";
+
 }

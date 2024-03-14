@@ -4,11 +4,16 @@ import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.BookRequestDTO;
 import com.project.library.management.exception.AuthorNotFoundException;
 import com.project.library.management.exception.BookNotFoundException;
+import com.project.library.management.service.BookIssueService;
 import com.project.library.management.service.BookRequestService;
 import com.project.library.management.service.BookService;
 import com.project.library.management.service.UserService;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import com.project.library.management.dto.BookIssueDTO;
+import java.util.List;
+
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +28,8 @@ public class UserController {
     private final UserService userService;
     private final BookRequestService bookRequestService;
     private final BookService bookService;
+    private final BookIssueService bookIssueService;
+
     @GetMapping("/test")
     protected ResponseEntity<String> test() {
         return ResponseEntity.ok("Hello from user only url");
@@ -53,11 +60,18 @@ public class UserController {
        BookDTO book=bookService.getBookByName(name);
        return ResponseEntity.of(Optional.of(book));
     }
-    
+
     @GetMapping("/getBookByAuthorName" )
     protected ResponseEntity<List<BookDTO>> getBooksByAuthorName (@Param("author") String author) throws AuthorNotFoundException {
       List <BookDTO> book=bookService.getBooksByAuthor(author);
-     
+
        return ResponseEntity.ok(book);
+    }
+
+    @GetMapping("/view-borrowed-books")
+    protected ResponseEntity<List<BookIssueDTO>> viewBorrowedBooks(HttpServletRequest request) {
+        String username = request.getUserPrincipal().getName();
+        List<BookIssueDTO> borrowedBooks = bookIssueService.viewBorrowedBooks(username);
+        return ResponseEntity.ofNullable(borrowedBooks);
     }
 }
