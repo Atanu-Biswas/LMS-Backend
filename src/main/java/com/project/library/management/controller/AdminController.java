@@ -11,6 +11,9 @@ import com.project.library.management.service.BookIssueService;
 import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.service.BookRequestService;
 import com.project.library.management.service.BookService;
+import com.project.library.management.service.PublisherService;
+import com.project.library.management.service.UserService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +35,7 @@ public class AdminController {
     private final BookIssueService bookIssueService;
     private final BookRequestRepository bookRequestRepository;
     private final BookService bookService;
+    private final UserService userService;
 
 
     private final PublisherService publisherService;
@@ -117,6 +121,11 @@ public class AdminController {
     public ResponseEntity<List<ManageBookRequestDTO>> getLast10BookRequests() {
         List<ManageBookRequestDTO> last10Requests = bookRequestService.getLast10BookRequests();
         return ResponseEntity.ok(last10Requests);
+    }
+    @GetMapping("/view-user")
+    public ResponseEntity<UserDTO> viewUserByUsername(@RequestParam String username) {
+        UserDTO userDTO = userService.getUserByUsername(username);
+        return ResponseEntity.ok(userDTO);
     }
     @GetMapping("/search-requests")
     public ResponseEntity<List<ManageBookRequestDTO>> searchRequestsByUsername(@Param("username") String username) {
