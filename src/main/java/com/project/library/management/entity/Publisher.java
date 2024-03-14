@@ -22,6 +22,7 @@ public class Publisher {
     private Long publisherId;
 
     @Column(nullable = false)
+    //unique constraint for publisherName needs to be added here
     private String name;
 
     private String email;

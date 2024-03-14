@@ -4,6 +4,7 @@ package com.project.library.management.service;
 import com.project.library.management.dto.PublisherDTO;
 import com.project.library.management.entity.Publisher;
 import com.project.library.management.exception.PublisherNotFoundException;
+import com.project.library.management.exception.SQLException;
 import com.project.library.management.repository.PublisherRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,22 @@ public class PublisherService {
 
     private final PublisherRepository publisherRepository;
 
-    public Publisher addPublisher(PublisherDTO publisherDTO){
+
+    //this method needs to be removed , as its functionality is implemented by getPublisher method below
+    public Publisher getPublisherById(Long Id) throws PublisherNotFoundException {
+        return publisherRepository.findById(Id).orElseThrow(PublisherNotFoundException::new);
+    }
+
+
+
+
+
+
+    public Publisher addPublisher(PublisherDTO publisherDTO)throws SQLException{
+
+            if(publisherRepository.existsByName(publisherDTO.getName())){
+                throw new SQLException("Publisher with this name already exists!!");
+            }
         Publisher publisher = new Publisher();
         publisher.setName(publisherDTO.getName());
         publisher.setEmail(publisherDTO.getEmail());
@@ -27,7 +43,7 @@ public class PublisherService {
     }
 
     public PublisherDTO getPublisher(Long publisherId) throws PublisherNotFoundException{
-        Publisher publisher= publisherRepository.findByPublisherId(publisherId).orElseThrow(()->new PublisherNotFoundException());
+        Publisher publisher= publisherRepository.findById(publisherId).orElseThrow(()->new PublisherNotFoundException());
         PublisherDTO publisherDTO = new PublisherDTO();
         publisherDTO.setName(publisher.getName());
         publisherDTO.setPhoneNo(publisher.getPhoneNo());
@@ -36,8 +52,8 @@ public class PublisherService {
         return publisherDTO;
     }
 
-    public void updatePublisher(PublisherDTO publisherDTO, Long id) {
-        Publisher publisher = publisherRepository.findByPublisherId(id).orElseThrow(PublisherNotFoundException::new);
+    public void updatePublisher(PublisherDTO publisherDTO, Long publisherId) throws PublisherNotFoundException{
+        Publisher publisher = publisherRepository.findById(publisherId).orElseThrow(PublisherNotFoundException::new);
         publisher.setName(publisherDTO.getName());
         publisher.setEmail(publisherDTO.getEmail());
         publisher.setPhoneNo(publisherDTO.getPhoneNo());
@@ -46,7 +62,8 @@ public class PublisherService {
     }
 
     @Transactional
-    public void deletePublisher(Long publisherId){
+    public void deletePublisher(Long publisherId) throws PublisherNotFoundException{
+        Publisher publisher= publisherRepository.findById(publisherId).orElseThrow(()->new PublisherNotFoundException());
         publisherRepository.deleteById(publisherId);
     }
 }
