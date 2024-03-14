@@ -1,10 +1,14 @@
 package com.project.library.management.controller;
 
 import com.project.library.management.dto.BookDTO;
+import com.project.library.management.dto.ManageBookRequestDTO;
 import com.project.library.management.dto.PublisherDTO;
+import com.project.library.management.entity.Book;
+import com.project.library.management.entity.BookRequest;
 import com.project.library.management.exception.BookIdNotFoundException;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.service.BookIssueService;
+import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.service.BookRequestService;
 import com.project.library.management.service.BookService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -25,6 +30,7 @@ import java.util.Optional;
 public class AdminController {
     private final BookRequestService bookRequestService;
     private final BookIssueService bookIssueService;
+    private final BookRequestRepository bookRequestRepository;
     private final BookService bookService;
 
 
@@ -56,6 +62,11 @@ public class AdminController {
         bookService.addBook(bookDTO);
         return ResponseEntity.ok("book is added successfully");
     }
+
+//    @PutMapping("update")
+//    protected ResponseEntity<String> updateBook(@Param("id")long id){
+//        Book updatedBook= BookDTO.findById(id).get();
+//    }
 
     @PostMapping("/enableDisable")
     //WORKING
@@ -100,6 +111,17 @@ public class AdminController {
         publisherService.deletePublisher(publisherId);
 
         return ResponseEntity.ok("Publisher with id "+publisherId+" is deleted successfully!");
+    }
+
+    @GetMapping("/last-10-book-requests")
+    public ResponseEntity<List<ManageBookRequestDTO>> getLast10BookRequests() {
+        List<ManageBookRequestDTO> last10Requests = bookRequestService.getLast10BookRequests();
+        return ResponseEntity.ok(last10Requests);
+    }
+    @GetMapping("/search-requests")
+    public ResponseEntity<List<ManageBookRequestDTO>> searchRequestsByUsername(@Param("username") String username) {
+        List<ManageBookRequestDTO> requests = bookRequestService.searchRequestsByUsername(username);
+        return ResponseEntity.ok(requests);
     }
     //Accept return end point
     @PostMapping("/accept-return")
