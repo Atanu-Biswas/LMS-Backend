@@ -2,6 +2,8 @@ package com.project.library.management.dto;
 
 import java.util.Date;
 
+import com.project.library.management.entity.Book;
+import com.project.library.management.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,15 +11,16 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
+
 @NoArgsConstructor
+@AllArgsConstructor
 public class BookIssueDTO {
 
     private Long issueId;
 
-    private Long bookId;
+    private Book book;
 
-    private String userId;
+    private User user;
 
     private Date issueDate;
 
