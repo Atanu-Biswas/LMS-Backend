@@ -3,26 +3,13 @@ package com.project.library.management.controller;
 import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.ManageBookRequestDTO;
 import com.project.library.management.dto.PublisherDTO;
-import com.project.library.management.entity.Book;
-import com.project.library.management.entity.BookRequest;
-import com.project.library.management.exception.AuthorNotFoundException;
-import com.project.library.management.exception.BookIdNotFoundException;
-import com.project.library.management.exception.BookNotFoundException;
-import com.project.library.management.exception.PublisherNotFoundException;
-import com.project.library.management.service.BookIssueService;
+import com.project.library.management.dto.UserDTO;
+import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookRequestRepository;
-import com.project.library.management.exception.SQLException;
-import com.project.library.management.service.BookRequestService;
-import com.project.library.management.service.BookService;
-import com.project.library.management.service.PublisherService;
-import com.project.library.management.service.UserService;
+import com.project.library.management.service.*;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,7 +19,7 @@ import java.util.Optional;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/admin")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class AdminController {
     private final BookRequestService bookRequestService;
     private final BookIssueService bookIssueService;
@@ -146,7 +133,7 @@ public class AdminController {
     }
      @GetMapping("/get-book-by-title" )
     protected ResponseEntity<List<BookDTO>> getBookByName (@Param("title") String title) throws BookNotFoundException {
-        List<BookDTO> bookDTOs=bookService.getBookByTitle(title);
+        List<BookDTO> bookDTOs=bookService.getBookListByTitle(title);
         return ResponseEntity.ok(bookDTOs);
     }
 

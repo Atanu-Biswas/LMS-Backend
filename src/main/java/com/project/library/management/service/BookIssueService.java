@@ -1,17 +1,5 @@
 package com.project.library.management.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
-import com.project.library.management.dto.BookIssueDTO;
-import com.project.library.management.entity.BookIssue;
-import com.project.library.management.repository.BookIssueRepository;
-import java.util.Date;
-
-import org.springframework.stereotype.Service;
-
 import com.project.library.management.entity.Book;
 import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.BookRequest;
@@ -19,38 +7,40 @@ import com.project.library.management.entity.User;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.BookRequestRepository;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
 public class BookIssueService {
     private final BookIssueRepository bookIssueRepository;
 
-    public List<BookIssueDTO> viewBorrowedBooks(String username) {
+//    public List<BookIssueDTO> viewBorrowedBooks(String userId) {
+//
+//        List<BookIssue> bookIssues = bookIssueRepository.findByUserId(userId);
+//        List<BookIssueDTO> borrowedBooks = new ArrayList<>();
+//
+//        bookIssues.forEach(issue -> {
+//            BookIssueDTO bookIssueDTO = new BookIssueDTO();
+//
+//            bookIssueDTO.setIssueId(issue.getIssueId());
+//            bookIssueDTO.setBookId(issue.getBook().getBookId());
+//            bookIssueDTO.setUserId(issue.getUser().getUserId());
+//            bookIssueDTO.setIssueDate(issue.getIssueDate());
+//            bookIssueDTO.setDueDate(issue.getIssueDate());
+//            bookIssueDTO.setReturnDate(issue.getReturnDate());
+//            bookIssueDTO.setFine(String.valueOf(issue.getFine()));
+//
+//            borrowedBooks.add(bookIssueDTO);
+//        });
+//
+//        return borrowedBooks;
+//    }
 
-        List<BookIssue> bookIssues = bookIssueRepository.findByUsername(username);
-        List<BookIssueDTO> borrowedBooks = new ArrayList<>();
-
-        bookIssues.forEach(issue -> {
-            BookIssueDTO bookIssueDTO = new BookIssueDTO();
-
-            bookIssueDTO.setIssueId(issue.getIssueId());
-            bookIssueDTO.setBookId(issue.getBook().getBookId());
-            bookIssueDTO.setUserId(issue.getUser().getUserId());
-            bookIssueDTO.setIssueDate(issue.getIssueDate());
-            bookIssueDTO.setDueDate(issue.getIssueDate());
-            bookIssueDTO.setReturnDate(issue.getReturnDate());
-            bookIssueDTO.setFine(issue.getFine());
-
-            borrowedBooks.add(bookIssueDTO);
-        });
-
-        return borrowedBooks;
-    }
 
 
-    private final BookIssueRepository bookIssueRepository;
     private final BookRequestRepository bookRequestRepository;
     private final BookRepository bookRepository;
 

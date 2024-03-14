@@ -9,15 +9,11 @@ import com.project.library.management.exception.BookNotFoundException;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.PublisherRepository;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import org.springframework.data.crossstore.ChangeSetPersister;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -41,8 +37,8 @@ public class BookService {
     return true;
   }
 
-  public List<BookDTO> getBookByTitle(String name) throws BookNotFoundException {
-    List<Book> books = bookRepository.findBookByTitle(name);
+  public List<BookDTO> getBookListByTitle(String name) throws BookNotFoundException {
+    List<Book> books = bookRepository.findBookListByTitle(name);
     // Publisher
     // publisher=publisherService.getPublisherById(book.getPublisher().getPublisherId());
     if (books.isEmpty()) {
@@ -144,5 +140,20 @@ public class BookService {
 
         bookRepository.save(book);
     }
-  }
+
+
+
+    public BookDTO getBookByName(String name) {
+        Book book = bookRepository.findBookByTitle(name);
+        BookDTO bookDTO = new BookDTO();
+        bookDTO.setAuthor(book.getAuthor());
+        bookDTO.setTitle(book.getTitle());
+        bookDTO.setImageUrl(book.getImageUrl());
+        bookDTO.setIsbn(book.getIsbn());
+        bookDTO.setPrintYear(book.getPrintYear());
+        bookDTO.setQuantityAvailable(book.getQuantityAvailable());
+        bookDTO.setActive(book.isActive());
+        bookDTO.setPublisherId(book.getPublisher().getPublisherId());
+        return bookDTO;
+    }
 }

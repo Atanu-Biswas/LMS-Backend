@@ -1,14 +1,20 @@
 package com.project.library.management.repository;
 
-import java.util.List;
+import com.project.library.management.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import com.project.library.management.entity.Book;
+
+import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book,Long>{
     
+
+
     @Query("select book from Book book where lower(book.title) like lower(concat('%', :title, '%'))")
-    List<Book>  findBookByTitle(String title);
+    List<Book>  findBookListByTitle(String title);
+
+    @Query("select book from Book book where lower(book.title) like lower(concat('%', :title, '%'))")
+    Book  findBookByTitle(String title);
 
     @Query("select book from Book book where lower(book.author) like lower(concat('%', :authorName, '%'))")
     List<Book> findByAuthorIgnoreCase(String authorName);
