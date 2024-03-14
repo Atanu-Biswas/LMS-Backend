@@ -114,4 +114,9 @@ public class AdminController {
         List<ManageBookRequestDTO> last10Requests = bookRequestService.getLast10BookRequests();
         return ResponseEntity.ok(last10Requests);
     }
+    @GetMapping("/search-requests")
+    public ResponseEntity<List<ManageBookRequestDTO>> searchRequestsByUsername(@Param("username") String username) {
+        List<ManageBookRequestDTO> requests = bookRequestService.searchRequestsByUsername(username);
+        return ResponseEntity.ok(requests);
+    }
 }

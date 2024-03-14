@@ -17,5 +17,6 @@ import lombok.NoArgsConstructor;
 public class BookRequestDTO 
 {
     private Long bookId;
+    private String bookTitle;
     private int weeksRequested;
 }

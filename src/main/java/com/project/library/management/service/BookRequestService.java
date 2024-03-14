@@ -108,4 +108,20 @@ public class BookRequestService {
         }
         return dtos;
     }
+
+    public List<ManageBookRequestDTO> searchRequestsByUsername(String username) {
+        List<BookRequest> requests = bookRequestRepository.findByUserUsername(username);
+        return convertToDTOs(requests);
+    }
+
+    private List<ManageBookRequestDTO> converttoDTOs(List<BookRequest> bookRequests) {
+        List<ManageBookRequestDTO> dtos = new ArrayList<>();
+        for (BookRequest request : bookRequests) {
+            ManageBookRequestDTO dto = new ManageBookRequestDTO();
+            dto.setBookTitle(request.getBook().getTitle());
+            dto.setRequestDate(request.getRequestDate());
+            dtos.add(dto);
+        }
+        return dtos;
+    }
 }

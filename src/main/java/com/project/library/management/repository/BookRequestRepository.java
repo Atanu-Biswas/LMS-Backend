@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface BookRequestRepository extends JpaRepository<BookRequest, Long> {
     List<BookRequest> findTop10ByOrderByRequestDateDesc();
+
+    List<BookRequest> findByUserUsername(String username);
 }
