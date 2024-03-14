@@ -50,5 +50,6 @@ public class Book {
     @OneToMany(mappedBy = "book")
     private List<BookRequest> bookRequests;
 
+
     // Getters and setters omitted for brevity
 }

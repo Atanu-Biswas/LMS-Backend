@@ -97,4 +97,9 @@ public class AdminController {
 
         return ResponseEntity.ok("Publisher with id "+publisherId+" is deleted successfully!");
     }
+    @PutMapping("/updateBook")
+    public ResponseEntity<String> updateBook(@Param("bookId") Long bookId, @RequestBody BookDTO updateBookRequest) {
+        bookService.updateBook(bookId, updateBookRequest);
+        return ResponseEntity.ok("Book updated successfully");
+    }
 }
