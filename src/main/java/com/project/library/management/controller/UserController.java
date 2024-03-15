@@ -2,8 +2,10 @@ package com.project.library.management.controller;
 
 import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.BookRequestDTO;
+import com.project.library.management.dto.ViewRequestsDTO;
 import com.project.library.management.exception.AuthorNotFoundException;
 import com.project.library.management.exception.BookNotFoundException;
+import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.service.BookRequestService;
 import com.project.library.management.service.BookService;
 import com.project.library.management.service.UserService;
@@ -42,10 +44,17 @@ public class UserController {
     }
     @GetMapping("/cancel-request")
     //working
-    public ResponseEntity<String> declineBookRequest(@Param("requestId") Long requestId){
+    public ResponseEntity<String> declineBookRequest(@Param("requestId") Long requestId) throws RequestNotFoundException{
         boolean isRequestCancelled = bookRequestService.cancelRequest(requestId);
         return ResponseEntity.ok(isRequestCancelled ? "Book Request Cancelled!!!" : "Book Request Retained!!!");
 
+    }
+    @GetMapping("/view-request")
+    public ResponseEntity<List<ViewRequestsDTO>> viewRequests(HttpServletRequest request) throws RequestNotFoundException{
+        String userName=request.getUserPrincipal().getName();
+         List<ViewRequestsDTO> viewRequestDTOs=bookRequestService.viewRequest(userName);
+
+        return ResponseEntity.ok(viewRequestDTOs);
     }
 
      @GetMapping("/getBookByName" )
