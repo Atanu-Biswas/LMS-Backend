@@ -13,6 +13,7 @@ import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class BookRequestService {
+    private static final Logger logger = Logger.getLogger(BookRequestService.class);
     private final BookRequestRepository bookRequestRepository;
     private final BookRepository bookRepository;
     private final BookIssueRepository bookIssueRepository;
@@ -30,6 +32,7 @@ public class BookRequestService {
 
     public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) {
         User user = userRepository.findByUsername(username).orElse(null);
+        logger.debug("Query fired for finding the User by username");
         Book book = bookRepository.findById(bookRequestDTO.getBookId()).orElse(null);
         if (book==null) {
             return false;
@@ -40,15 +43,18 @@ public class BookRequestService {
         request.setRequestDate(new Date());
         request.setWeeksRequested(bookRequestDTO.getWeeksRequested());
         bookRequestRepository.save(request);
+        logger.debug("Saved an issue Request for a book for the username: "+username);
         return true;
     }
 
 
     public boolean cancelRequest(Long requestId) {
         BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
+        logger.debug("Query fired for finding the book by Book Id");
         if (request!=null && request.getStatus().equals("PENDING")) {
             request.setStatus("CANCELLED");
             bookRequestRepository.save(request);
+            logger.debug("Saving the cancel request in Database");
             return true;
         }
         return false;
