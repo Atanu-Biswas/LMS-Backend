@@ -1,0 +1,3 @@
+[2024-03-15 11:34:49,491] http-nio-8080-exec-2 com.project.library.management.controller.AdminController 38 DEBUG  - Debug message
+[2024-03-15 11:34:49,493] http-nio-8080-exec-2 com.project.library.management.controller.AdminController 39 WARN   - Warning message
+[2024-03-15 11:34:49,494] http-nio-8080-exec-2 com.project.library.management.controller.AdminController 40 INFO   - Info message
