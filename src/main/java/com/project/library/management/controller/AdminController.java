@@ -1,6 +1,7 @@
 package com.project.library.management.controller;
 
 import com.project.library.management.dto.BookDTO;
+import com.project.library.management.dto.BookPaginationDTO;
 import com.project.library.management.dto.PublisherDTO;
 import com.project.library.management.exception.BookIdNotFoundException;
 import com.project.library.management.exception.PublisherNotFoundException;
@@ -96,5 +97,13 @@ public class AdminController {
         publisherService.deletePublisher(publisherId);
 
         return ResponseEntity.ok("Publisher with id "+publisherId+" is deleted successfully!");
+    }
+
+    @GetMapping("/view-all-books")
+    protected ResponseEntity<BookPaginationDTO> getAllBooks(@Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize, @Param("sortBy") String sortBy, @Param("sortDir") String sortDir ){
+
+        BookPaginationDTO bookPaginationDTO= bookService.getAllBooks(pageNumber,pageSize,sortBy,sortDir);
+
+        return ResponseEntity.of(Optional.of(bookPaginationDTO));
     }
 }

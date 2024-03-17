@@ -1,6 +1,7 @@
 package com.project.library.management.controller;
 
 import com.project.library.management.dto.BookDTO;
+import com.project.library.management.dto.BookPaginationDTO;
 import com.project.library.management.dto.BookRequestDTO;
 import com.project.library.management.exception.AuthorNotFoundException;
 import com.project.library.management.exception.BookNotFoundException;
@@ -59,5 +60,13 @@ public class UserController {
       List <BookDTO> book=bookService.getBooksByAuthor(author);
      
        return ResponseEntity.ok(book);
+    }
+
+    @GetMapping("/view-all-books")
+    protected ResponseEntity<BookPaginationDTO> getAllBooks(@Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize, @Param("sortBy") String sortBy, @Param("sortDir") String sortDir){
+
+        BookPaginationDTO bookPaginationDTO = bookService.getAllBooks(pageNumber, pageSize, sortBy, sortDir);
+
+        return ResponseEntity.of(Optional.of(bookPaginationDTO));
     }
 }
