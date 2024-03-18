@@ -14,12 +14,16 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface BookRequestRepository extends JpaRepository<BookRequest, Long> {
 
     @Query("SELECT bookRequest FROM BookRequest bookRequest WHERE bookRequest.user.username = :userName")
     List<BookRequest> findAllRequestByUserId(String userName);
 
     BookRequest findByUserAndBook(User user, Book book);
+
+    //filter it by sending only the books that have status PENDING
     List<BookRequest> findTop10ByOrderByRequestDateDesc();
 
     List<BookRequest> findByUserUsername(String username);

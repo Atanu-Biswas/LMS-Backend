@@ -24,6 +24,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin("http://localhost:4200")
 @RequiredArgsConstructor
 public class UserController {
     private static final Logger logger = LogManager.getLogger(UserController.class);
@@ -43,12 +44,13 @@ public class UserController {
         return ResponseEntity.ok(userService.isUsernameAvailable(username));
     }
     @PostMapping("/request-book")
-    //working
-    public ResponseEntity<String> issueBookRequest(@RequestBody BookRequestDTO bookRequestDTO, HttpServletRequest request) {
+    //working //changed for frontend
+    public ResponseEntity<Boolean> issueBookRequest(@RequestBody BookRequestDTO bookRequestDTO, HttpServletRequest request) {
         String username = request.getUserPrincipal().getName();
         System.out.println("username: "+username);
         boolean isIssueSuccessful = bookRequestService.issueRequest(username, bookRequestDTO);
-        return ResponseEntity.ok(isIssueSuccessful ? "Book Requested Successfully!!!" : "Book Request Unsuccessfull!!!");
+        System.out.println(isIssueSuccessful);
+        return ResponseEntity.ok(isIssueSuccessful);
     }
     @GetMapping("/cancel-request")
     //working
@@ -75,11 +77,21 @@ public class UserController {
      @GetMapping("/getBookByName" )
     protected ResponseEntity<BookDTO> getBookByName (@Param("name") String name) throws BookNotFoundException {
        BookDTO book=bookService.getBookByName(name);
-       return ResponseEntity.of(Optional.of(book));}
-     @GetMapping("/get-book-by-title" )
+
+       return ResponseEntity.of(Optional.of(book));
+    }
+
+    @GetMapping("/get-book-List-by-title" )
     protected ResponseEntity<List<BookDTO>> getBookByTitle (@Param("title") String title) throws BookNotFoundException {
         List<BookDTO> bookDTOs=bookService.getBookListByTitle(title);
-       return ResponseEntity.ok(bookDTOs);
+        return ResponseEntity.ok(bookDTOs);
+    }
+
+     @GetMapping("/getBookById" )
+    protected ResponseEntity<BookDTO> getBookById (@Param("id") Long id) throws BookNotFoundException {
+       BookDTO book=bookService.getBookById(id);
+
+       return ResponseEntity.of(Optional.of(book));
     }
 
 

@@ -15,18 +15,22 @@ import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.service.*;
 import lombok.AllArgsConstructor;
-import org.apache.log4j.Logger;
+import java.util.List;
+
+
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import com.project.library.management.dto.ManageBookRequestDTO;
 import java.util.Optional;
 
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/admin")
+@CrossOrigin("http://localhost:4200")
 //@RequiredArgsConstructor
 public class AdminController {
     private final BookRequestService bookRequestService;
@@ -48,17 +52,17 @@ public class AdminController {
     }
 
     @GetMapping("/accept-request")
-    // working
-    protected ResponseEntity<String> acceptRequest(@Param("requestId") Long requestId) throws RequestNotFoundException{
+    // working //edited for front-end
+    protected ResponseEntity<Boolean> acceptRequest(@Param("requestId") Long requestId) {
         boolean isRequestAccepted = bookRequestService.acceptRequest(requestId);
         return ResponseEntity.ok(isRequestAccepted ? "Book Request Accepted!!!" : "Book Request still Pending!!!");
     }
 
     @GetMapping("/decline-request")
-    // working
-    protected ResponseEntity<String> declineRequest(@Param("requestId") Long requestId) throws RequestNotFoundException{
+    // working // edited for front-end
+    protected ResponseEntity<Boolean> declineRequest(@Param("requestId") Long requestId) {
         boolean isRequestDeclined = bookRequestService.declineRequest(requestId);
-        return ResponseEntity.ok(isRequestDeclined ? "Book Request Rejected!!!" : "Book Request still Pending!!!");
+        return ResponseEntity.ok(isRequestDeclined);
     }
 
     @PostMapping("/addBook")
@@ -69,11 +73,13 @@ public class AdminController {
         return ResponseEntity.ok("book is added successfully");
     }
 
-    @PostMapping("/enableDisable")
-    //WORKING
-    protected ResponseEntity<String> enableDisableBook(@Param("id") Long id) throws BookIdNotFoundException {
+    @GetMapping("/enableDisable")
+    //WORKING // changed for frontend
+    protected ResponseEntity<Boolean> enableDisableBook(@RequestParam(value = "id") Long id) throws BookIdNotFoundException {
+        System.out.println("Inside Controller"+id);
         boolean isBookDisabled=bookService.enableDisableBook(id);
-        return ResponseEntity.ok(isBookDisabled ?"Book Is Disabled" :"Book Is Enabled");
+        System.out.println("Book status: "+isBookDisabled);
+        return ResponseEntity.ok(isBookDisabled);
     }
 
 
@@ -119,16 +125,19 @@ public class AdminController {
         List<ManageBookRequestDTO> last10Requests = bookRequestService.getLast10BookRequests();
         return ResponseEntity.ok(last10Requests);
     }
-    @GetMapping("/view-user")
-    public ResponseEntity<UserDTO> viewUserByUsername(@RequestParam String username) {
-        UserDTO userDTO = userService.getUserByUsername(username);
-        return ResponseEntity.ok(userDTO);
-    }
     @GetMapping("/search-requests")
     public ResponseEntity<List<ManageBookRequestDTO>> searchRequestsByUsername(@Param("username") String username) {
         List<ManageBookRequestDTO> requests = bookRequestService.searchRequestsByUsername(username);
         return ResponseEntity.ok(requests);
     }
+
+
+    @GetMapping("/view-user")
+    public ResponseEntity<UserDTO> viewUserByUsername(@RequestParam String username) {
+        UserDTO userDTO = userService.getUserByUsername(username);
+        return ResponseEntity.ok(userDTO);
+    }
+
     //Accept return end point
     @PostMapping("/accept-return")
     protected ResponseEntity<String> acceptReturn(@RequestParam("issueId") Long issueId){
