@@ -12,5 +12,6 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
     @Query("SELECT b FROM BookIssue b WHERE b.user.username=:username AND b.fineStatus='UNPAID'")
     List<BookIssue> calculateFinesByUserName(@Param("username") String username);
 
-    List<BookIssue> findByUserId(String username);
+    List<BookIssue> findByUserUsername(String username);
+
 }
