@@ -8,6 +8,7 @@ import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.service.*;
 import lombok.AllArgsConstructor;
+import org.apache.log4j.Logger;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,11 +28,15 @@ public class AdminController {
     private final BookService bookService;
     private final UserService userService;
 
+    private static final Logger logger = Logger.getLogger(AdminController.class);
 
     private final PublisherService publisherService;
 
     @GetMapping("/test")
     protected ResponseEntity<String> test() {
+        logger.debug("Debug message");
+        logger.warn("Warning message");
+        logger.info("Info message");
         return ResponseEntity.ok("Hello from admin only url");
     }
 

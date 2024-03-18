@@ -20,11 +20,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
+    private static final Logger logger = LogManager.getLogger(UserController.class);
     private final UserService userService;
     private final BookRequestService bookRequestService;
     private final BookService bookService;
@@ -37,6 +40,7 @@ public class UserController {
     @GetMapping("/is-username-available")
     //working
     protected ResponseEntity<Boolean> isUsernameAvailable(@Param("username") String username) {
+        logger.debug("Debug message");
         return ResponseEntity.ok(userService.isUsernameAvailable(username));
     }
     @PostMapping("/request-book")
