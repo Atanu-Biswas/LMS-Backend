@@ -1,3 +1,8 @@
 [2024-03-15 11:34:49,491] http-nio-8080-exec-2 com.project.library.management.controller.AdminController 38 DEBUG  - Debug message
 [2024-03-15 11:34:49,493] http-nio-8080-exec-2 com.project.library.management.controller.AdminController 39 WARN   - Warning message
 [2024-03-15 11:34:49,494] http-nio-8080-exec-2 com.project.library.management.controller.AdminController 40 INFO   - Info message
+[2024-03-18 10:25:57,910] http-nio-8080-exec-7 com.project.library.management.service.AuthenticationService 39 DEBUG  - Registered a new user into our LMS Portal !
+[2024-03-18 10:29:41,942] http-nio-8080-exec-10 com.project.library.management.service.AuthenticationService 58 DEBUG  - Query fired for finding the Username for logging in
+[2024-03-18 10:29:41,943] http-nio-8080-exec-10 com.project.library.management.service.AuthenticationService 60 INFO   - Generated the Access Token for the user
+[2024-03-18 10:29:41,970] http-nio-8080-exec-10 com.project.library.management.service.AuthenticationService 62 INFO   - Generated the Refresh Token for the user
+[2024-03-18 10:29:41,973] http-nio-8080-exec-10 com.project.library.management.service.AuthenticationService 93 DEBUG  - Query fired for finding the User by username

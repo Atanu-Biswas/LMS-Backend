@@ -12,12 +12,13 @@ import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.PublisherRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.springframework.data.domain.Page;
@@ -52,15 +53,15 @@ public class BookService {
   }
 
    public List<BookDTO> getBookListByTitle (String name) throws BookNotFoundException{
-    Book book=bookRepository.findBookByTitle(name);
+      List<Book> books=bookRepository.findBookListByTitle(name);
     logger.debug("Query fired for getting the Book by BookName");
     //Publisher publisher=publisherService.getPublisherById(book.getPublisher().getPublisherId());
-    if (book == null) {
+    if (books == null) {
         logger.error("Book Not Found Exception generated !");
       throw new BookNotFoundException("Book with title '" + name + "' not found");
     }
-    List<BookDTO> bookDTOs = new ArrayList<>();
-    for (Book book : books) {
+       List<BookDTO> bookDTOs = new ArrayList<>();
+       for (Book book : books) {
     BookDTO bookDTO = new BookDTO();
     bookDTO.setAuthor(book.getAuthor());
     bookDTO.setTitle(book.getTitle());

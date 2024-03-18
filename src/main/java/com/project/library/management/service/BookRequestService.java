@@ -1,13 +1,10 @@
 package com.project.library.management.service;
 
-import com.project.library.management.dto.BookDTO;
-import com.project.library.management.dto.BookIssueDTO;
 import com.project.library.management.dto.BookRequestDTO;
 import com.project.library.management.dto.ManageBookRequestDTO;
-import com.project.library.management.entity.Book;
-import com.project.library.management.entity.BookIssue;
-import com.project.library.management.entity.BookRequest;
-import com.project.library.management.entity.User;
+import com.project.library.management.dto.ViewRequestsDTO;
+import com.project.library.management.entity.*;
+import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.BookRequestRepository;
@@ -47,7 +44,7 @@ public class BookRequestService {
         return true;
     }
 
-    public boolean cancelRequest(Long requestId) throws RequestNotFoundException{
+    public boolean cancelRequest(Long requestId) throws RequestNotFoundException {
         BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
         logger.debug("Query fired for finding the book by Book Id");
         if (request == null) {
@@ -85,7 +82,7 @@ public class BookRequestService {
             issue.setDueDate(dueDate);
 
             issue.setUser(request.getUser());
-
+            issue.setFineStatus(Fine.valueOf("NOFINE"));
             bookIssueRepository.save(issue);
             return true;
         }

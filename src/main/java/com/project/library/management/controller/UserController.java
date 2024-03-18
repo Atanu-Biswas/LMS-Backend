@@ -1,20 +1,19 @@
 package com.project.library.management.controller;
 
-import com.project.library.management.dto.BookDTO;
-import com.project.library.management.dto.BookRequestDTO;
-import com.project.library.management.dto.FineDTO;
+import com.project.library.management.dto.*;
 import com.project.library.management.entity.BookIssue;
-import com.project.library.management.dto.ViewRequestsDTO;
 import com.project.library.management.exception.AuthorNotFoundException;
 import com.project.library.management.exception.BookNotFoundException;
+import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.service.BookIssueService;
-import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.service.BookRequestService;
 import com.project.library.management.service.BookService;
 import com.project.library.management.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @RestController
 @RequestMapping("/user")
