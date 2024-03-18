@@ -13,6 +13,7 @@ import com.project.library.management.exception.AuthorNotFoundException;
 import com.project.library.management.exception.BookIdNotFoundException;
 import com.project.library.management.exception.BookNotFoundException;
 import com.project.library.management.exception.PublisherNotFoundException;
+import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.exception.SQLException;
 
 @Controller
@@ -31,8 +32,7 @@ public class ExceptionHandlerController {
     }
 
     @ExceptionHandler(value = PublisherNotFoundException.class)
-    protected ResponseEntity<ErrorDTO> handlePublisherNotFoundException(PublisherNotFoundException e) {
-
+    protected ResponseEntity<ErrorDTO> handleInvalidPublisherCredentialsException(PublisherNotFoundException e) {
         return new ResponseEntity<>(
                 ErrorDTO
                         .builder()
@@ -43,35 +43,46 @@ public class ExceptionHandlerController {
     }
 
     @ExceptionHandler(value = BookNotFoundException.class)
-    protected ResponseEntity<ErrorDTO> handleInvalidBookNameException() {
+    protected ResponseEntity<ErrorDTO> handleInvalidBookNameException(BookNotFoundException e) {
         return new ResponseEntity<>(
                 ErrorDTO
                         .builder()
-                        .message("Book With This Name Not Found")
+                        .message(e.getMessage())
                         .timestamp(new Date())
                         .build(),
-                HttpStatus.BAD_REQUEST);
+                HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = AuthorNotFoundException.class)
-    protected ResponseEntity<ErrorDTO> handleInvalidAuthorNameException() {
+    protected ResponseEntity<ErrorDTO> handleInvalidAuthorNameException(AuthorNotFoundException e) {
         return new ResponseEntity<>(
                 ErrorDTO
                         .builder()
-                        .message("Enter Corret Author Name")
+                        .message(e.getMessage())
                         .timestamp(new Date())
                         .build(),
-                HttpStatus.BAD_REQUEST);
+                HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = BookIdNotFoundException.class)
-    protected ResponseEntity<ErrorDTO> handleInvalidBookIdException() {
+    protected ResponseEntity<ErrorDTO> handleInvalidBookIdException(BookIdNotFoundException e) {
         return new ResponseEntity<>(
                 ErrorDTO
                         .builder()
-                        .message("Enter Corret Book Id")
+                        .message(e.getMessage())
                         .timestamp(new Date())
                         .build(),
-                HttpStatus.BAD_REQUEST);
+                HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = RequestNotFoundException.class)
+    protected ResponseEntity<ErrorDTO> handleInvalidRequestIdException(RequestNotFoundException e) {
+        return new ResponseEntity<>(
+                ErrorDTO
+                        .builder()
+                        .message(e.getMessage())
+                        .timestamp(new Date())
+                        .build(),
+                HttpStatus.NOT_FOUND);
     }
 }

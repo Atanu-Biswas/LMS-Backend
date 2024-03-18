@@ -47,21 +47,25 @@ public class BookRequestService {
         return true;
     }
 
-
-    public boolean cancelRequest(Long requestId) {
+    public boolean cancelRequest(Long requestId) throws RequestNotFoundException{
         BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
         logger.debug("Query fired for finding the book by Book Id");
-        if (request!=null && request.getStatus().equals("PENDING")) {
+        if (request == null) {
+            throw new RequestNotFoundException("No request with request Id'" + requestId + "found");
+        }
+        if (request != null && request.getStatus().equals("PENDING")) {
             request.setStatus("CANCELLED");
             bookRequestRepository.save(request);
-            logger.debug("Saving the cancel request in Database");
             return true;
         }
         return false;
     }
 
-    public boolean acceptRequest(Long requestId) {
+    public boolean acceptRequest(Long requestId) throws RequestNotFoundException {
         BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
+        if (request == null) {
+            throw new RequestNotFoundException("No request with request Id'" + requestId + "found");
+        }
 
         if (request!=null && request.getStatus().equals("PENDING")) {
             request.setStatus("ACCEPTED");
@@ -88,14 +92,42 @@ public class BookRequestService {
         return false;
     }
 
-    public boolean declineRequest(Long requestId) {
+    public boolean declineRequest(Long requestId) throws RequestNotFoundException{
         BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
-        if (request!=null && request.getStatus().equals("PENDING")) {
+        if (request == null) {
+            throw new RequestNotFoundException("No request with request Id'" + requestId + "found");
+        }
+        if (request != null && request.getStatus().equals("PENDING")) {
             request.setStatus("REJECTED");
             bookRequestRepository.save(request);
             return true;
         }
         return false;
+    }
+    public List<ViewRequestsDTO> viewRequest(String userName) throws RequestNotFoundException{
+        List<BookRequest> bookRequests = bookRequestRepository.findAllRequestByUserId(userName);
+
+        if (bookRequests.isEmpty()) {
+            throw new RequestNotFoundException("No request by" + userName + "found");
+        }
+        List<ViewRequestsDTO> viewRequestsDTOList = new ArrayList<>();
+
+        for (BookRequest bookRequest : bookRequests) {
+            ViewRequestsDTO dto = new ViewRequestsDTO();
+            dto.setRequestId(bookRequest.getRequestId());
+            dto.setBookId(bookRequest.getBook().getBookId());
+            dto.setAuthor(bookRequest.getBook().getAuthor());
+            dto.setBookTitle(bookRequest.getBook().getTitle());
+            dto.setPrintYear(bookRequest.getBook().getPrintYear());
+            dto.setPublisherName(bookRequest.getBook().getPublisher().getName());
+            dto.setRequestDate(bookRequest.getRequestDate());
+            dto.setWeeksRequested(bookRequest.getWeeksRequested());
+            dto.setStatus(bookRequest.getStatus());
+            viewRequestsDTOList.add(dto);
+        }
+
+        return viewRequestsDTOList;
+
     }
 
     public List<ManageBookRequestDTO> getLast10BookRequests() {

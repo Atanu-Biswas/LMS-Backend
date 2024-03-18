@@ -24,5 +24,4 @@ public class BookDTO {
    private Long publisherId;
 
 
-
 }
