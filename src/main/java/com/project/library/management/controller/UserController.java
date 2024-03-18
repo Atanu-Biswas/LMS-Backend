@@ -67,12 +67,12 @@ public class UserController {
         return ResponseEntity.ok(viewRequestDTOs);
     }
 
-//    @GetMapping("/view-borrowed-books")
-//    protected ResponseEntity<List<BookIssueDTO>> viewBorrowedBooks(HttpServletRequest request) {
-//        String username = request.getUserPrincipal().getName();
-//        List<BookIssueDTO> borrowedBooks = bookIssueService.viewBorrowedBooks(username);
-//        return ResponseEntity.ofNullable(borrowedBooks);
-//    }
+    @GetMapping("/view-borrowed-books")
+    protected ResponseEntity<List<BookIssueDTO>> viewBorrowedBooks(HttpServletRequest request) {
+        String username = request.getUserPrincipal().getName();
+        List<BookIssueDTO> borrowedBooks = bookIssueService.viewBorrowedBooks(username);
+        return ResponseEntity.ofNullable(borrowedBooks);
+    }
 
      @GetMapping("/getBookByName" )
     protected ResponseEntity<BookDTO> getBookByName (@Param("name") String name) throws BookNotFoundException {
