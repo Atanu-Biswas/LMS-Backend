@@ -8,9 +8,17 @@ import com.project.library.management.dto.ViewRequestsDTO;
 import com.project.library.management.entity.*;
 import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.repository.BookIssueRepository;
+import com.project.library.management.dto.UserDTO;
+import com.project.library.management.entity.Book;
+import com.project.library.management.entity.BookRequest;
+import com.project.library.management.entity.User;
 import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.repository.UserRepository;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -34,7 +42,7 @@ public class BookRequestService {
         User user = userRepository.findByUsername(username).orElse(null);
         logger.debug("Query fired for finding the User by username");
         Book book = bookRepository.findById(bookRequestDTO.getBookId()).orElse(null);
-        if (book==null) {
+        if (book == null) {
             return false;
         }
         BookRequest request = new BookRequest();
@@ -91,20 +99,37 @@ public class BookRequestService {
             System.out.println("Saved in Book Issue Repository");
             return true;
         }
-        return false;
-    }
 
     public boolean declineRequest(Long requestId) throws RequestNotFoundException{
         BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
-        if (request == null) {
-            throw new RequestNotFoundException("No request with request Id'" + requestId + "found");
-        }
         if (request != null && request.getStatus().equals("PENDING")) {
             request.setStatus("REJECTED");
             bookRequestRepository.save(request);
             return true;
         }
         return false;
+    }
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @SuppressWarnings("unchecked")
+    public List<BookRequestDTO> viewPendingRequests() {
+        String jpql = "SELECT br FROM BookRequest br WHERE br.status = 'PENDING'";
+        Query query = entityManager.createQuery(jpql, BookRequest.class);
+        List<BookRequest> book_req = query.getResultList();
+        List<BookRequestDTO> book_req_dtos = book_req
+                .stream()
+                .map((req) -> BookRequestDTO
+                        .builder()
+                        .requestId(req.getRequestId())
+                        .bookId(req.getBook().getBookId())
+                        .weeksRequested(req.getWeeksRequested())
+                        .status(req.getStatus())
+                        .username(req.getUser().getUsername())
+                        .build())
+                .toList();
+        return book_req_dtos;
     }
     public List<ViewRequestsDTO> viewRequest(String userName) throws RequestNotFoundException{
         List<BookRequest> bookRequests = bookRequestRepository.findAllRequestByUserId(userName);

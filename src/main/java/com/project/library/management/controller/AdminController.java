@@ -5,27 +5,21 @@ import com.project.library.management.dto.BookPaginationDTO;
 import com.project.library.management.dto.ManageBookRequestDTO;
 import com.project.library.management.dto.PublisherDTO;
 import com.project.library.management.exception.BookIdNotFoundException;
+import com.project.library.management.dto.BookRequestDTO;
+import com.project.library.management.entity.BookRequest;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.service.BookRequestService;
 import com.project.library.management.service.BookService;
-import com.project.library.management.service.PublisherService;
-import com.project.library.management.dto.UserDTO;
-import com.project.library.management.exception.*;
-import com.project.library.management.repository.BookRequestRepository;
-import com.project.library.management.service.*;
-import lombok.AllArgsConstructor;
-import java.util.List;
-
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import com.project.library.management.dto.ManageBookRequestDTO;
+import java.util.List;
 import java.util.Optional;
-
 
 @RestController
 @AllArgsConstructor
@@ -73,109 +67,15 @@ public class AdminController {
         return ResponseEntity.ok("book is added successfully");
     }
 
-    @GetMapping("/enableDisable")
-    //WORKING // changed for frontend
-    protected ResponseEntity<Boolean> enableDisableBook(@RequestParam(value = "id") Long id) throws BookIdNotFoundException {
-        System.out.println("Inside Controller"+id);
-        boolean isBookDisabled=bookService.enableDisableBook(id);
-        System.out.println("Book status: "+isBookDisabled);
-        return ResponseEntity.ok(isBookDisabled);
-    }
-
-
-
-    @PostMapping("/publisher")
-//    working
-    protected ResponseEntity<String> addPublisher(@RequestBody PublisherDTO publisherDTO) throws SQLException{
-
-        publisherService.addPublisher(publisherDTO);
-
-        return ResponseEntity.ok("Publisher is added Successfully!");
-    }
-
-    @GetMapping("/publisher")
-//    working
-    protected ResponseEntity<PublisherDTO> getPublisher(@Param("id") Long id) throws PublisherNotFoundException{
-
-        PublisherDTO publisherDTO = publisherService.getPublisher(id);
-
-        return ResponseEntity.of(Optional.of(publisherDTO));
-    }
-
-    @PutMapping("/publisher")
+    @GetMapping("/getBookByName/{name}" )
     //working
-    protected ResponseEntity<String> updatePublisher(@RequestBody PublisherDTO publisherDTO, @Param("id") Long id) throws PublisherNotFoundException{
-
-        publisherService.updatePublisher(publisherDTO,id);
-
-        return ResponseEntity.ok("Publisher is updated successfully!");
+    protected ResponseEntity<BookDTO> getBookByName(@PathVariable("name") String name){
+       BookDTO book=bookService.getBookByName(name);
+       return ResponseEntity.of(Optional.of(book));
     }
 
-    @DeleteMapping("/publisher")
-    //working
-    protected ResponseEntity<String> deletePublisher(@Param("publisherId") Long publisherId) throws PublisherNotFoundException{
-        System.out.println("Id "+publisherId);
-        publisherService.deletePublisher(publisherId);
-
-        return ResponseEntity.ok("Publisher with id "+publisherId+" is deleted successfully!");
-    }
-
-    @GetMapping("/last-10-book-requests")
-    public ResponseEntity<List<ManageBookRequestDTO>> getLast10BookRequests() {
-        List<ManageBookRequestDTO> last10Requests = bookRequestService.getLast10BookRequests();
-        return ResponseEntity.ok(last10Requests);
-    }
-    @GetMapping("/search-requests")
-    public ResponseEntity<List<ManageBookRequestDTO>> searchRequestsByUsername(@Param("username") String username) {
-        List<ManageBookRequestDTO> requests = bookRequestService.searchRequestsByUsername(username);
-        return ResponseEntity.ok(requests);
-    }
-
-
-    @GetMapping("/view-user")
-    public ResponseEntity<UserDTO> viewUserByUsername(@RequestParam String username) {
-        UserDTO userDTO = userService.getUserByUsername(username);
-        return ResponseEntity.ok(userDTO);
-    }
-
-    //Accept return end point
-    @PostMapping("/accept-return")
-    protected ResponseEntity<String> acceptReturn(@RequestParam("issueId") Long issueId){
-
-        boolean isReturnAccepted = bookIssueService.acceptReturn(issueId);
-
-        return ResponseEntity.ok(isReturnAccepted ? "Book return is successfully accepted" : "Book return is unsuccessful!!!");
-    }
-
-    @PutMapping("/updateBook")
-    public ResponseEntity<String> updateBook(@Param("bookId") Long bookId, @RequestBody BookDTO updateBookRequest) {
-        bookService.updateBook(bookId, updateBookRequest);
-        return ResponseEntity.ok("Book updated successfully");
-    }
-     @GetMapping("/get-book-by-title" )
-    protected ResponseEntity<List<BookDTO>> getBookByName (@Param("title") String title) throws BookNotFoundException {
-        List<BookDTO> bookDTOs=bookService.getBookListByTitle(title);
-        return ResponseEntity.ok(bookDTOs);
-    }
-
-    @GetMapping("/get-book-by-authorName" )
-    protected ResponseEntity<List<BookDTO>> getBooksByAuthorName (@Param("authorName") String authorName) throws AuthorNotFoundException {
-      List <BookDTO> bookDTOs=bookService.getBooksByAuthor(authorName);
-
-       return ResponseEntity.ok(bookDTOs);
-    }
-    @GetMapping("/get-book-by-publisherName" )
-    protected ResponseEntity<List<BookDTO>> getBooksByPublisherName (@Param("publisherName") String publisherName) throws AuthorNotFoundException {
-      List <BookDTO> book=bookService.getBooksByPublisher(publisherName);
-
-       return ResponseEntity.ok(book);
-    }
-
-    @GetMapping("/view-all-books")
-    protected ResponseEntity<BookPaginationDTO> getAllBooks(@Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize, @Param("sortBy") String sortBy, @Param("sortDir") String sortDir ){
-
-        BookPaginationDTO bookPaginationDTO= bookService.getAllBooks(pageNumber,pageSize,sortBy,sortDir);
-
-        return ResponseEntity.of(Optional.of(bookPaginationDTO));
+    @GetMapping("/pending-requests")
+    public List<BookRequestDTO> getPendingRequests() {
+        return bookRequestService.viewPendingRequests();
     }
 }
