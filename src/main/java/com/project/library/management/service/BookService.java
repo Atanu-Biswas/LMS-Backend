@@ -66,6 +66,7 @@ public class BookService {
             bookDTO.setQuantityAvailable(book.getQuantityAvailable());
             bookDTO.setActive(bookDTO.isActive());
             bookDTO.setPublisherId(book.getPublisher().getPublisherId());
+            
             bookDTOs.add(bookDTO);
         }
 
