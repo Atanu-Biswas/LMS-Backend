@@ -44,6 +44,26 @@ public class BookService {
       throw new BookNotFoundException("Book with title '" + name + "' not found");
   }
     BookDTO bookDTO=new BookDTO();
+    bookDTO.setBookId(book.getBookId());
+    bookDTO.setAuthor(book.getAuthor());
+    bookDTO.setTitle(book.getTitle());
+    bookDTO.setImageUrl(book.getImageUrl());
+    bookDTO.setIsbn(book.getIsbn());
+    bookDTO.setPrintYear(book.getPrintYear());
+    bookDTO.setQuantityAvailable(book.getQuantityAvailable());
+    bookDTO.setActive(bookDTO.isActive());
+    bookDTO.setPublisherId(book.getPublisher().getPublisherId());
+    return bookDTO;
+   }
+
+   public BookDTO getBookById  (Long id) throws BookNotFoundException{
+    Book book=bookRepository.findByBookId(id);
+    //Publisher publisher=publisherService.getPublisherById(book.getPublisher().getPublisherId());
+    if (book == null) {
+      throw new BookNotFoundException("Book with title '" + id + "' not found");
+  }
+    BookDTO bookDTO=new BookDTO();
+    bookDTO.setBookId(book.getBookId());
     bookDTO.setAuthor(book.getAuthor());
     bookDTO.setTitle(book.getTitle());
     bookDTO.setImageUrl(book.getImageUrl());
@@ -67,6 +87,7 @@ public class BookService {
     List<BookDTO> bookDTOs = new ArrayList<>();
     for (Book book : books) {
         BookDTO bookDTO = new BookDTO();
+        bookDTO.setBookId(book.getBookId());
         bookDTO.setAuthor(book.getAuthor());
         bookDTO.setTitle(book.getTitle());
         bookDTO.setImageUrl(book.getImageUrl());
