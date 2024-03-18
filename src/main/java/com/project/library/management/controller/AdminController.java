@@ -3,6 +3,7 @@ package com.project.library.management.controller;
 import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.BookPaginationDTO;
 import com.project.library.management.dto.BookRequestDTO;
+import com.project.library.management.dto.UserPaginationDTO;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.repository.BookRequestRepository;
@@ -75,11 +76,27 @@ public class AdminController {
     }
 
     @GetMapping("/view-all-books")
-    protected ResponseEntity<BookPaginationDTO> getAllBooks(@Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize, @Param("sortBy") String sortBy, @Param("sortDir") String sortDir ){
+    protected ResponseEntity<BookPaginationDTO> getAllBooks(
+        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+        @RequestParam(value = "sortBy", defaultValue ="title", required = false) String sortBy,
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ){
 
         BookPaginationDTO bookPaginationDTO= bookService.getAllBooks(pageNumber,pageSize,sortBy,sortDir);
 
         return ResponseEntity.of(Optional.of(bookPaginationDTO));
+    }
+
+    @GetMapping("/view-all-users")
+    protected ResponseEntity<UserPaginationDTO> getAllUsers(
+        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+        @RequestParam(value = "sortBy", defaultValue ="username", required = false) String sortBy,
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ){
+
+        UserPaginationDTO userPaginationDTO= userService.getAllUsers(pageNumber,pageSize,sortBy,sortDir);
+
+        return ResponseEntity.of(Optional.of(userPaginationDTO));
     }
 
 }
