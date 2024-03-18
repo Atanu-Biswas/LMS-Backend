@@ -113,6 +113,14 @@ public class UserController {
                 ).toList();
         return ResponseEntity.ok(fineDTOList);
     }
+
+    @GetMapping("/view-all-books")
+    protected ResponseEntity<BookPaginationDTO> getAllBooks(@Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize, @Param("sortBy") String sortBy, @Param("sortDir") String sortDir){
+
+        BookPaginationDTO bookPaginationDTO = bookService.getAllBooks(pageNumber, pageSize, sortBy, sortDir);
+
+        return ResponseEntity.of(Optional.of(bookPaginationDTO));
+    }
 }
 
 
