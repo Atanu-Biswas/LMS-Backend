@@ -2,27 +2,22 @@ package com.project.library.management.controller;
 
 import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.BookPaginationDTO;
-import com.project.library.management.dto.ManageBookRequestDTO;
-import com.project.library.management.dto.PublisherDTO;
-import com.project.library.management.exception.BookIdNotFoundException;
 import com.project.library.management.dto.BookRequestDTO;
-import com.project.library.management.entity.BookRequest;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.exception.RequestNotFoundException;
-import com.project.library.management.service.BookRequestService;
-import com.project.library.management.service.BookService;
+import com.project.library.management.repository.BookRequestRepository;
+import com.project.library.management.service.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.log4j.Logger;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import com.project.library.management.dto.ManageBookRequestDTO;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/admin")
 @CrossOrigin("http://localhost:4200")
 //@RequiredArgsConstructor
@@ -47,14 +42,14 @@ public class AdminController {
 
     @GetMapping("/accept-request")
     // working //edited for front-end
-    protected ResponseEntity<Boolean> acceptRequest(@Param("requestId") Long requestId) {
+    protected ResponseEntity<Boolean> acceptRequest(@Param("requestId") Long requestId) throws RequestNotFoundException {
         boolean isRequestAccepted = bookRequestService.acceptRequest(requestId);
-        return ResponseEntity.ok(isRequestAccepted ? "Book Request Accepted!!!" : "Book Request still Pending!!!");
+        return ResponseEntity.ok(isRequestAccepted);
     }
 
     @GetMapping("/decline-request")
     // working // edited for front-end
-    protected ResponseEntity<Boolean> declineRequest(@Param("requestId") Long requestId) {
+    protected ResponseEntity<Boolean> declineRequest(@Param("requestId") Long requestId) throws RequestNotFoundException {
         boolean isRequestDeclined = bookRequestService.declineRequest(requestId);
         return ResponseEntity.ok(isRequestDeclined);
     }
@@ -78,4 +73,13 @@ public class AdminController {
     public List<BookRequestDTO> getPendingRequests() {
         return bookRequestService.viewPendingRequests();
     }
+
+    @GetMapping("/view-all-books")
+    protected ResponseEntity<BookPaginationDTO> getAllBooks(@Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize, @Param("sortBy") String sortBy, @Param("sortDir") String sortDir ){
+
+        BookPaginationDTO bookPaginationDTO= bookService.getAllBooks(pageNumber,pageSize,sortBy,sortDir);
+
+        return ResponseEntity.of(Optional.of(bookPaginationDTO));
+    }
+
 }

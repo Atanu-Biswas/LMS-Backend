@@ -7,7 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book,Long>{
-    
+
+
 
 
     @Query("select book from Book book where lower(book.title) like lower(concat('%', :title, '%'))")
@@ -22,7 +23,7 @@ public interface BookRepository extends JpaRepository<Book,Long>{
 
     @Query("SELECT b FROM Book b WHERE LOWER(b.publisher.name) = LOWER(:publisherName)")
     List<Book> findByPublisher(String publisherName);
- 
-     @Query("select book from Book book where book.bookId= :id")  
-     Book findByBookId(Long id);
+
+
+    Book findByBookId(Long id);
 }

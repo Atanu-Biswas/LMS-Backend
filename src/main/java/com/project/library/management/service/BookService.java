@@ -1,6 +1,5 @@
 package com.project.library.management.service;
 
-import com.project.library.management.controller.AdminController;
 import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.BookPaginationDTO;
 import com.project.library.management.entity.Book;
@@ -13,19 +12,15 @@ import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.PublisherRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.Optional;
-
-import org.apache.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -209,6 +204,7 @@ public class BookService {
 
     List<BookDTO> bookDTOs=books.stream().map(book->{
       BookDTO bookDTO=new BookDTO();
+      bookDTO.setBookId(book.getBookId());
       bookDTO.setTitle(book.getTitle());
       bookDTO.setAuthor(book.getAuthor());
       bookDTO.setIsbn(book.getIsbn());

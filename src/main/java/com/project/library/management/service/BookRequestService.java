@@ -1,28 +1,20 @@
 package com.project.library.management.service;
 
-import com.project.library.management.dto.BookDTO;
-import com.project.library.management.dto.BookIssueDTO;
 import com.project.library.management.dto.BookRequestDTO;
 import com.project.library.management.dto.ManageBookRequestDTO;
 import com.project.library.management.dto.ViewRequestsDTO;
 import com.project.library.management.entity.*;
 import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.repository.BookIssueRepository;
-import com.project.library.management.dto.UserDTO;
-import com.project.library.management.entity.Book;
-import com.project.library.management.entity.BookRequest;
-import com.project.library.management.entity.User;
 import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.repository.UserRepository;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
-import com.project.library.management.dto.ManageBookRequestDTO;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -70,15 +62,18 @@ public class BookRequestService {
         return false;
     }
 
-    public boolean acceptRequest(Long requestId) {
+    public boolean acceptRequest(Long requestId) throws RequestNotFoundException {
         BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
         if (request == null) {
             throw new RequestNotFoundException("No request with request Id'" + requestId + "found");
         }
 
-        if (request!=null && request.getStatus().equals("PENDING")) {
+        if (request != null && request.getStatus().equals("PENDING")) {
             request.setStatus("ACCEPTED");
             bookRequestRepository.save(request);
+
+
+
 
             BookIssue issue = new BookIssue();
 
@@ -92,13 +87,20 @@ public class BookRequestService {
             calendar.add(Calendar.DATE, daysToAdd);
             Date dueDate = calendar.getTime();
             issue.setDueDate(dueDate);
-
+            issue.setFineStatus(Fine.valueOf("NOFINE"));
             issue.setUser(request.getUser());
+
+            Book book = bookRepository.findByBookId(request.getBook().getBookId());
+
+            int bookQuantity=book.getQuantityAvailable();
+            book.setQuantityAvailable(bookQuantity-1);
             System.out.println("Setting values for Book Issue Table done");
             bookIssueRepository.save(issue);//error
             System.out.println("Saved in Book Issue Repository");
-            return true;
+
         }
+        return true;
+    }
 
     public boolean declineRequest(Long requestId) throws RequestNotFoundException{
         BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
@@ -162,17 +164,17 @@ public class BookRequestService {
         return convertToDTOs(last10Requests);
     }
 
-    private List<ManageBookRequestDTO> convertToDTOs(List<BookRequest> bookRequests) {
-        List<ManageBookRequestDTO> dtos = new ArrayList<>();
-        for (BookRequest request : bookRequests) {
-            ManageBookRequestDTO dto = new ManageBookRequestDTO();
-            dto.setUsername(request.getUser().getUsername());
-            dto.setBookTitle(request.getBook().getTitle());
-            dto.setRequestDate(request.getRequestDate());
-            dtos.add(dto);
-        }
-        return dtos;
-    }
+//    private List<ManageBookRequestDTO> convertToDTOs(List<BookRequest> bookRequests) {
+//        List<ManageBookRequestDTO> dtos = new ArrayList<>();
+//        for (BookRequest request : bookRequests) {
+//            ManageBookRequestDTO dto = new ManageBookRequestDTO();
+//            dto.setUsername(request.getUser().getUsername());
+//            dto.setBookTitle(request.getBook().getTitle());
+//            dto.setRequestDate(request.getRequestDate());
+//            dtos.add(dto);
+//        }
+//        return dtos;
+//    }
 
     public List<ManageBookRequestDTO> searchRequestsByUsername(String username) {
         List<BookRequest> requests = bookRequestRepository.findByUserUsername(username);
@@ -190,10 +192,10 @@ public class BookRequestService {
         return dtos;
     }
 
-    public List<ManageBookRequestDTO> getLast10BookRequests() {
-        List<BookRequest> last10Requests = bookRequestRepository.findTop10ByOrderByRequestDateDesc();
-        return convertToDTOs(last10Requests);
-    }
+//    public List<ManageBookRequestDTO> getLast10BookRequests() {
+//        List<BookRequest> last10Requests = bookRequestRepository.findTop10ByOrderByRequestDateDesc();
+//        return convertToDTOs(last10Requests);
+//    }
 
     private List<ManageBookRequestDTO> convertToDTOs(List<BookRequest> bookRequests) {
         List<ManageBookRequestDTO> dtos = new ArrayList<>();
@@ -210,20 +212,20 @@ public class BookRequestService {
         return dtos;
     }
 
-    public List<ManageBookRequestDTO> searchRequestsByUsername(String username) {
-        List<BookRequest> requests = bookRequestRepository.findByUserUsername(username);
-        return convertToDTOs(requests);
-    }
+//    public List<ManageBookRequestDTO> searchRequestsByUsername(String username) {
+//        List<BookRequest> requests = bookRequestRepository.findByUserUsername(username);
+//        return convertToDTOs(requests);
+//    }
 
-    private List<ManageBookRequestDTO> converttoDTOs(List<BookRequest> bookRequests) {
-        List<ManageBookRequestDTO> dtos = new ArrayList<>();
-        for (BookRequest request : bookRequests) {
-            ManageBookRequestDTO dto = new ManageBookRequestDTO();
-            dto.setBookTitle(request.getBook().getTitle());
-            dto.setRequestDate(request.getRequestDate());
-            dtos.add(dto);
-        }
-        return dtos;
-    }
+//    private List<ManageBookRequestDTO> converttoDTOs(List<BookRequest> bookRequests) {
+//        List<ManageBookRequestDTO> dtos = new ArrayList<>();
+//        for (BookRequest request : bookRequests) {
+//            ManageBookRequestDTO dto = new ManageBookRequestDTO();
+//            dto.setBookTitle(request.getBook().getTitle());
+//            dto.setRequestDate(request.getRequestDate());
+//            dtos.add(dto);
+//        }
+//        return dtos;
+//    }
 
 }
