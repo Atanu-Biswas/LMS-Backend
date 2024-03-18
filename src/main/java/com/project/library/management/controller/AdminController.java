@@ -3,6 +3,8 @@ package com.project.library.management.controller;
 import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.BookPaginationDTO;
 import com.project.library.management.dto.BookRequestDTO;
+import com.project.library.management.dto.ManageBookRequestDTO;
+import com.project.library.management.exception.BookIdNotFoundException;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.repository.BookRequestRepository;
@@ -81,5 +83,22 @@ public class AdminController {
 
         return ResponseEntity.of(Optional.of(bookPaginationDTO));
     }
+
+        @GetMapping("/enableDisable")
+    //WORKING // changed for frontend
+    protected ResponseEntity<Boolean> enableDisableBook(@RequestParam(value = "id") Long id) throws BookIdNotFoundException {
+        System.out.println("Inside Controller"+id);
+        boolean isBookDisabled=bookService.enableDisableBook(id);
+        System.out.println("Book status: "+isBookDisabled);
+        return ResponseEntity.ok(isBookDisabled);
+    }
+
+        @GetMapping("/last-10-book-requests")
+    public ResponseEntity<List<ManageBookRequestDTO>> getLast10BookRequests() {
+        List<ManageBookRequestDTO> last10Requests = bookRequestService.getLast10BookRequests();
+        return ResponseEntity.ok(last10Requests);
+    }
+
+
 
 }

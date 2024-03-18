@@ -66,7 +66,7 @@ public class BookService {
             bookDTO.setQuantityAvailable(book.getQuantityAvailable());
             bookDTO.setActive(bookDTO.isActive());
             bookDTO.setPublisherId(book.getPublisher().getPublisherId());
-            
+            bookDTO.setBookId(book.getBookId());
             bookDTOs.add(bookDTO);
         }
 
@@ -113,6 +113,7 @@ public class BookService {
       bookDTO.setQuantityAvailable(book.getQuantityAvailable());
       bookDTO.setActive(book.isActive());
       bookDTO.setPublisherId(book.getPublisher().getPublisherId());
+      bookDTO.setBookId(book.getBookId());
       bookDTOs.add(bookDTO);
     }
 
