@@ -61,11 +61,14 @@ public class AdminController {
         return ResponseEntity.ok("book is added successfully");
     }
 
-    @GetMapping("/getBookByName/{name}" )
-    //working
-    protected ResponseEntity<BookDTO> getBookByName(@PathVariable("name") String name){
-       BookDTO book=bookService.getBookByName(name);
-       return ResponseEntity.of(Optional.of(book));
+
+
+
+    //keep this controller
+    @GetMapping("/get-book-List-by-title" )
+    protected ResponseEntity<List<BookDTO>> getBookByTitle (@Param("title") String title) throws BookNotFoundException {
+        List<BookDTO> bookDTOs=bookService.getBookListByTitle(title);
+        return ResponseEntity.ok(bookDTOs);
     }
 
     @GetMapping("/pending-requests")
@@ -104,7 +107,8 @@ public class AdminController {
         return ResponseEntity.of(Optional.of(userPaginationDTO));
     }
 
-        @GetMapping("/enableDisable")
+    //keep this changes
+        @GetMapping("/enable-disable")
     //WORKING // changed for frontend
     protected ResponseEntity<Boolean> enableDisableBook(@RequestParam(value = "id") Long id) throws BookIdNotFoundException {
         System.out.println("Inside Controller"+id);
@@ -119,6 +123,22 @@ public class AdminController {
         return ResponseEntity.ok(last10Requests);
     }
 
+
+   //view pending request by username keeep this also
+   @GetMapping("/pending-requests-by-username")
+   public ResponseEntity<BookRequestPaginationDTO> getPendingRequestsByUser(
+       @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+       @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+       @RequestParam(value = "sortBy", defaultValue ="requestDate", required = false) String sortBy,
+       @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ,
+       @RequestParam String username) {
+       BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewPendingRequestsByUserName(pageNumber, pageSize, sortBy, sortDir,username);
+
+       return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
+   }
+
+
+
     @GetMapping("/view-borrowed-books")
     protected ResponseEntity<BookIssuePaginationDTO> viewBorrowedBooks(@RequestParam("username") String username,
                                                                        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
@@ -129,5 +149,24 @@ public class AdminController {
         BookIssuePaginationDTO borrowedBooks = bookIssueService.viewBorrowedBooks(username,pageNumber,pageSize,sortBy,sortDir);
         return ResponseEntity.ofNullable(borrowedBooks);
     }
+
+       return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
+   }
+
+
+ //keep this also
+   @GetMapping("/view-user-by-username")
+   protected ResponseEntity<UserPaginationDTO> getUserByUsername(
+    @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+   @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+   @RequestParam(value = "sortBy", defaultValue ="name", required = false) String sortBy,
+   @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ,
+   String username ){
+
+    UserPaginationDTO userDTOs= userService.getUserByUsername(pageNumber, pageSize, sortBy, sortDir,username);
+
+       return ResponseEntity.ok(userDTOs);
+   }
+
 
 }

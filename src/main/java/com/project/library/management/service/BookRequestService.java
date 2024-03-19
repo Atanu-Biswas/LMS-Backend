@@ -227,6 +227,41 @@ public class BookRequestService {
         return dtos;
     }
 
+//add this service
+    public BookRequestPaginationDTO viewPendingRequestsByUserName(int pageNumber, int pageSize, String sortBy,
+            String sortDir, String username) {
+                Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+                Pageable p=PageRequest.of(pageNumber, pageSize, sort);
+                Page<BookRequest> bookRequestPage=bookRequestRepository.findAllPendingRequestsByUserName(username,p);
+        
+                List<BookRequest> bookRequests=bookRequestPage.getContent();
+        
+                List<BookRequestDTO> bookRequestDTOs=bookRequests.stream().map(bookRequest->
+                    BookRequestDTO.builder()
+                                    .bookId(bookRequest.getBook().getBookId())
+                                    .bookTitle(bookRequest.getBook().getTitle())
+                                    .weeksRequested(bookRequest.getWeeksRequested())
+                                    .status(bookRequest.getStatus())
+                                    .requestId(bookRequest.getRequestId())
+                                    .username(bookRequest.getUser().getUsername())
+                                    .requestDate(bookRequest.getRequestDate())
+                                    .build())
+                                .toList();
+        
+                return BookRequestPaginationDTO.builder()
+                                .content(bookRequestDTOs)
+                                .pageNumber(pageNumber)
+                                .pageSize(pageSize)
+                                .totalElements(bookRequestPage.getTotalElements())
+                                .totalPages(bookRequestPage.getTotalPages())
+                                .isLastPage(bookRequestPage.isLast())
+                                .build();
+            }
+        // TODO Auto-generated method stub
+       
+    }
+
 //    public List<ManageBookRequestDTO> searchRequestsByUsername(String username) {
 //        List<BookRequest> requests = bookRequestRepository.findByUserUsername(username);
 //        return convertToDTOs(requests);
@@ -243,4 +278,4 @@ public class BookRequestService {
 //        return dtos;
 //    }
 
-}
+
