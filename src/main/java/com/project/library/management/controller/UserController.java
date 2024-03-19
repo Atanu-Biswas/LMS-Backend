@@ -68,9 +68,13 @@ public class UserController {
     }
 
     @GetMapping("/view-borrowed-books")
-    protected ResponseEntity<List<BookIssueDTO>> viewBorrowedBooks(HttpServletRequest request) {
+    protected ResponseEntity<BookIssuePaginationDTO> viewBorrowedBooks(HttpServletRequest request,
+                                                                         @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+                                                                         @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+                                                                         @RequestParam(value = "sortBy", defaultValue ="issueDate", required = false) String sortBy,
+                                                                         @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ) {
         String username = request.getUserPrincipal().getName();
-        List<BookIssueDTO> borrowedBooks = bookIssueService.viewBorrowedBooks(username);
+        BookIssuePaginationDTO borrowedBooks = bookIssueService.viewBorrowedBooks(username,pageNumber,pageSize,sortBy,sortDir);
         return ResponseEntity.ofNullable(borrowedBooks);
     }
 

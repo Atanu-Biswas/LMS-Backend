@@ -1,10 +1,7 @@
 package com.project.library.management.controller;
 
-import com.project.library.management.dto.BookDTO;
-import com.project.library.management.dto.BookPaginationDTO;
-import com.project.library.management.dto.BookRequestPaginationDTO;
-import com.project.library.management.dto.BookRequestDTO;
-import com.project.library.management.dto.UserPaginationDTO;
+import com.project.library.management.dto.*;
+import com.project.library.management.exception.BookIdNotFoundException;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.repository.BookRequestRepository;
@@ -122,6 +119,15 @@ public class AdminController {
         return ResponseEntity.ok(last10Requests);
     }
 
+    @GetMapping("/view-borrowed-books")
+    protected ResponseEntity<BookIssuePaginationDTO> viewBorrowedBooks(@RequestParam("username") String username,
+                                                                       @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+                                                                       @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+                                                                       @RequestParam(value = "sortBy", defaultValue ="issueDate", required = false) String sortBy,
+                                                                       @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ) {
 
+        BookIssuePaginationDTO borrowedBooks = bookIssueService.viewBorrowedBooks(username,pageNumber,pageSize,sortBy,sortDir);
+        return ResponseEntity.ofNullable(borrowedBooks);
+    }
 
 }

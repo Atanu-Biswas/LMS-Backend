@@ -32,3 +32,5 @@ build/
 ### IDE ###
 .vscode/
 qodana.yaml
+
+/apps/logs/
