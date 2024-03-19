@@ -141,9 +141,6 @@ public class AdminController {
         return ResponseEntity.ofNullable(borrowedBooks);
     }
 
-       return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
-   }
-
 
  //keep this also
    @GetMapping("/view-user-by-username")
