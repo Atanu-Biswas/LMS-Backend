@@ -1,5 +1,6 @@
 package com.project.library.management.service;
 
+import com.project.library.management.dto.BookIssueDTO;
 import com.project.library.management.entity.Book;
 import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.BookRequest;
@@ -11,38 +12,34 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BookIssueService {
     private final BookIssueRepository bookIssueRepository;
-
-//    public List<BookIssueDTO> viewBorrowedBooks(String userId) {
-//
-//        List<BookIssue> bookIssues = bookIssueRepository.findByUserId(userId);
-//        List<BookIssueDTO> borrowedBooks = new ArrayList<>();
-//
-//        bookIssues.forEach(issue -> {
-//            BookIssueDTO bookIssueDTO = new BookIssueDTO();
-//
-//            bookIssueDTO.setIssueId(issue.getIssueId());
-//            bookIssueDTO.setBookId(issue.getBook().getBookId());
-//            bookIssueDTO.setUserId(issue.getUser().getUserId());
-//            bookIssueDTO.setIssueDate(issue.getIssueDate());
-//            bookIssueDTO.setDueDate(issue.getIssueDate());
-//            bookIssueDTO.setReturnDate(issue.getReturnDate());
-//            bookIssueDTO.setFine(String.valueOf(issue.getFine()));
-//
-//            borrowedBooks.add(bookIssueDTO);
-//        });
-//
-//        return borrowedBooks;
-//    }
-
-
-
     private final BookRequestRepository bookRequestRepository;
     private final BookRepository bookRepository;
+
+    public List<BookIssueDTO> viewBorrowedBooks(String username) {
+        List<BookIssue> bookIssues = bookIssueRepository.findByUserUsername(username);
+        List<BookIssueDTO> borrowedBooks = bookIssues.stream().filter(bookIssue -> bookIssue.getReturnDate() == null).map(bookIssue->{
+            
+            BookIssueDTO bookIssueDTO = new BookIssueDTO();
+            bookIssueDTO.setIssueId(bookIssue.getIssueId());
+            bookIssueDTO.setBookId(bookIssue.getBook().getBookId());
+            bookIssueDTO.setUserId(bookIssue.getUser().getUserId());
+            bookIssueDTO.setIssueDate(bookIssue.getIssueDate());
+            bookIssueDTO.setDueDate(bookIssue.getIssueDate());
+            bookIssueDTO.setReturnDate(bookIssue.getReturnDate());
+            bookIssueDTO.setFine(bookIssue.getFine());
+            bookIssueDTO.setFineStatus(bookIssue.getFineStatus());
+            return bookIssueDTO;
+        }).collect(Collectors.toList());
+
+        return borrowedBooks;
+    }
 
     public boolean acceptReturn(Long issueId){
 
