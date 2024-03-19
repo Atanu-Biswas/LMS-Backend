@@ -1,10 +1,6 @@
 package com.project.library.management.dto;
 
 import java.util.Date;
-import java.util.UUID;
-
-import com.project.library.management.entity.Book;
-import com.project.library.management.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,4 +18,5 @@ public class BookRequestDTO {
     private String status;
     private Long requestId;
     private String username;
+    private Date requestDate;
 }

@@ -2,9 +2,7 @@ package com.project.library.management.controller;
 
 import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.BookPaginationDTO;
-import com.project.library.management.dto.BookRequestDTO;
-import com.project.library.management.dto.ManageBookRequestDTO;
-import com.project.library.management.exception.BookIdNotFoundException;
+import com.project.library.management.dto.BookRequestPaginationDTO;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.repository.BookRequestRepository;
@@ -72,8 +70,15 @@ public class AdminController {
     }
 
     @GetMapping("/pending-requests")
-    public List<BookRequestDTO> getPendingRequests() {
-        return bookRequestService.viewPendingRequests();
+    public ResponseEntity<BookRequestPaginationDTO> getPendingRequests(
+        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+        @RequestParam(value = "sortBy", defaultValue ="requestDate", required = false) String sortBy,
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ) {
+
+        BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewPendingRequests(pageNumber, pageSize, sortBy, sortDir);
+
+        return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
     }
 
     @GetMapping("/view-all-books")

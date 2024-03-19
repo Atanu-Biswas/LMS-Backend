@@ -1,6 +1,7 @@
 package com.project.library.management.service;
 
 import com.project.library.management.dto.BookRequestDTO;
+import com.project.library.management.dto.BookRequestPaginationDTO;
 import com.project.library.management.dto.ManageBookRequestDTO;
 import com.project.library.management.dto.ViewRequestsDTO;
 import com.project.library.management.entity.*;
@@ -14,6 +15,10 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -112,27 +117,37 @@ public class BookRequestService {
         return false;
     }
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    public BookRequestPaginationDTO viewPendingRequests(int pageNumber,int pageSize,String sortBy, String sortDir) {
 
-    @SuppressWarnings("unchecked")
-    public List<BookRequestDTO> viewPendingRequests() {
-        String jpql = "SELECT br FROM BookRequest br WHERE br.status = 'PENDING'";
-        Query query = entityManager.createQuery(jpql, BookRequest.class);
-        List<BookRequest> book_req = query.getResultList();
-        List<BookRequestDTO> book_req_dtos = book_req
-                .stream()
-                .map((req) -> BookRequestDTO
-                        .builder()
-                        .requestId(req.getRequestId())
-                        .bookId(req.getBook().getBookId())
-                        .weeksRequested(req.getWeeksRequested())
-                        .status(req.getStatus())
-                        .username(req.getUser().getUsername())
-                        .build())
-                .toList();
-        return book_req_dtos;
+        Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable p=PageRequest.of(pageNumber, pageSize, sort);
+        Page<BookRequest> bookRequestPage=bookRequestRepository.findAllPendingRequests(p);
+
+        List<BookRequest> bookRequests=bookRequestPage.getContent();
+
+        List<BookRequestDTO> bookRequestDTOs=bookRequests.stream().map(bookRequest->
+            BookRequestDTO.builder()
+                            .bookId(bookRequest.getBook().getBookId())
+                            .bookTitle(bookRequest.getBook().getTitle())
+                            .weeksRequested(bookRequest.getWeeksRequested())
+                            .status(bookRequest.getStatus())
+                            .requestId(bookRequest.getRequestId())
+                            .username(bookRequest.getUser().getUsername())
+                            .requestDate(bookRequest.getRequestDate())
+                            .build())
+                        .toList();
+
+        return BookRequestPaginationDTO.builder()
+                        .content(bookRequestDTOs)
+                        .pageNumber(pageNumber)
+                        .pageSize(pageSize)
+                        .totalElements(bookRequestPage.getTotalElements())
+                        .totalPages(bookRequestPage.getTotalPages())
+                        .isLastPage(bookRequestPage.isLast())
+                        .build();
     }
+
     public List<ViewRequestsDTO> viewRequest(String userName) throws RequestNotFoundException{
         List<BookRequest> bookRequests = bookRequestRepository.findAllRequestByUserId(userName);
 
