@@ -73,8 +73,8 @@ public class UserController {
         List<BookIssueDTO> borrowedBooks = bookIssueService.viewBorrowedBooks(username);
         return ResponseEntity.ofNullable(borrowedBooks);
     }
-
-     @GetMapping("/getBookByName" )
+     //remone this !!!!!//
+     @GetMapping("/get-book-by-name" )
     protected ResponseEntity<BookDTO> getBookByName (@Param("name") String name) throws BookNotFoundException {
        BookDTO book=bookService.getBookByName(name);
 
@@ -86,8 +86,8 @@ public class UserController {
         List<BookDTO> bookDTOs=bookService.getBookListByTitle(title);
         return ResponseEntity.ok(bookDTOs);
     }
-
-     @GetMapping("/getBookById" )
+     //keep these changes
+     @GetMapping("/get-book-by-id" )
     protected ResponseEntity<BookDTO> getBookById (@Param("id") Long id) throws BookNotFoundException {
        BookDTO book=bookService.getBookById(id);
 
@@ -107,20 +107,18 @@ public class UserController {
     @Autowired
     private BookIssueRepository booksIssuedRepository;
 
+    //keepThe changes
     @GetMapping("/fines")
-    public ResponseEntity<List<FineDTO>> getUserFines(HttpServletRequest request) {
+    public ResponseEntity<FinePaginationDTO> getUserFines(HttpServletRequest request,
+    @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+    @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+    @RequestParam(value = "sortBy", defaultValue ="returnDate", required = false) String sortBy,
+    @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir) {
         String username = request.getUserPrincipal().getName();
-        List<BookIssue> finedBookIssues = booksIssuedRepository.calculateFinesByUserName(username);
-        List<FineDTO> fineDTOList = finedBookIssues.stream()
-                .map((BookIssue bookIssue)->
-                        FineDTO.
-                        builder().
-                                issueId(bookIssue.getIssueId()).
-                                fine(bookIssue.getFine()).
-                                bookName(bookIssue.getBook().getTitle())
-                                .build()
-                ).toList();
-        return ResponseEntity.ok(fineDTOList);
+    
+        FinePaginationDTO finePaginationDTO = userService.viewFine(pageNumber, pageSize, sortBy, sortDir,username);
+       
+        return ResponseEntity.ok(finePaginationDTO);
     }
 
     @GetMapping("/view-all-books")
@@ -133,6 +131,19 @@ public class UserController {
         BookPaginationDTO bookPaginationDTO = bookService.getAllBooks(pageNumber, pageSize, sortBy, sortDir);
 
         return ResponseEntity.of(Optional.of(bookPaginationDTO));
+    }
+ ///keep this
+    @GetMapping("/pending-requests")
+    public ResponseEntity<BookRequestPaginationDTO> getPendingRequestsByUser(HttpServletRequest request,
+        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+        @RequestParam(value = "sortBy", defaultValue ="requestDate", required = false) String sortBy,
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir) {
+ 
+            String username = request.getUserPrincipal().getName();
+        BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewPendingRequestsByUserName(pageNumber, pageSize, sortBy, sortDir,username);
+ 
+        return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
     }
 }
 
