@@ -194,6 +194,20 @@ public class BookService {
         return bookDTO;
     }
 
+  private BookDTO convertToDTO(Book book){
+    BookDTO bookDTO=new BookDTO();
+    bookDTO.setBookId(book.getBookId());
+    bookDTO.setTitle(book.getTitle());
+    bookDTO.setAuthor(book.getAuthor());
+    bookDTO.setIsbn(book.getIsbn());
+    bookDTO.setPrintYear(book.getPrintYear());
+    bookDTO.setImageUrl(book.getImageUrl());
+    bookDTO.setQuantityAvailable(book.getQuantityAvailable());
+    bookDTO.setActive(book.isActive());
+    bookDTO.setPublisherId(book.getPublisher().getPublisherId());
+    return bookDTO;
+  }
+
 
   public BookPaginationDTO getAllBooks(int pageNumber,int pageSize,String sortBy, String sortDir){
 
@@ -205,16 +219,7 @@ public class BookService {
     List<Book> books = bookPage.getContent();
 
     List<BookDTO> bookDTOs=books.stream().map(book->{
-      BookDTO bookDTO=new BookDTO();
-      bookDTO.setBookId(book.getBookId());
-      bookDTO.setTitle(book.getTitle());
-      bookDTO.setAuthor(book.getAuthor());
-      bookDTO.setIsbn(book.getIsbn());
-      bookDTO.setPrintYear(book.getPrintYear());
-      bookDTO.setImageUrl(book.getImageUrl());
-      bookDTO.setQuantityAvailable(book.getQuantityAvailable());
-      bookDTO.setActive(book.isActive());
-      bookDTO.setPublisherId(book.getPublisher().getPublisherId());
+      BookDTO bookDTO=convertToDTO(book);
       return bookDTO;
     }).collect(Collectors.toList());
 

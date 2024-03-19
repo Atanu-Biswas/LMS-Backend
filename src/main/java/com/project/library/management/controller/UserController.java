@@ -124,7 +124,11 @@ public class UserController {
     }
 
     @GetMapping("/view-all-books")
-    protected ResponseEntity<BookPaginationDTO> getAllBooks(@Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize, @Param("sortBy") String sortBy, @Param("sortDir") String sortDir){
+    protected ResponseEntity<BookPaginationDTO> getAllBooks(
+        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+        @RequestParam(value = "sortBy", defaultValue ="title", required = false) String sortBy,
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ){
 
         BookPaginationDTO bookPaginationDTO = bookService.getAllBooks(pageNumber, pageSize, sortBy, sortDir);
 
