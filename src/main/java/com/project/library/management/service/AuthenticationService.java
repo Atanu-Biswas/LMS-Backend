@@ -95,4 +95,17 @@ public class AuthenticationService {
     }
 
 
+    public void logout(String username, String Token) {
+
+     RefreshToken refreshToken = refreshTokenService.findByToken(Token).orElseThrow(
+                () -> new RuntimeException("Refresh token is not in database!")
+        );
+
+        if(refreshToken.getUser().getUsername().equals(username)){
+                refreshTokenService.deleteByToken(Token);
+        }
+        else {
+            throw new RuntimeException("Token not belongs to the user");
+        }
+}
 }
