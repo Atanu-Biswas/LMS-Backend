@@ -1,6 +1,9 @@
 package com.project.library.management.repository;
 
 import com.project.library.management.entity.Book;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -11,14 +14,12 @@ public interface BookRepository extends JpaRepository<Book,Long>{
 
 
 
-    @Query("select book from Book book where lower(book.title) like lower(concat('%', :title, '%'))")
-    List<Book>  findBookListByTitle(String title);
+    Page<Book> findByTitleStartingWithIgnoreCase(String title, Pageable p);
 
     @Query("select book from Book book where lower(book.title) like lower(concat('%', :title, '%'))")
     Book  findBookByTitle(String title);
 
-    @Query("select book from Book book where lower(book.author) like lower(concat('%', :authorName, '%'))")
-    List<Book> findByAuthorIgnoreCase(String authorName);
+    Page<Book> findByAuthorStartingWithIgnoreCase(String authorName, Pageable p);
 
 
     @Query("SELECT b FROM Book b WHERE LOWER(b.publisher.name) = LOWER(:publisherName)")

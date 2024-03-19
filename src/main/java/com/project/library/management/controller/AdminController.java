@@ -62,15 +62,6 @@ public class AdminController {
     }
 
 
-
-
-    //keep this controller
-    @GetMapping("/get-book-List-by-title" )
-    protected ResponseEntity<List<BookDTO>> getBookByTitle (@Param("title") String title) throws BookNotFoundException {
-        List<BookDTO> bookDTOs=bookService.getBookListByTitle(title);
-        return ResponseEntity.ok(bookDTOs);
-    }
-
     @GetMapping("/pending-requests")
     public ResponseEntity<BookRequestPaginationDTO> getPendingRequests(
         @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
@@ -107,7 +98,7 @@ public class AdminController {
         return ResponseEntity.of(Optional.of(userPaginationDTO));
     }
 
-    //keep this changes
+
         @GetMapping("/enable-disable")
     //WORKING // changed for frontend
     protected ResponseEntity<Boolean> enableDisableBook(@RequestParam(value = "id") Long id) throws BookIdNotFoundException {

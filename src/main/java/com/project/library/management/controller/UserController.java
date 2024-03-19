@@ -77,18 +77,18 @@ public class UserController {
         BookIssuePaginationDTO borrowedBooks = bookIssueService.viewBorrowedBooks(username,pageNumber,pageSize,sortBy,sortDir);
         return ResponseEntity.ofNullable(borrowedBooks);
     }
-     //remone this !!!!!//
-     @GetMapping("/get-book-by-name" )
-    protected ResponseEntity<BookDTO> getBookByName (@Param("name") String name) throws BookNotFoundException {
-       BookDTO book=bookService.getBookByName(name);
 
-       return ResponseEntity.of(Optional.of(book));
-    }
 
     @GetMapping("/get-book-List-by-title" )
-    protected ResponseEntity<List<BookDTO>> getBookByTitle (@Param("title") String title) throws BookNotFoundException {
-        List<BookDTO> bookDTOs=bookService.getBookListByTitle(title);
-        return ResponseEntity.ok(bookDTOs);
+    protected ResponseEntity<BookPaginationDTO> getBookByTitle (
+        @RequestParam("title") String title,
+        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+        @RequestParam(value = "sortBy", defaultValue ="title", required = false) String sortBy,
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir) throws BookNotFoundException {
+
+        BookPaginationDTO bookPaginationDTO=bookService.getBookListByTitle(title,pageNumber,pageSize,sortBy,sortDir);
+        return ResponseEntity.of(Optional.of(bookPaginationDTO));
     }
      //keep these changes
      @GetMapping("/get-book-by-id" )
@@ -102,16 +102,21 @@ public class UserController {
 
 
     @GetMapping("/get-book-by-authorName" )
-    protected ResponseEntity<List<BookDTO>> getBooksByAuthorName (@Param("author") String author) throws AuthorNotFoundException {
-      List <BookDTO> book=bookService.getBooksByAuthor(author);
+    protected ResponseEntity<BookPaginationDTO> getBooksByAuthorName (
+        @RequestParam("author") String author,
+        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+        @RequestParam(value = "sortBy", defaultValue ="title", required = false) String sortBy,
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir) throws AuthorNotFoundException {
 
-       return ResponseEntity.ok(book);
+        BookPaginationDTO bookPaginationDTO=bookService.getBooksByAuthor(author,pageNumber,pageSize,sortBy,sortDir);
+
+       return ResponseEntity.of(Optional.of(bookPaginationDTO));
     }
 
     @Autowired
     private BookIssueRepository booksIssuedRepository;
 
-    //keepThe changes
     @GetMapping("/fines")
     public ResponseEntity<FinePaginationDTO> getUserFines(HttpServletRequest request,
     @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
@@ -119,9 +124,9 @@ public class UserController {
     @RequestParam(value = "sortBy", defaultValue ="returnDate", required = false) String sortBy,
     @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir) {
         String username = request.getUserPrincipal().getName();
-    
+
         FinePaginationDTO finePaginationDTO = userService.viewFine(pageNumber, pageSize, sortBy, sortDir,username);
-       
+
         return ResponseEntity.ok(finePaginationDTO);
     }
 
@@ -143,10 +148,10 @@ public class UserController {
         @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
         @RequestParam(value = "sortBy", defaultValue ="requestDate", required = false) String sortBy,
         @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir) {
- 
+
             String username = request.getUserPrincipal().getName();
         BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewPendingRequestsByUserName(pageNumber, pageSize, sortBy, sortDir,username);
- 
+
         return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
     }
 }
