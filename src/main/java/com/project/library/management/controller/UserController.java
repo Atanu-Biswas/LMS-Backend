@@ -78,6 +78,7 @@ public class UserController {
         return ResponseEntity.ofNullable(borrowedBooks);
     }
 
+    //remove this
      @GetMapping("/getBookByName" )
     protected ResponseEntity<BookDTO> getBookByName (@Param("name") String name) throws BookNotFoundException {
        BookDTO book=bookService.getBookByName(name);
@@ -86,9 +87,15 @@ public class UserController {
     }
 
     @GetMapping("/get-book-List-by-title" )
-    protected ResponseEntity<List<BookDTO>> getBookByTitle (@Param("title") String title) throws BookNotFoundException {
-        List<BookDTO> bookDTOs=bookService.getBookListByTitle(title);
-        return ResponseEntity.ok(bookDTOs);
+    protected ResponseEntity<BookPaginationDTO> getBookByTitle (
+        @RequestParam("title") String title,
+        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+        @RequestParam(value = "sortBy", defaultValue ="title", required = false) String sortBy,
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir) throws BookNotFoundException {
+        
+        BookPaginationDTO bookPaginationDTO=bookService.getBookListByTitle(title,pageNumber,pageSize,sortBy,sortDir);
+        return ResponseEntity.of(Optional.of(bookPaginationDTO));
     }
 
      @GetMapping("/getBookById" )
@@ -102,10 +109,16 @@ public class UserController {
 
 
     @GetMapping("/get-book-by-authorName" )
-    protected ResponseEntity<List<BookDTO>> getBooksByAuthorName (@Param("author") String author) throws AuthorNotFoundException {
-      List <BookDTO> book=bookService.getBooksByAuthor(author);
+    protected ResponseEntity<BookPaginationDTO> getBooksByAuthorName (
+        @RequestParam("author") String author,
+        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+        @RequestParam(value = "sortBy", defaultValue ="title", required = false) String sortBy,
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir) throws AuthorNotFoundException {
+      
+        BookPaginationDTO bookPaginationDTO=bookService.getBooksByAuthor(author,pageNumber,pageSize,sortBy,sortDir);
 
-       return ResponseEntity.ok(book);
+       return ResponseEntity.of(Optional.of(bookPaginationDTO));
     }
 
     @Autowired

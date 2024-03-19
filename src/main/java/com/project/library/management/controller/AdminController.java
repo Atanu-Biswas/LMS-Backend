@@ -61,6 +61,7 @@ public class AdminController {
         return ResponseEntity.ok("book is added successfully");
     }
 
+    //remove this
     @GetMapping("/getBookByName/{name}" )
     //working
     protected ResponseEntity<BookDTO> getBookByName(@PathVariable("name") String name){
