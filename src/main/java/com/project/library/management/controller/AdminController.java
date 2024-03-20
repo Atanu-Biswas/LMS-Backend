@@ -2,6 +2,7 @@ package com.project.library.management.controller;
 
 import com.project.library.management.dto.*;
 import com.project.library.management.exception.BookIdNotFoundException;
+import com.project.library.management.exception.BookNotFoundException;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.repository.BookRequestRepository;
@@ -141,8 +142,7 @@ public class AdminController {
         return ResponseEntity.ofNullable(borrowedBooks);
     }
 
-       return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
-   }
+
 
 
  //keep this also

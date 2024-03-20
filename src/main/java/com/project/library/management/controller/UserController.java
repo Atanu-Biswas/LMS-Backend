@@ -1,7 +1,6 @@
 package com.project.library.management.controller;
 
 import com.project.library.management.dto.*;
-import com.project.library.management.entity.BookIssue;
 import com.project.library.management.exception.AuthorNotFoundException;
 import com.project.library.management.exception.BookNotFoundException;
 import com.project.library.management.exception.RequestNotFoundException;

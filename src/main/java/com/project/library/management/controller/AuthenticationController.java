@@ -55,7 +55,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationResponse);
     }
 
-    @DeleteMapping("/logout")
+    @PostMapping("/logout")
     public ResponseEntity<String> logout(
            @RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO, HttpServletRequest request
     ) {
