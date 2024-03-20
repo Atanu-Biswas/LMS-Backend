@@ -42,6 +42,10 @@ public class BookRequestService {
         if (book == null) {
             return false;
         }
+        boolean isEnable =  true;
+        if(isEnable!=book.isActive()){
+            return false;
+        }
         BookRequest request = new BookRequest();
         request.setUser(user);
         request.setBook(book);
@@ -68,9 +72,18 @@ public class BookRequestService {
 
     public boolean acceptRequest(Long requestId) throws RequestNotFoundException {
         BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
+        
         if (request == null) {
             throw new RequestNotFoundException("No request with request Id'" + requestId + "found");
         }
+
+        Book book = bookRepository.findByBookId(request.getBook().getBookId());
+        
+        boolean isEnable =  true;
+        if(isEnable!=book.isActive()){
+            return false;
+        }
+
 
         if (request != null && request.getStatus().equals("PENDING")) {
             request.setStatus("ACCEPTED");
@@ -94,7 +107,7 @@ public class BookRequestService {
             issue.setFineStatus(Fine.valueOf("NOFINE"));
             issue.setUser(request.getUser());
 
-            Book book = bookRepository.findByBookId(request.getBook().getBookId());
+            //Book book = bookRepository.findByBookId(request.getBook().getBookId());
 
             int bookQuantity=book.getQuantityAvailable();
             book.setQuantityAvailable(bookQuantity-1);

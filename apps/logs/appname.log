@@ -5,3 +5,15 @@
 [2024-03-20 08:58:17,501] http-nio-8080-exec-2 com.project.library.management.service.AuthenticationService 93 DEBUG  - Query fired for finding the User by username
 [2024-03-20 08:58:28,441] http-nio-8080-exec-8 com.project.library.management.service.BookService 148 DEBUG  - Query fired for finding the Book by Id
 [2024-03-20 08:58:28,451] http-nio-8080-exec-8 com.project.library.management.service.BookService 164 DEBUG  - Enabled/Disabled the book by Id
+[2024-03-20 12:40:51,613] http-nio-8080-exec-2 com.project.library.management.service.AuthenticationService 39 DEBUG  - Registered a new user into our LMS Portal !
+[2024-03-20 12:41:28,611] http-nio-8080-exec-3 com.project.library.management.service.AuthenticationService 58 DEBUG  - Query fired for finding the Username for logging in
+[2024-03-20 12:41:28,612] http-nio-8080-exec-3 com.project.library.management.service.AuthenticationService 60 INFO   - Generated the Access Token for the user
+[2024-03-20 12:41:28,620] http-nio-8080-exec-3 com.project.library.management.service.AuthenticationService 62 INFO   - Generated the Refresh Token for the user
+[2024-03-20 12:41:28,622] http-nio-8080-exec-3 com.project.library.management.service.AuthenticationService 93 DEBUG  - Query fired for finding the User by username
+[2024-03-20 12:42:12,224] http-nio-8080-exec-4 com.project.library.management.service.BookRequestService 40 DEBUG  - Query fired for finding the User by username
+[2024-03-20 12:42:19,753] http-nio-8080-exec-5 com.project.library.management.service.BookRequestService 40 DEBUG  - Query fired for finding the User by username
+[2024-03-20 12:44:20,617] http-nio-8080-exec-3 com.project.library.management.service.AuthenticationService 58 DEBUG  - Query fired for finding the Username for logging in
+[2024-03-20 12:44:20,618] http-nio-8080-exec-3 com.project.library.management.service.AuthenticationService 60 INFO   - Generated the Access Token for the user
+[2024-03-20 12:44:20,625] http-nio-8080-exec-3 com.project.library.management.service.AuthenticationService 62 INFO   - Generated the Refresh Token for the user
+[2024-03-20 12:44:20,627] http-nio-8080-exec-3 com.project.library.management.service.AuthenticationService 93 DEBUG  - Query fired for finding the User by username
+[2024-03-20 12:44:34,492] http-nio-8080-exec-4 com.project.library.management.service.BookRequestService 40 DEBUG  - Query fired for finding the User by username
