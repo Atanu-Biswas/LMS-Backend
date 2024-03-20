@@ -143,8 +143,6 @@ public class AdminController {
     }
 
 
-
-
  //keep this also
    @GetMapping("/view-user-by-username")
    protected ResponseEntity<UserPaginationDTO> getUserByUsername(

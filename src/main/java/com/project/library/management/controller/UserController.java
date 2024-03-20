@@ -53,9 +53,9 @@ public class UserController {
     }
     @GetMapping("/cancel-request")
     //working
-    public ResponseEntity<String> declineBookRequest(@Param("requestId") Long requestId) throws RequestNotFoundException{
+    public ResponseEntity<Boolean> declineBookRequest(@Param("requestId") Long requestId) throws RequestNotFoundException{
         boolean isRequestCancelled = bookRequestService.cancelRequest(requestId);
-        return ResponseEntity.ok(isRequestCancelled ? "Book Request Cancelled!!!" : "Book Request Retained!!!");
+        return ResponseEntity.ok(isRequestCancelled);
 
     }
     @GetMapping("/view-request")
