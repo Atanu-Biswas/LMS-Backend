@@ -1,22 +1,30 @@
 package com.project.library.management.repository;
 
-import java.util.List;
-import java.util.Optional;
+import com.project.library.management.entity.Book;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
-import com.project.library.management.entity.Book;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book,Long>{
-    Book  findBookByTitle(String name);
 
-    @Query("select book from Book book where lower(book.author) like lower(concat('%', :authorname, '%'))")
-    List<Book> findByAuthorIgnoreCase(String authorname);
- 
-     @Query("select book from Book book where book.bookId= :id")  
-     Book findByBookId(Long id);
+
+
+
+    Page<Book> findByTitleStartingWithIgnoreCase(String title, Pageable p);
+
+    @Query("select book from Book book where lower(book.title) like lower(concat('%', :title, '%'))")
+    Book  findBookByTitle(String title);
+
+    Page<Book> findByAuthorStartingWithIgnoreCase(String authorName, Pageable p);
+
+
+    @Query("SELECT b FROM Book b WHERE LOWER(b.publisher.name) = LOWER(:publisherName)")
+    List<Book> findByPublisher(String publisherName);
+
+
+    Book findByBookId(Long id);
 }

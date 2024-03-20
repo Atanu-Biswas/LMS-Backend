@@ -1,6 +1,7 @@
 package com.project.library.management.service;
 
 import com.project.library.management.dto.BookDTO;
+import com.project.library.management.dto.BookPaginationDTO;
 import com.project.library.management.entity.Book;
 import com.project.library.management.entity.Publisher;
 import com.project.library.management.exception.AuthorNotFoundException;
@@ -8,22 +9,30 @@ import com.project.library.management.exception.BookIdNotFoundException;
 import com.project.library.management.exception.BookNotFoundException;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.repository.BookRepository;
+import com.project.library.management.repository.PublisherRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.log4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BookService {
+    private static final Logger logger = Logger.getLogger(BookService.class);
   private final BookRepository bookRepository;
+  private final PublisherRepository publisherRepository;
   private final PublisherService publisherService;
 
   public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException {
     Publisher publisher = publisherService.getPublisherById(bookDTO.getPublisherId());
+    logger.debug("Query fired for getting Publisher by Id");
     Book book = new Book();
     book.setAuthor(bookDTO.getAuthor());
     book.setTitle(bookDTO.getTitle());
@@ -34,34 +43,87 @@ public class BookService {
     book.setActive(bookDTO.isActive());
     book.setPublisher(publisher);
     bookRepository.save(book);
+    logger.debug("Saved the Book details in the database");
     return true;
   }
 
-   public BookDTO getBookByName  (String name) throws BookNotFoundException{
-    Book book=bookRepository.findBookByTitle(name);
-    //Publisher publisher=publisherService.getPublisherById(book.getPublisher().getPublisherId());
-    if (book == null) {
-      throw new BookNotFoundException("Book with title '" + name + "' not found");
+  public BookPaginationDTO getBookListByTitle (String title,int pageNumber,int pageSize,String sortBy, String sortDir) throws BookNotFoundException{
+    Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+    Pageable p=PageRequest.of(pageNumber, pageSize, sort);
+    Page<Book> bookPage = bookRepository.findByTitleStartingWithIgnoreCase(title,p);
+    List<Book> books = bookPage.getContent();
+    logger.debug("Query fired for getting the Book by title");
+
+    if (books == null) {
+        logger.error("Book Not Found Exception generated !");
+        throw new BookNotFoundException("Book with title '" + title + "' not found");
+    }
+
+    List<BookDTO> bookDTOs=books.stream().map(book->convertToDTO(book)).toList();
+
+    return BookPaginationDTO.builder()
+                  .content(bookDTOs)
+                  .pageNumber(pageNumber)
+                  .pageSize(pageSize)
+                  .totalElements(bookPage.getTotalElements())
+                  .totalPages(bookPage.getTotalPages())
+                  .isLastPage(bookPage.isLast())
+                  .build();
   }
-    BookDTO bookDTO=new BookDTO();
-    bookDTO.setAuthor(book.getAuthor());
-    bookDTO.setTitle(book.getTitle());
-    bookDTO.setImageUrl(book.getImageUrl());
-    bookDTO.setIsbn(book.getIsbn());
-    bookDTO.setPrintYear(book.getPrintYear());
-    bookDTO.setQuantityAvailable(book.getQuantityAvailable());
-    bookDTO.setActive(bookDTO.isActive());
-    bookDTO.setPublisherId(book.getPublisher().getPublisherId());
-    return bookDTO;
-   }
 
-   public List<BookDTO> getBooksByAuthor  (String author) throws AuthorNotFoundException{
-   
-    List<Book> books =  bookRepository.findByAuthorIgnoreCase(author);
+    public BookDTO getBookById  (Long id) throws BookNotFoundException{
+        Book book=bookRepository.findByBookId(id);
+        //Publisher publisher=publisherService.getPublisherById(book.getPublisher().getPublisherId());
+        if (book == null) {
+            throw new BookNotFoundException("Book with title '" + id + "' not found");
+        }
+        BookDTO bookDTO=new BookDTO();
+        bookDTO.setBookId(book.getBookId());
+        bookDTO.setAuthor(book.getAuthor());
+        bookDTO.setTitle(book.getTitle());
+        bookDTO.setImageUrl(book.getImageUrl());
+        bookDTO.setIsbn(book.getIsbn());
+        bookDTO.setPrintYear(book.getPrintYear());
+        bookDTO.setQuantityAvailable(book.getQuantityAvailable());
+        bookDTO.setActive(bookDTO.isActive());
+        bookDTO.setPublisherId(book.getPublisher().getPublisherId());
+        return bookDTO;
+    }
 
+   public BookPaginationDTO getBooksByAuthor  (String author,int pageNumber,int pageSize,String sortBy, String sortDir) throws AuthorNotFoundException{
+
+    Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+    Pageable p=PageRequest.of(pageNumber, pageSize, sort);
+    Page<Book> bookPage = bookRepository.findByAuthorStartingWithIgnoreCase(author,p);
    
+    List<Book> books =  bookPage.getContent();
+    logger.debug("Query fired for Finding the Book by Author Name");
+
      if (books.isEmpty()) {
+         logger.error("Author Not Found Exception generated !");
         throw new AuthorNotFoundException("No books found for author '" + author + "'");
+    }
+
+    List<BookDTO> bookDTOs=books.stream().map(book->convertToDTO(book)).toList();
+    
+    return BookPaginationDTO.builder()
+                  .content(bookDTOs)
+                  .pageNumber(pageNumber)
+                  .pageSize(pageSize)
+                  .totalElements(bookPage.getTotalElements())
+                  .totalPages(bookPage.getTotalPages())
+                  .isLastPage(bookPage.isLast())
+                  .build();
+  }
+
+  public List<BookDTO> getBooksByPublisher(String publisherName) throws PublisherNotFoundException {
+
+    List<Book> books = bookRepository.findByPublisher(publisherName);
+
+    if (books.isEmpty()) {
+      throw new PublisherNotFoundException("No books found for publisher '" + publisherName + "'");
     }
 
     List<BookDTO> bookDTOs = new ArrayList<>();
@@ -83,7 +145,9 @@ public class BookService {
 
    public boolean enableDisableBook(Long id) throws BookIdNotFoundException{
     Book book=bookRepository.findByBookId(id);
+    logger.debug("Query fired for finding the Book by Id");
         if (book == null) {
+            logger.error("Book Id Not Found Exception generated !");
             throw new BookIdNotFoundException("Book with ID " + id + " not found");
         }
     boolean isEnable=true;
@@ -97,7 +161,75 @@ public class BookService {
       book.setActive(true);
     }
     bookRepository.save(book);
+    logger.debug("Enabled/Disabled the book by Id");
 
     return !isEnable;
    }
+
+    public void updateBook(Long bookId, BookDTO updateBookRequest) {
+        Book book = bookRepository.findByBookId(bookId);
+
+        // Update book properties based on DTO values
+        book.setTitle(updateBookRequest.getTitle());
+        book.setAuthor(updateBookRequest.getAuthor());
+
+        bookRepository.save(book);
+    }
+
+
+
+    public BookDTO getBookByName(String name) {
+        Book book = bookRepository.findBookByTitle(name);
+        BookDTO bookDTO = new BookDTO();
+        bookDTO.setAuthor(book.getAuthor());
+        bookDTO.setTitle(book.getTitle());
+        bookDTO.setImageUrl(book.getImageUrl());
+        bookDTO.setIsbn(book.getIsbn());
+        bookDTO.setPrintYear(book.getPrintYear());
+        bookDTO.setQuantityAvailable(book.getQuantityAvailable());
+        bookDTO.setActive(book.isActive());
+        bookDTO.setPublisherId(book.getPublisher().getPublisherId());
+        return bookDTO;
+    }
+
+  private BookDTO convertToDTO(Book book){
+
+    return BookDTO.builder()
+                  .bookId(book.getBookId())
+                  .title(book.getTitle())
+                  .author(book.getAuthor())
+                  .isbn(book.getIsbn())
+                  .printYear(book.getPrintYear())
+                  .imageUrl(book.getImageUrl())
+                  .quantityAvailable(book.getQuantityAvailable())
+                  .isActive(book.isActive())
+                  .publisherId(book.getPublisher().getPublisherId())
+                  .build();
+  }
+
+
+  public BookPaginationDTO getAllBooks(int pageNumber,int pageSize,String sortBy, String sortDir){
+
+    Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+    Pageable p=PageRequest.of(pageNumber, pageSize, sort);
+    Page<Book> bookPage = bookRepository.findAll(p);
+
+    List<Book> books = bookPage.getContent();
+
+    List<BookDTO> bookDTOs=books.stream().map(book->{
+      BookDTO bookDTO=convertToDTO(book);
+      return bookDTO;
+    }).collect(Collectors.toList());
+
+    BookPaginationDTO bookPaginationDTO= new BookPaginationDTO();
+    bookPaginationDTO.setContent(bookDTOs);
+    bookPaginationDTO.setPageNumber(pageNumber);
+    bookPaginationDTO.setPageSize(pageSize);
+    bookPaginationDTO.setTotalElements(bookPage.getTotalElements());
+    bookPaginationDTO.setTotalPages(bookPage.getTotalPages());
+    bookPaginationDTO.setLastPage(bookPage.isLast());
+
+    return bookPaginationDTO;
+  }
 }

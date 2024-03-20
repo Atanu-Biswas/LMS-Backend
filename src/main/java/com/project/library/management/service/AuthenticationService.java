@@ -9,6 +9,7 @@ import com.project.library.management.entity.Role;
 import com.project.library.management.entity.User;
 import com.project.library.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+    private static final Logger logger = Logger.getLogger(AuthenticationService.class);
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -34,7 +36,7 @@ public class AuthenticationService {
 
         user.setRole(Role.USER);
         user = userRepository.save(user);
-
+        logger.debug("Registered a new user into our LMS Portal !");
         String token = jwtService.generateToken(user);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
         String refreshTokenToken = refreshToken.getToken();
@@ -53,9 +55,11 @@ public class AuthenticationService {
         );
 
         User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
-
+        logger.debug("Query fired for finding the Username for logging in");
         String token = jwtService.generateToken(user);
+        logger.info("Generated the Access Token for the user");
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
+        logger.info("Generated the Refresh Token for the user");
         String refreshTokenToken = refreshToken.getToken();
 
         return new AuthenticationResponse(token, refreshTokenToken);
@@ -86,8 +90,22 @@ public class AuthenticationService {
 
     public String getUserRole(String username) {
         User user = userRepository.findByUsername(username).orElseThrow();
+        logger.debug("Query fired for finding the User by username");
         return user.getRole().name();
     }
 
 
+    public void logout(String username, String Token) {
+
+     RefreshToken refreshToken = refreshTokenService.findByToken(Token).orElseThrow(
+                () -> new RuntimeException("Refresh token is not in database!")
+        );
+
+        if(refreshToken.getUser().getUsername().equals(username)){
+                refreshTokenService.deleteByToken(Token);
+        }
+        else {
+            throw new RuntimeException("Token not belongs to the user");
+        }
+}
 }

@@ -50,4 +50,10 @@ public class RefreshTokenService {
     public Object verifyExpiration(RefreshToken refreshToken) {
         return refreshToken.getExpiryDate().isBefore(Instant.now());
     }
+
+    public Object deleteByToken(String refreshToken) {
+
+        findByToken(refreshToken).ifPresent(refreshTokenRepository::delete);
+        return "Refresh Token Deleted Successfully";
+    }
 }
