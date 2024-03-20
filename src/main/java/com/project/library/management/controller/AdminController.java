@@ -2,7 +2,6 @@ package com.project.library.management.controller;
 
 import com.project.library.management.dto.*;
 import com.project.library.management.exception.BookIdNotFoundException;
-import com.project.library.management.exception.BookNotFoundException;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.repository.BookRequestRepository;
@@ -156,6 +155,17 @@ public class AdminController {
 
        return ResponseEntity.ok(userDTOs);
    }
+
+    @GetMapping("/accept-return")
+    protected ResponseEntity<String> acceptReturn(@RequestParam("issueId") Long issueId){
+        System.out.println("issueId: "+issueId);
+        boolean isReturnAccepted = bookIssueService.acceptReturn(issueId);
+
+        System.out.println("inside accept return");
+
+        return ResponseEntity.ok(isReturnAccepted ? "Book return is successfully accepted" : "Book return is unsuccessful!!!");
+    }
+
 
 
 }
