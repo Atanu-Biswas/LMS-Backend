@@ -5,20 +5,18 @@ import com.project.library.management.dto.FinePaginationDTO;
 import com.project.library.management.dto.UserDTO;
 import com.project.library.management.dto.UserPaginationDTO;
 import com.project.library.management.entity.BookIssue;
-import com.project.library.management.entity.Fine;
 import com.project.library.management.entity.User;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -111,7 +109,7 @@ public class UserService {
                 .map((BookIssue bookIssue) -> FineDTO.builder().issueId(bookIssue.getIssueId())
                         .fine(bookIssue.getFine()).bookName(bookIssue.getBook().getTitle())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
 
         FinePaginationDTO finePaginationDTO = new FinePaginationDTO();
         finePaginationDTO.setContent(fineDTOs);
@@ -120,6 +118,8 @@ public class UserService {
         finePaginationDTO.setTotalElements(finePage.getTotalElements());
         finePaginationDTO.setTotalPages(finePage.getTotalPages());
         finePaginationDTO.setLastPage(finePage.isLast());
+
+        System.out.println(finePaginationDTO);
         return finePaginationDTO;
     }
 }

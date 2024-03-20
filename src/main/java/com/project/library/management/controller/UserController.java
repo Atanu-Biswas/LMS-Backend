@@ -1,7 +1,6 @@
  package com.project.library.management.controller;
 
 import com.project.library.management.dto.*;
-import com.project.library.management.entity.BookIssue;
 import com.project.library.management.exception.AuthorNotFoundException;
 import com.project.library.management.exception.BookNotFoundException;
 import com.project.library.management.exception.RequestNotFoundException;
@@ -54,9 +53,9 @@ public class UserController {
     }
     @GetMapping("/cancel-request")
     //working
-    public ResponseEntity<String> declineBookRequest(@Param("requestId") Long requestId) throws RequestNotFoundException{
+    public ResponseEntity<Boolean> declineBookRequest(@Param("requestId") Long requestId) throws RequestNotFoundException{
         boolean isRequestCancelled = bookRequestService.cancelRequest(requestId);
-        return ResponseEntity.ok(isRequestCancelled ? "Book Request Cancelled!!!" : "Book Request Retained!!!");
+        return ResponseEntity.ok(isRequestCancelled);
 
     }
     @GetMapping("/view-request")
