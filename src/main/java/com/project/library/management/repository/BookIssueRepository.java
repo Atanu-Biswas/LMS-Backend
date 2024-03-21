@@ -12,5 +12,7 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
     Page<BookIssue> calculateFinesByUserName(String username,Pageable p);
 
     Page<BookIssue> findByUserUsername(String username, Pageable p);
-
+    
+    @Query("SELECT COUNT(bi) > 0 FROM BookIssue bi WHERE bi.book.bookId = :bookId")
+    boolean existsByBookId(Long bookId);
 }

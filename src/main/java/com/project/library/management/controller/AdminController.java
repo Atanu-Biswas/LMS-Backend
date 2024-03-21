@@ -2,6 +2,7 @@ package com.project.library.management.controller;
 
 import com.project.library.management.dto.*;
 import com.project.library.management.exception.BookIdNotFoundException;
+import com.project.library.management.exception.BookNotDeletedException;
 import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.exception.RequestNotFoundException;
 import com.project.library.management.repository.BookRequestRepository;
@@ -166,6 +167,13 @@ public class AdminController {
         return ResponseEntity.ok(isReturnAccepted ? "Book return is successfully accepted" : "Book return is unsuccessful!!!");
     }
 
+ //keep this
+ @DeleteMapping("/delete-book")
+ protected ResponseEntity<Boolean> deleteBook(@RequestParam("bookId") Long bookId )throws BookNotDeletedException{
 
+    boolean isDeleted=bookService.deleteBook(bookId);
+    System.out.println(isDeleted);
+    return ResponseEntity.ok(isDeleted);
+ }
 
 }

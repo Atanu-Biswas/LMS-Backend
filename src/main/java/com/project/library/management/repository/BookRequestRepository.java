@@ -37,4 +37,6 @@ public interface BookRequestRepository extends JpaRepository<BookRequest, Long> 
     //keep this 
     @Query("SELECT br FROM BookRequest br WHERE br.user.username= :username AND br.status = 'PENDING'")
     Page<BookRequest> findAllPendingRequestsByUserName(String username,Pageable p);
+
+    
 }
