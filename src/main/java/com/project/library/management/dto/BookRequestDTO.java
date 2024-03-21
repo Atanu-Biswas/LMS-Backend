@@ -19,4 +19,5 @@ public class BookRequestDTO {
     private Long requestId;
     private String username;
     private Date requestDate;
+    private int quantityAvailable;
 }

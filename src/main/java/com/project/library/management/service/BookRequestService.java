@@ -5,14 +5,13 @@ import com.project.library.management.dto.BookRequestPaginationDTO;
 import com.project.library.management.dto.ManageBookRequestDTO;
 import com.project.library.management.dto.ViewRequestsDTO;
 import com.project.library.management.entity.*;
-import com.project.library.management.exception.RequestNotFoundException;
+import com.project.library.management.exception.BookNotFoundException;
+import com.project.library.management.exception.UserNotFoundException;
+import com.project.library.management.exception.BookRequestNotFoundException;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.repository.UserRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
 import org.springframework.data.domain.Page;
@@ -35,12 +34,12 @@ public class BookRequestService {
     private final BookIssueRepository bookIssueRepository;
     private final UserRepository userRepository;
 
-    public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) {
+    public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) throws BookNotFoundException {
         User user = userRepository.findByUsername(username).orElse(null);
         logger.debug("Query fired for finding the User by username");
         Book book = bookRepository.findById(bookRequestDTO.getBookId()).orElse(null);
         if (book == null) {
-            return false;
+            throw new BookNotFoundException("Requested Book Not Found!!");
         }
         BookRequest request = new BookRequest();
         request.setUser(user);
@@ -48,16 +47,15 @@ public class BookRequestService {
         request.setRequestDate(new Date());
         request.setWeeksRequested(bookRequestDTO.getWeeksRequested());
         bookRequestRepository.save(request);
-        logger.debug("Saved an issue Request for a book for the username: "+username);
+        logger.debug("Saved an issue Request for a book for the username: " + username);
         return true;
     }
 
-
-    public boolean cancelRequest(Long requestId) throws RequestNotFoundException {
+    public boolean cancelRequest(Long requestId) throws BookRequestNotFoundException {
         BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
         logger.debug("Query fired for finding the book by Book Id");
         if (request == null) {
-            throw new RequestNotFoundException("No request with request Id'" + requestId + "found");
+            throw new BookRequestNotFoundException("No request with request Id'" + requestId + "found");
         }
         if (request != null && request.getStatus().equals("PENDING")) {
             request.setStatus("CANCELLED");
@@ -67,18 +65,12 @@ public class BookRequestService {
         return false;
     }
 
-    public boolean acceptRequest(Long requestId) throws RequestNotFoundException {
-        BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
-        if (request == null) {
-            throw new RequestNotFoundException("No request with request Id'" + requestId + "found");
-        }
+    public boolean acceptRequest(Long requestId) throws BookRequestNotFoundException,BookNotFoundException {
+        BookRequest request = bookRequestRepository.findById(requestId).orElseThrow(()->new BookRequestNotFoundException("Book request with request Id: " +requestId+" not found"));
 
         if (request != null && request.getStatus().equals("PENDING")) {
             request.setStatus("ACCEPTED");
             bookRequestRepository.save(request);
-
-
-
 
             BookIssue issue = new BookIssue();
 
@@ -95,10 +87,10 @@ public class BookRequestService {
             issue.setFineStatus(Fine.valueOf("NOFINE"));
             issue.setUser(request.getUser());
 
-            Book book = bookRepository.findByBookId(request.getBook().getBookId());
+            Book book = bookRepository.findById(request.getBook().getBookId()).orElseThrow(()->new BookNotFoundException());
 
-            int bookQuantity=book.getQuantityAvailable();
-            book.setQuantityAvailable(bookQuantity-1);
+            int bookQuantity = book.getQuantityAvailable();
+            book.setQuantityAvailable(bookQuantity - 1);
             System.out.println("Setting values for Book Issue Table done");
             bookIssueRepository.save(issue);//error
             System.out.println("Saved in Book Issue Repository");
@@ -107,8 +99,8 @@ public class BookRequestService {
         return true;
     }
 
-    public boolean declineRequest(Long requestId) throws RequestNotFoundException{
-        BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
+    public boolean declineRequest(Long requestId) throws BookRequestNotFoundException {
+        BookRequest request = bookRequestRepository.findById(requestId).orElseThrow(()->new BookRequestNotFoundException("Book request with request Id: " +requestId+" not found"));
         if (request != null && request.getStatus().equals("PENDING")) {
             request.setStatus("REJECTED");
             bookRequestRepository.save(request);
@@ -117,42 +109,45 @@ public class BookRequestService {
         return false;
     }
 
-    public BookRequestPaginationDTO viewPendingRequests(int pageNumber,int pageSize,String sortBy, String sortDir) {
+    public BookRequestPaginationDTO viewPendingRequests(int pageNumber, int pageSize, String sortBy, String sortDir) throws BookRequestNotFoundException {
 
         Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
-        Pageable p=PageRequest.of(pageNumber, pageSize, sort);
-        Page<BookRequest> bookRequestPage=bookRequestRepository.findAllPendingRequests(p);
+        Pageable p = PageRequest.of(pageNumber, pageSize, sort);
+        Page<BookRequest> bookRequestPage = bookRequestRepository.findAllPendingRequests(p);
+        if(bookRequestPage.isEmpty()){
+            throw new BookRequestNotFoundException("No request is pending!!");
+        }
 
-        List<BookRequest> bookRequests=bookRequestPage.getContent();
+        List<BookRequest> bookRequests = bookRequestPage.getContent();
 
-        List<BookRequestDTO> bookRequestDTOs=bookRequests.stream().map(bookRequest->
-            BookRequestDTO.builder()
-                            .bookId(bookRequest.getBook().getBookId())
-                            .bookTitle(bookRequest.getBook().getTitle())
-                            .weeksRequested(bookRequest.getWeeksRequested())
-                            .status(bookRequest.getStatus())
-                            .requestId(bookRequest.getRequestId())
-                            .username(bookRequest.getUser().getUsername())
-                            .requestDate(bookRequest.getRequestDate())
-                            .build())
-                        .toList();
+        List<BookRequestDTO> bookRequestDTOs = bookRequests.stream().map(bookRequest -> BookRequestDTO.builder()
+                .bookId(bookRequest.getBook().getBookId())
+                .bookTitle(bookRequest.getBook().getTitle())
+                .weeksRequested(bookRequest.getWeeksRequested())
+                .status(bookRequest.getStatus())
+                .requestId(bookRequest.getRequestId())
+                .username(bookRequest.getUser().getUsername())
+                .requestDate(bookRequest.getRequestDate())
+                .quantityAvailable(bookRequest.getBook().getQuantityAvailable())
+                .build())
+                .toList();
 
         return BookRequestPaginationDTO.builder()
-                        .content(bookRequestDTOs)
-                        .pageNumber(pageNumber)
-                        .pageSize(pageSize)
-                        .totalElements(bookRequestPage.getTotalElements())
-                        .totalPages(bookRequestPage.getTotalPages())
-                        .isLastPage(bookRequestPage.isLast())
-                        .build();
+                .content(bookRequestDTOs)
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .totalElements(bookRequestPage.getTotalElements())
+                .totalPages(bookRequestPage.getTotalPages())
+                .isLastPage(bookRequestPage.isLast())
+                .build();
     }
 
-    public List<ViewRequestsDTO> viewRequest(String userName) throws RequestNotFoundException{
+    public List<ViewRequestsDTO> viewRequest(String userName) throws BookRequestNotFoundException {
         List<BookRequest> bookRequests = bookRequestRepository.findAllRequestByUserId(userName);
 
         if (bookRequests.isEmpty()) {
-            throw new RequestNotFoundException("No request by" + userName + "found");
+            throw new BookRequestNotFoundException("No request by" + userName + "found");
         }
         List<ViewRequestsDTO> viewRequestsDTOList = new ArrayList<>();
 
@@ -174,22 +169,26 @@ public class BookRequestService {
 
     }
 
-    public List<ManageBookRequestDTO> getLast10BookRequests() {
+    public List<ManageBookRequestDTO> getLast10BookRequests() throws BookRequestNotFoundException {
         List<BookRequest> last10Requests = bookRequestRepository.findTop10ByOrderByRequestDateDesc();
+        if(last10Requests.isEmpty()){
+            throw new BookRequestNotFoundException();
+        }
         return convertToDTOs(last10Requests);
     }
 
-//    private List<ManageBookRequestDTO> convertToDTOs(List<BookRequest> bookRequests) {
-//        List<ManageBookRequestDTO> dtos = new ArrayList<>();
-//        for (BookRequest request : bookRequests) {
-//            ManageBookRequestDTO dto = new ManageBookRequestDTO();
-//            dto.setUsername(request.getUser().getUsername());
-//            dto.setBookTitle(request.getBook().getTitle());
-//            dto.setRequestDate(request.getRequestDate());
-//            dtos.add(dto);
-//        }
-//        return dtos;
-//    }
+    // private List<ManageBookRequestDTO> convertToDTOs(List<BookRequest>
+    // bookRequests) {
+    // List<ManageBookRequestDTO> dtos = new ArrayList<>();
+    // for (BookRequest request : bookRequests) {
+    // ManageBookRequestDTO dto = new ManageBookRequestDTO();
+    // dto.setUsername(request.getUser().getUsername());
+    // dto.setBookTitle(request.getBook().getTitle());
+    // dto.setRequestDate(request.getRequestDate());
+    // dtos.add(dto);
+    // }
+    // return dtos;
+    // }
 
     public List<ManageBookRequestDTO> searchRequestsByUsername(String username) {
         List<BookRequest> requests = bookRequestRepository.findByUserUsername(username);
@@ -207,10 +206,11 @@ public class BookRequestService {
         return dtos;
     }
 
-//    public List<ManageBookRequestDTO> getLast10BookRequests() {
-//        List<BookRequest> last10Requests = bookRequestRepository.findTop10ByOrderByRequestDateDesc();
-//        return convertToDTOs(last10Requests);
-//    }
+    // public List<ManageBookRequestDTO> getLast10BookRequests() {
+    // List<BookRequest> last10Requests =
+    // bookRequestRepository.findTop10ByOrderByRequestDateDesc();
+    // return convertToDTOs(last10Requests);
+    // }
 
     private List<ManageBookRequestDTO> convertToDTOs(List<BookRequest> bookRequests) {
         List<ManageBookRequestDTO> dtos = new ArrayList<>();
@@ -220,62 +220,63 @@ public class BookRequestService {
             dto.setBookTitle(request.getBook().getTitle());
             dto.setRequestDate(request.getRequestDate());
             dto.setRequestId(request.getRequestId()); // line added
-            dto.setWeeksRequested(request.getWeeksRequested()); //line added
-            dto.setStatus(request.getStatus()); //line added
+            dto.setWeeksRequested(request.getWeeksRequested()); // line added
+            dto.setStatus(request.getStatus()); // line added
             dtos.add(dto);
         }
         return dtos;
     }
 
-//add this service
+    // add this service
     public BookRequestPaginationDTO viewPendingRequestsByUserName(int pageNumber, int pageSize, String sortBy,
-            String sortDir, String username) {
-                Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+            String sortDir, String username) throws BookRequestNotFoundException, UserNotFoundException {
 
-                Pageable p=PageRequest.of(pageNumber, pageSize, sort);
-                Page<BookRequest> bookRequestPage=bookRequestRepository.findAllPendingRequestsByUserName(username,p);
-        
-                List<BookRequest> bookRequests=bookRequestPage.getContent();
-        
-                List<BookRequestDTO> bookRequestDTOs=bookRequests.stream().map(bookRequest->
-                    BookRequestDTO.builder()
-                                    .bookId(bookRequest.getBook().getBookId())
-                                    .bookTitle(bookRequest.getBook().getTitle())
-                                    .weeksRequested(bookRequest.getWeeksRequested())
-                                    .status(bookRequest.getStatus())
-                                    .requestId(bookRequest.getRequestId())
-                                    .username(bookRequest.getUser().getUsername())
-                                    .requestDate(bookRequest.getRequestDate())
-                                    .build())
-                                .toList();
-        
-                return BookRequestPaginationDTO.builder()
-                                .content(bookRequestDTOs)
-                                .pageNumber(pageNumber)
-                                .pageSize(pageSize)
-                                .totalElements(bookRequestPage.getTotalElements())
-                                .totalPages(bookRequestPage.getTotalPages())
-                                .isLastPage(bookRequestPage.isLast())
-                                .build();
-            }
-        // TODO Auto-generated method stub
-       
+        boolean isUsernameValid = userRepository.existsByUsername(username);
+        if (!isUsernameValid) {
+            throw new UserNotFoundException("User with username '" + username + "' does not exist!!");
+        }
+
+        Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable p = PageRequest.of(pageNumber, pageSize, sort);
+
+        Page<BookRequest> bookRequestPage = bookRequestRepository.findAllPendingRequestsByUserName(username, p);
+        logger.debug("Query fired for finding the Pending Requests by username");
+        if (bookRequestPage.isEmpty()) {
+            logger.error("BookRequestNotFound Exception generated !");
+            throw new BookRequestNotFoundException("No pending requests foung for user with given username!!");
+        }
+
+        List<BookRequest> bookRequests = bookRequestPage.getContent();
+
+        List<BookRequestDTO> bookRequestDTOs = bookRequests.stream().map(bookRequest -> BookRequestDTO.builder()
+                .bookId(bookRequest.getBook().getBookId())
+                .bookTitle(bookRequest.getBook().getTitle())
+                .weeksRequested(bookRequest.getWeeksRequested())
+                .status(bookRequest.getStatus())
+                .requestId(bookRequest.getRequestId())
+                .username(bookRequest.getUser().getUsername())
+                .requestDate(bookRequest.getRequestDate())
+                .quantityAvailable(bookRequest.getBook().getQuantityAvailable())
+                .build())
+                .toList();
+
+        return BookRequestPaginationDTO.builder()
+                .content(bookRequestDTOs)
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .totalElements(bookRequestPage.getTotalElements())
+                .totalPages(bookRequestPage.getTotalPages())
+                .isLastPage(bookRequestPage.isLast())
+                .build();
     }
+    // TODO Auto-generated method stub
 
-//    public List<ManageBookRequestDTO> searchRequestsByUsername(String username) {
-//        List<BookRequest> requests = bookRequestRepository.findByUserUsername(username);
-//        return convertToDTOs(requests);
-//    }
+}
 
-//    private List<ManageBookRequestDTO> converttoDTOs(List<BookRequest> bookRequests) {
-//        List<ManageBookRequestDTO> dtos = new ArrayList<>();
-//        for (BookRequest request : bookRequests) {
-//            ManageBookRequestDTO dto = new ManageBookRequestDTO();
-//            dto.setBookTitle(request.getBook().getTitle());
-//            dto.setRequestDate(request.getRequestDate());
-//            dtos.add(dto);
-//        }
-//        return dtos;
-//    }
-
+// public List<ManageBookRequestDTO> searchRequestsByUsername(String username) {
+// List<BookRequest> requests =
+// bookRequestRepository.findByUserUsername(username);
+// return convertToDTOs(requests);
+// }
 
