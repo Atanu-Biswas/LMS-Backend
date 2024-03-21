@@ -41,6 +41,11 @@ public class BookRequestService {
         if (book == null) {
             throw new BookNotFoundException("Requested Book Not Found!!");
         }
+        //add exception here
+//        boolean isEnable =  true;
+//        if(isEnable!=book.isActive()){
+//            return false;
+//        }
         BookRequest request = new BookRequest();
         request.setUser(user);
         request.setBook(book);
@@ -68,9 +73,21 @@ public class BookRequestService {
     public boolean acceptRequest(Long requestId) throws BookRequestNotFoundException,BookNotFoundException {
         BookRequest request = bookRequestRepository.findById(requestId).orElseThrow(()->new BookRequestNotFoundException("Book request with request Id: " +requestId+" not found"));
 
+//        throw exception here
+//        Book book = bookRepository.findByBookId(request.getBook().getBookId());
+//
+//        boolean isEnable =  true;
+//        if(isEnable!=book.isActive()){
+//            return false;
+//        }
+
+
         if (request != null && request.getStatus().equals("PENDING")) {
             request.setStatus("ACCEPTED");
             bookRequestRepository.save(request);
+
+
+
 
             BookIssue issue = new BookIssue();
 
@@ -177,18 +194,17 @@ public class BookRequestService {
         return convertToDTOs(last10Requests);
     }
 
-    // private List<ManageBookRequestDTO> convertToDTOs(List<BookRequest>
-    // bookRequests) {
-    // List<ManageBookRequestDTO> dtos = new ArrayList<>();
-    // for (BookRequest request : bookRequests) {
-    // ManageBookRequestDTO dto = new ManageBookRequestDTO();
-    // dto.setUsername(request.getUser().getUsername());
-    // dto.setBookTitle(request.getBook().getTitle());
-    // dto.setRequestDate(request.getRequestDate());
-    // dtos.add(dto);
-    // }
-    // return dtos;
-    // }
+//    private List<ManageBookRequestDTO> convertToDTOs(List<BookRequest> bookRequests) {
+//        List<ManageBookRequestDTO> dtos = new ArrayList<>();
+//        for (BookRequest request : bookRequests) {
+//            ManageBookRequestDTO dto = new ManageBookRequestDTO();
+//            dto.setUsername(request.getUser().getUsername());
+//            dto.setBookTitle(request.getBook().getTitle());
+//            dto.setRequestDate(request.getRequestDate());
+//            dtos.add(dto);
+//        }
+//        return dtos;
+//    }
 
     public List<ManageBookRequestDTO> searchRequestsByUsername(String username) {
         List<BookRequest> requests = bookRequestRepository.findByUserUsername(username);
@@ -206,11 +222,10 @@ public class BookRequestService {
         return dtos;
     }
 
-    // public List<ManageBookRequestDTO> getLast10BookRequests() {
-    // List<BookRequest> last10Requests =
-    // bookRequestRepository.findTop10ByOrderByRequestDateDesc();
-    // return convertToDTOs(last10Requests);
-    // }
+//    public List<ManageBookRequestDTO> getLast10BookRequests() {
+//        List<BookRequest> last10Requests = bookRequestRepository.findTop10ByOrderByRequestDateDesc();
+//        return convertToDTOs(last10Requests);
+//    }
 
     private List<ManageBookRequestDTO> convertToDTOs(List<BookRequest> bookRequests) {
         List<ManageBookRequestDTO> dtos = new ArrayList<>();
@@ -274,9 +289,20 @@ public class BookRequestService {
 
 }
 
-// public List<ManageBookRequestDTO> searchRequestsByUsername(String username) {
-// List<BookRequest> requests =
-// bookRequestRepository.findByUserUsername(username);
-// return convertToDTOs(requests);
-// }
+//    public List<ManageBookRequestDTO> searchRequestsByUsername(String username) {
+//        List<BookRequest> requests = bookRequestRepository.findByUserUsername(username);
+//        return convertToDTOs(requests);
+//    }
+
+//    private List<ManageBookRequestDTO> converttoDTOs(List<BookRequest> bookRequests) {
+//        List<ManageBookRequestDTO> dtos = new ArrayList<>();
+//        for (BookRequest request : bookRequests) {
+//            ManageBookRequestDTO dto = new ManageBookRequestDTO();
+//            dto.setBookTitle(request.getBook().getTitle());
+//            dto.setRequestDate(request.getRequestDate());
+//            dtos.add(dto);
+//        }
+//        return dtos;
+//    }
+
 

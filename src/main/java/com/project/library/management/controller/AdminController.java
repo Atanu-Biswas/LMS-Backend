@@ -38,7 +38,7 @@ public class AdminController {
     @GetMapping("/test")
     protected ResponseEntity<String> test() {
         logger.debug("Debug message");
-        logger.warn("Warning message");
+        logger.warn("Warning message");   
         logger.info("Info message");
         return ResponseEntity.ok("Hello from admin only url");
     }
