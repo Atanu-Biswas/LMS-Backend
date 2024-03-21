@@ -6,8 +6,9 @@ import com.project.library.management.dto.ManageBookRequestDTO;
 import com.project.library.management.dto.ViewRequestsDTO;
 import com.project.library.management.entity.*;
 import com.project.library.management.exception.BookNotFoundException;
-import com.project.library.management.exception.UserNotFoundException;
 import com.project.library.management.exception.BookRequestNotFoundException;
+import com.project.library.management.exception.DisabledBookException;
+import com.project.library.management.exception.UserNotFoundException;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.BookRequestRepository;
@@ -34,18 +35,15 @@ public class BookRequestService {
     private final BookIssueRepository bookIssueRepository;
     private final UserRepository userRepository;
 
-    public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) throws BookNotFoundException {
+    public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) throws BookNotFoundException, DisabledBookException {
         User user = userRepository.findByUsername(username).orElse(null);
         logger.debug("Query fired for finding the User by username");
-        Book book = bookRepository.findById(bookRequestDTO.getBookId()).orElse(null);
-        if (book == null) {
-            throw new BookNotFoundException("Requested Book Not Found!!");
+        Book book = bookRepository.findById(bookRequestDTO.getBookId()).orElseThrow(()->new BookNotFoundException("Requested Book Not Found!!"));
+
+        if(!book.isActive()){
+            throw new DisabledBookException("The book you are requesting is disabled!!");
         }
-        //add exception here
-//        boolean isEnable =  true;
-//        if(isEnable!=book.isActive()){
-//            return false;
-//        }
+
         BookRequest request = new BookRequest();
         request.setUser(user);
         request.setBook(book);
@@ -70,17 +68,15 @@ public class BookRequestService {
         return false;
     }
 
-    public boolean acceptRequest(Long requestId) throws BookRequestNotFoundException,BookNotFoundException {
+    public boolean acceptRequest(Long requestId) throws BookRequestNotFoundException, BookNotFoundException, DisabledBookException {
         BookRequest request = bookRequestRepository.findById(requestId).orElseThrow(()->new BookRequestNotFoundException("Book request with request Id: " +requestId+" not found"));
 
-//        throw exception here
-//        Book book = bookRepository.findByBookId(request.getBook().getBookId());
-//
-//        boolean isEnable =  true;
-//        if(isEnable!=book.isActive()){
-//            return false;
-//        }
 
+        Book book = bookRepository.findById(request.getBook().getBookId()).orElseThrow(()->new BookNotFoundException());
+
+        if(!book.isActive()){
+            throw new DisabledBookException("The requested book is disabled!!");
+        }
 
         if (request != null && request.getStatus().equals("PENDING")) {
             request.setStatus("ACCEPTED");
@@ -103,8 +99,6 @@ public class BookRequestService {
             issue.setDueDate(dueDate);
             issue.setFineStatus(Fine.valueOf("NOFINE"));
             issue.setUser(request.getUser());
-
-            Book book = bookRepository.findById(request.getBook().getBookId()).orElseThrow(()->new BookNotFoundException());
 
             int bookQuantity = book.getQuantityAvailable();
             book.setQuantityAvailable(bookQuantity - 1);

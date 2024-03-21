@@ -1,12 +1,7 @@
  package com.project.library.management.controller;
 
 import com.project.library.management.dto.*;
-import com.project.library.management.exception.BookIssueNotFoundException;
-import com.project.library.management.exception.BookNotFoundException;
-import com.project.library.management.exception.LMSException;
-import com.project.library.management.exception.NoFineFoundException;
-import com.project.library.management.exception.UserNotFoundException;
-import com.project.library.management.exception.BookRequestNotFoundException;
+import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.service.BookIssueService;
 import com.project.library.management.service.BookRequestService;
@@ -47,7 +42,7 @@ public class UserController {
     }
     @PostMapping("/request-book")
     //working //changed for frontend
-    public ResponseEntity<Boolean> issueBookRequest(@RequestBody BookRequestDTO bookRequestDTO, HttpServletRequest request) throws BookNotFoundException{
+    public ResponseEntity<Boolean> issueBookRequest(@RequestBody BookRequestDTO bookRequestDTO, HttpServletRequest request) throws BookNotFoundException, DisabledBookException {
         String username = request.getUserPrincipal().getName();
         System.out.println("username: "+username);
         boolean isIssueSuccessful = bookRequestService.issueRequest(username, bookRequestDTO);

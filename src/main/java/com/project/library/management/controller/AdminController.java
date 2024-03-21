@@ -1,13 +1,7 @@
 package com.project.library.management.controller;
 
 import com.project.library.management.dto.*;
-import com.project.library.management.exception.BookIdNotFoundException;
-import com.project.library.management.exception.BookNotDeletedException;
-import com.project.library.management.exception.BookIssueNotFoundException;
-import com.project.library.management.exception.BookNotFoundException;
-import com.project.library.management.exception.PublisherNotFoundException;
-import com.project.library.management.exception.UserNotFoundException;
-import com.project.library.management.exception.BookRequestNotFoundException;
+import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.service.*;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +39,7 @@ public class AdminController {
 
     @GetMapping("/accept-request")
     // working //edited for front-end
-    protected ResponseEntity<Boolean> acceptRequest(@Param("requestId") Long requestId) throws BookRequestNotFoundException, BookNotFoundException {
+    protected ResponseEntity<Boolean> acceptRequest(@Param("requestId") Long requestId) throws BookRequestNotFoundException, BookNotFoundException, DisabledBookException {
         boolean isRequestAccepted = bookRequestService.acceptRequest(requestId);
         return ResponseEntity.ok(isRequestAccepted);
     }
@@ -161,13 +155,26 @@ public class AdminController {
    }
 
     @GetMapping("/accept-return")
-    protected ResponseEntity<String> acceptReturn(@RequestParam("issueId") Long issueId){
+    protected ResponseEntity<Boolean> acceptReturn(@RequestParam("issueId") Long issueId){
         System.out.println("issueId: "+issueId);
         boolean isReturnAccepted = bookIssueService.acceptReturn(issueId);
 
         System.out.println("inside accept return");
 
-        return ResponseEntity.ok(isReturnAccepted ? "Book return is successfully accepted" : "Book return is unsuccessful!!!");
+        return ResponseEntity.ok(isReturnAccepted);
+    }
+
+    @GetMapping("/fines")
+    public ResponseEntity<FinePaginationDTO> getUserFines(@RequestParam("username") String username,
+                                                          @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+                                                          @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+                                                          @RequestParam(value = "sortBy", defaultValue ="returnDate", required = false) String sortBy,
+                                                          @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir) throws NoFineFoundException {
+
+
+        FinePaginationDTO finePaginationDTO = userService.viewFine(pageNumber, pageSize, sortBy, sortDir,username);
+
+        return ResponseEntity.ok(finePaginationDTO);
     }
 
  //keep this
