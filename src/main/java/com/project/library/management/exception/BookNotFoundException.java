@@ -1,6 +1,6 @@
 package com.project.library.management.exception;
 
-public class BookNotFoundException  extends Exception{
+public class BookNotFoundException  extends LMSException {
     public BookNotFoundException(){
         super("Book Not Found!!");
     }

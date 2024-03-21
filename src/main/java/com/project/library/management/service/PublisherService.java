@@ -3,8 +3,8 @@ package com.project.library.management.service;
 
 import com.project.library.management.dto.PublisherDTO;
 import com.project.library.management.entity.Publisher;
+import com.project.library.management.exception.LMSException;
 import com.project.library.management.exception.PublisherNotFoundException;
-import com.project.library.management.exception.SQLException;
 import com.project.library.management.repository.PublisherRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.AllArgsConstructor;
@@ -28,10 +28,10 @@ public class PublisherService {
 
 
 
-    public Publisher addPublisher(PublisherDTO publisherDTO)throws SQLException{
+    public Publisher addPublisher(PublisherDTO publisherDTO) throws LMSException{
 
             if(publisherRepository.existsByName(publisherDTO.getName())){
-                throw new SQLException("Publisher with this name already exists!!");
+                throw new LMSException("Publisher with name '"+publisherDTO.getName()+"' already exists!!");
             }
         Publisher publisher = new Publisher();
         publisher.setName(publisherDTO.getName());

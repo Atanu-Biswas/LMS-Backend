@@ -6,9 +6,13 @@ import com.project.library.management.entity.Book;
 import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.BookRequest;
 import com.project.library.management.entity.User;
+import com.project.library.management.exception.BookIssueNotFoundException;
+import com.project.library.management.exception.UserNotFoundException;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.BookRequestRepository;
+import com.project.library.management.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,12 +29,21 @@ public class BookIssueService {
     private final BookIssueRepository bookIssueRepository;
     private final BookRequestRepository bookRequestRepository;
     private final BookRepository bookRepository;
+    private final UserRepository userRepository;
 
-    public BookIssuePaginationDTO viewBorrowedBooks(String username, int pageNumber, int pageSize, String sortBy, String sortDir) {
+    public BookIssuePaginationDTO viewBorrowedBooks(String username, int pageNumber, int pageSize, String sortBy, String sortDir) throws BookIssueNotFoundException, UserNotFoundException {
+        boolean isUsernameValid = userRepository.existsByUsername(username);
+        if (!isUsernameValid) {
+            throw new UserNotFoundException("User with username '" + username + "' does not exist!!");
+        }
+
         Sort sort= (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
         Pageable p = PageRequest.of(pageNumber, pageSize, sort);
         Page<BookIssue> bookIssuePage= bookIssueRepository.findByUserUsername(username,p);
+        if(bookIssuePage==null){
+            throw new BookIssueNotFoundException("No borrowed books found for given user!!");
+        }
 
         List<BookIssue> bookIssues = bookIssuePage.getContent();
         List<BookIssueDTO> borrowedBooks = bookIssues.stream().filter(bookIssue -> bookIssue.getReturnDate() == null).map(bookIssue->
