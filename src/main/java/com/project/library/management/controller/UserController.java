@@ -139,15 +139,16 @@ public class UserController {
         return ResponseEntity.of(Optional.of(bookPaginationDTO));
     }
  ///keep this
-    @GetMapping("/pending-requests")
+    @GetMapping("/view-requests")
     public ResponseEntity<BookRequestPaginationDTO> getPendingRequestsByUser(HttpServletRequest request,
         @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
         @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
         @RequestParam(value = "sortBy", defaultValue ="requestDate", required = false) String sortBy,
-        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir) throws BookRequestNotFoundException, UserNotFoundException {
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir,
+        @RequestParam(value = "filterBy",required = false) String filterBy) throws BookRequestNotFoundException, UserNotFoundException {
 
-            String username = request.getUserPrincipal().getName();
-        BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewPendingRequestsByUserName(pageNumber, pageSize, sortBy, sortDir,username);
+        String username = request.getUserPrincipal().getName();
+        BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewRequestsByUserName(pageNumber, pageSize, sortBy, sortDir,username,filterBy);
 
         return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
     }

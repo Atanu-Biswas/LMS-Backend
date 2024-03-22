@@ -60,14 +60,15 @@ public class AdminController {
     }
 
 
-    @GetMapping("/pending-requests")
-    public ResponseEntity<BookRequestPaginationDTO> getPendingRequests(
+    @GetMapping("/view-requests")
+    public ResponseEntity<BookRequestPaginationDTO> getRequests(
         @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
         @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
         @RequestParam(value = "sortBy", defaultValue ="requestDate", required = false) String sortBy,
-        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ) throws BookRequestNotFoundException {
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir,
+        @RequestParam(value = "filterBy",required = false) String filterBy) throws BookRequestNotFoundException {
 
-        BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewPendingRequests(pageNumber, pageSize, sortBy, sortDir);
+        BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewRequests(pageNumber, pageSize, sortBy, sortDir,filterBy);
 
         return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
     }
@@ -113,15 +114,16 @@ public class AdminController {
     }
 
 
-   //view pending request by username keeep this also
-   @GetMapping("/pending-requests-by-username")
-   public ResponseEntity<BookRequestPaginationDTO> getPendingRequestsByUser(
+   @GetMapping("/view-requests-by-username")
+   public ResponseEntity<BookRequestPaginationDTO> getRequestsByUsername(
        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
        @RequestParam(value = "sortBy", defaultValue ="requestDate", required = false) String sortBy,
        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ,
-       @RequestParam("username") String username) throws BookRequestNotFoundException, UserNotFoundException {
-       BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewPendingRequestsByUserName(pageNumber, pageSize, sortBy, sortDir,username);
+       @RequestParam("username") String username, 
+       @RequestParam(value = "filterBy",required = false) String filterBy) throws BookRequestNotFoundException, UserNotFoundException {
+
+       BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewRequestsByUserName(pageNumber, pageSize, sortBy, sortDir,username,filterBy);
 
        return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
    }
