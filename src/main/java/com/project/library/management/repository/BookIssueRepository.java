@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 
 public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
+//    @Query("SELECT b FROM BookIssue b WHERE b.user.username=:username AND b.fineStatus='UNPAID'")
     @Query("SELECT b FROM BookIssue b WHERE b.user.username=:username AND b.fineStatus='UNPAID'")
     Page<BookIssue> calculateFinesByUserName(String username,Pageable p);
 

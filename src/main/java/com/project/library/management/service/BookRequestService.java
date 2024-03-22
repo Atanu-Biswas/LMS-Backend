@@ -5,10 +5,7 @@ import com.project.library.management.dto.BookRequestPaginationDTO;
 import com.project.library.management.dto.ManageBookRequestDTO;
 import com.project.library.management.dto.ViewRequestsDTO;
 import com.project.library.management.entity.*;
-import com.project.library.management.exception.BookNotFoundException;
-import com.project.library.management.exception.BookRequestNotFoundException;
-import com.project.library.management.exception.DisabledBookException;
-import com.project.library.management.exception.UserNotFoundException;
+import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.BookRequestRepository;
@@ -35,7 +32,7 @@ public class BookRequestService {
     private final BookIssueRepository bookIssueRepository;
     private final UserRepository userRepository;
 
-    public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) throws BookNotFoundException, DisabledBookException {
+    public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) throws BookNotFoundException, DisabledBookException, BookAlreadyRequestedExecption {
         User user = userRepository.findByUsername(username).orElse(null);
         logger.debug("Query fired for finding the User by username");
         Book book = bookRepository.findById(bookRequestDTO.getBookId()).orElseThrow(()->new BookNotFoundException("Requested Book Not Found!!"));
@@ -43,6 +40,16 @@ public class BookRequestService {
         if(!book.isActive()){
             throw new DisabledBookException("The book you are requesting is disabled!!");
         }
+
+        List<BookRequest> bookRequest = bookRequestRepository.findListByUserAndBook(user, book);
+
+
+        for(BookRequest request: bookRequest){
+            if(request.getStatus().equals("PENDING") || request.getStatus().equals("ACCEPTED")){
+                throw new BookAlreadyRequestedExecption("This book is already");
+            }
+        }
+
 
         BookRequest request = new BookRequest();
         request.setUser(user);
