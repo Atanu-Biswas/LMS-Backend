@@ -1,17 +1,11 @@
 package com.project.library.management.controller;
 
-import com.project.library.management.dto.BookDTO;
-import com.project.library.management.dto.ManageBookRequestDTO;
-import com.project.library.management.dto.PublisherDTO;
-import com.project.library.management.entity.Book;
-import com.project.library.management.entity.BookRequest;
-import com.project.library.management.exception.BookIdNotFoundException;
-import com.project.library.management.exception.PublisherNotFoundException;
+import com.project.library.management.dto.*;
+import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookRequestRepository;
-import com.project.library.management.service.BookRequestService;
-import com.project.library.management.service.BookService;
-import com.project.library.management.service.PublisherService;
-import lombok.AllArgsConstructor;
+import com.project.library.management.service.*;
+import lombok.RequiredArgsConstructor;
+import org.apache.log4j.Logger;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,39 +13,45 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/admin")
+@CrossOrigin("http://localhost:4200")
 //@RequiredArgsConstructor
 public class AdminController {
     private final BookRequestService bookRequestService;
+    private final BookIssueService bookIssueService;
     private final BookRequestRepository bookRequestRepository;
     private final BookService bookService;
+    private final UserService userService;
 
+    private static final Logger logger = Logger.getLogger(AdminController.class);
 
     private final PublisherService publisherService;
 
     @GetMapping("/test")
     protected ResponseEntity<String> test() {
+        logger.debug("Debug message");
+        logger.warn("Warning message");   
+        logger.info("Info message");
         return ResponseEntity.ok("Hello from admin only url");
     }
 
     @GetMapping("/accept-request")
-    // working
-    protected ResponseEntity<String> acceptRequest(@Param("requestId") Long requestId) {
+    // working //edited for front-end
+    protected ResponseEntity<Boolean> acceptRequest(@Param("requestId") Long requestId) throws BookRequestNotFoundException, BookNotFoundException, DisabledBookException {
         boolean isRequestAccepted = bookRequestService.acceptRequest(requestId);
-        return ResponseEntity.ok(isRequestAccepted ? "Book Request Accepted!!!" : "Book Request still Pending!!!");
+        return ResponseEntity.ok(isRequestAccepted);
     }
 
     @GetMapping("/decline-request")
-    // working
-    protected ResponseEntity<String> declineRequest(@Param("requestId") Long requestId) {
+    // working // edited for front-end
+    protected ResponseEntity<Boolean> declineRequest(@Param("requestId") Long requestId) throws BookRequestNotFoundException {
         boolean isRequestDeclined = bookRequestService.declineRequest(requestId);
-        return ResponseEntity.ok(isRequestDeclined ? "Book Request Rejected!!!" : "Book Request still Pending!!!");
+        return ResponseEntity.ok(isRequestDeclined);
     }
 
-    @PostMapping("/addBook")
+    @PostMapping("/add-book")
     // working
     protected ResponseEntity<String> addBook(@RequestBody BookDTO bookDTO) throws PublisherNotFoundException {
         System.out.println("bookDTO: " + bookDTO);
@@ -59,59 +59,131 @@ public class AdminController {
         return ResponseEntity.ok("book is added successfully");
     }
 
-//    @PutMapping("update")
-//    protected ResponseEntity<String> updateBook(@Param("id")long id){
-//        Book updatedBook= BookDTO.findById(id).get();
-//    }
 
-    @PostMapping("/enableDisable")
-    //WORKING
-    protected ResponseEntity<String> enableDisableBook(@Param("id") Long id) throws BookIdNotFoundException {
+    @GetMapping("/pending-requests")
+    public ResponseEntity<BookRequestPaginationDTO> getPendingRequests(
+        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+        @RequestParam(value = "sortBy", defaultValue ="requestDate", required = false) String sortBy,
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ) throws BookRequestNotFoundException {
+
+        BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewPendingRequests(pageNumber, pageSize, sortBy, sortDir);
+
+        return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
+    }
+
+    @GetMapping("/view-all-books")
+    protected ResponseEntity<BookPaginationDTO> getAllBooks(
+        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+        @RequestParam(value = "sortBy", defaultValue ="title", required = false) String sortBy,
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ) throws BookNotFoundException{
+
+        BookPaginationDTO bookPaginationDTO= bookService.getAllBooks(pageNumber,pageSize,sortBy,sortDir);
+
+        return ResponseEntity.of(Optional.of(bookPaginationDTO));
+    }
+
+    @GetMapping("/view-all-users")
+    protected ResponseEntity<UserPaginationDTO> getAllUsers(
+        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+        @RequestParam(value = "sortBy", defaultValue ="username", required = false) String sortBy,
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ) throws UserNotFoundException{
+
+        UserPaginationDTO userPaginationDTO= userService.getAllUsers(pageNumber,pageSize,sortBy,sortDir);
+
+        return ResponseEntity.of(Optional.of(userPaginationDTO));
+    }
+
+
+        @GetMapping("/enable-disable")
+    //WORKING // changed for frontend
+    protected ResponseEntity<Boolean> enableDisableBook(@RequestParam(value = "id") Long id) throws BookNotFoundException {
+        System.out.println("Inside Controller"+id);
         boolean isBookDisabled=bookService.enableDisableBook(id);
-        return ResponseEntity.ok(isBookDisabled ?"Book Is Disabled" :"Book Is Enabled");
+        System.out.println("Book status: "+isBookDisabled);
+        return ResponseEntity.ok(isBookDisabled);
     }
 
-
-
-    @PostMapping("/publisher")
-//    working
-    protected ResponseEntity<String> addPublisher(@RequestBody PublisherDTO publisherDTO){
-
-        publisherService.addPublisher(publisherDTO);
-
-        return ResponseEntity.ok("Publisher is added Successfully!");
-    }
-
-    @GetMapping("/publisher")
-//    working
-    protected ResponseEntity<PublisherDTO> getPublisher(@Param("id") Long id){
-
-        PublisherDTO publisherDTO = publisherService.getPublisher(id);
-
-        return ResponseEntity.of(Optional.of(publisherDTO));
-    }
-
-    @PutMapping("/publisher")
-    //working
-    protected ResponseEntity<String> updatePublisher(@RequestBody PublisherDTO publisherDTO, @Param("id") Long id){
-
-        publisherService.updatePublisher(publisherDTO,id);
-
-        return ResponseEntity.ok("Publisher is updated successfully!");
-    }
-
-    @DeleteMapping("/publisher")
-    //working
-    protected ResponseEntity<String> deletePublisher(@Param("publisherId") Long publisherId){
-        System.out.println("Id "+publisherId);
-        publisherService.deletePublisher(publisherId);
-
-        return ResponseEntity.ok("Publisher with id "+publisherId+" is deleted successfully!");
-    }
-
-    @GetMapping("/last-10-book-requests")
-    public ResponseEntity<List<ManageBookRequestDTO>> getLast10BookRequests() {
+        @GetMapping("/last-10-book-requests")
+    public ResponseEntity<List<ManageBookRequestDTO>> getLast10BookRequests() throws BookRequestNotFoundException {
         List<ManageBookRequestDTO> last10Requests = bookRequestService.getLast10BookRequests();
         return ResponseEntity.ok(last10Requests);
     }
+
+
+   //view pending request by username keeep this also
+   @GetMapping("/pending-requests-by-username")
+   public ResponseEntity<BookRequestPaginationDTO> getPendingRequestsByUser(
+       @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+       @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+       @RequestParam(value = "sortBy", defaultValue ="requestDate", required = false) String sortBy,
+       @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ,
+       @RequestParam("username") String username) throws BookRequestNotFoundException, UserNotFoundException {
+       BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewPendingRequestsByUserName(pageNumber, pageSize, sortBy, sortDir,username);
+
+       return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
+   }
+
+
+
+    @GetMapping("/view-borrowed-books")
+    protected ResponseEntity<BookIssuePaginationDTO> viewBorrowedBooks(@RequestParam("username") String username,
+                                                                       @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+                                                                       @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+                                                                       @RequestParam(value = "sortBy", defaultValue ="issueDate", required = false) String sortBy,
+                                                                       @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ) throws BookIssueNotFoundException, UserNotFoundException {
+
+        BookIssuePaginationDTO borrowedBooks = bookIssueService.viewBorrowedBooks(username,pageNumber,pageSize,sortBy,sortDir);
+        return ResponseEntity.ofNullable(borrowedBooks);
+    }
+
+
+ //keep this also
+   @GetMapping("/view-user-by-username")
+   protected ResponseEntity<UserPaginationDTO> getUserByUsername(
+    @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+   @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+   @RequestParam(value = "sortBy", defaultValue ="name", required = false) String sortBy,
+   @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ,
+   @RequestParam("username") String username ) throws UserNotFoundException{
+
+    UserPaginationDTO userPaginationDTO= userService.getUserByUsername(pageNumber, pageSize, sortBy, sortDir,username);
+
+       return ResponseEntity.ok(userPaginationDTO);
+   }
+
+    @GetMapping("/accept-return")
+    protected ResponseEntity<Boolean> acceptReturn(@RequestParam("issueId") Long issueId){
+        System.out.println("issueId: "+issueId);
+        boolean isReturnAccepted = bookIssueService.acceptReturn(issueId);
+
+        System.out.println("inside accept return");
+
+        return ResponseEntity.ok(isReturnAccepted);
+    }
+
+    @GetMapping("/fines")
+    public ResponseEntity<FinePaginationDTO> getUserFines(@RequestParam("username") String username,
+                                                          @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+                                                          @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+                                                          @RequestParam(value = "sortBy", defaultValue ="returnDate", required = false) String sortBy,
+                                                          @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir) throws NoFineFoundException {
+
+
+        FinePaginationDTO finePaginationDTO = userService.viewFine(pageNumber, pageSize, sortBy, sortDir,username);
+
+        return ResponseEntity.ok(finePaginationDTO);
+    }
+
+ //keep this
+ @DeleteMapping("/delete-book")
+ protected ResponseEntity<Boolean> deleteBook(@RequestParam("bookId") Long bookId )throws BookNotDeletedException{
+
+    boolean isDeleted=bookService.deleteBook(bookId);
+    System.out.println(isDeleted);
+    return ResponseEntity.ok(isDeleted);
+ }
+
 }

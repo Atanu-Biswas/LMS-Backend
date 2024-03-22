@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookDTO {
-    
+   private Long bookId;
    private  String title;
    private String author;
    private String isbn;
@@ -22,7 +22,6 @@ public class BookDTO {
    private boolean isActive;
 
    private Long publisherId;
-
 
 
 }

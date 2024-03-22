@@ -6,14 +6,12 @@ import com.project.library.management.dto.Temp;
 import com.project.library.management.dto.UserDTO;
 import com.project.library.management.entity.AuthenticationResponse;
 import com.project.library.management.service.AuthenticationService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-//@CrossOrigin("http://localhost:4200")
+@CrossOrigin("http://localhost:4200")
 @RequestMapping("/auth")
 
 public class AuthenticationController {
@@ -52,9 +50,17 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> refreshToken(
             @RequestBody RefreshTokenRequestDTO request
     ) {
+        System.out.println("Got the request"+request);
         AuthenticationResponse authenticationResponse = authService.refreshToken(request);
         return ResponseEntity.ok(authenticationResponse);
     }
 
-
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(
+           @RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO, HttpServletRequest request
+    ) {
+        String username = request.getUserPrincipal().getName();
+        authService.logout(username, refreshTokenRequestDTO.getRefreshToken());
+        return ResponseEntity.ok("Logged out successfully");
+    }
 }
