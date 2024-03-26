@@ -6,7 +6,13 @@ import com.project.library.management.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import com.project.library.management.entity.User;
+import com.project.library.management.entity.Book;
+
+
+import java.util.List;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -23,16 +29,11 @@ public interface BookRequestRepository extends JpaRepository<BookRequest, Long> 
 
     List<BookRequest> findByUserUsername(String username);
 
-    @Query("SELECT br FROM BookRequest br WHERE br.status = 'PENDING'")
-    Page<BookRequest> findAllPendingRequests(Pageable p);
+    @Query("SELECT br FROM BookRequest br WHERE br.status IN (:statuses)")
+    Page<BookRequest> findFilteredRequests(List<String> statuses,Pageable p);
+
+    @Query("SELECT br FROM BookRequest br WHERE br.user.username= :username AND br.status IN (:statuses)")
+    Page<BookRequest> findFilteredRequestsByUserName(List<String> statuses,String username,Pageable p);
+
     
-
-    //keep this 
-    @Query("SELECT br FROM BookRequest br WHERE br.user.username= :username AND br.status = 'PENDING'")
-    Page<BookRequest> findAllPendingRequestsByUserName(String username,Pageable p);
-
-
-
-
-
 }

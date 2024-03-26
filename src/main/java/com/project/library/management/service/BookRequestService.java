@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -127,14 +128,18 @@ public class BookRequestService {
         return false;
     }
 
-    public BookRequestPaginationDTO viewPendingRequests(int pageNumber, int pageSize, String sortBy, String sortDir) throws BookRequestNotFoundException {
+    public BookRequestPaginationDTO viewRequests(int pageNumber, int pageSize, String sortBy, String sortDir, String filterBy) throws BookRequestNotFoundException {
 
         Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
         Pageable p = PageRequest.of(pageNumber, pageSize, sort);
-        Page<BookRequest> bookRequestPage = bookRequestRepository.findAllPendingRequests(p);
+
+        List<String> statuses =(filterBy!=null) ? Arrays.asList(filterBy) : Arrays.asList("PENDING", "ACCEPTED", "REJECTED");
+
+        Page<BookRequest> bookRequestPage = bookRequestRepository.findFilteredRequests(statuses,p);
+        
         if(bookRequestPage.isEmpty()){
-            throw new BookRequestNotFoundException("No request is pending!!");
+            throw new BookRequestNotFoundException();
         }
 
         List<BookRequest> bookRequests = bookRequestPage.getContent();
@@ -244,8 +249,8 @@ public class BookRequestService {
     }
 
     // add this service
-    public BookRequestPaginationDTO viewPendingRequestsByUserName(int pageNumber, int pageSize, String sortBy,
-            String sortDir, String username) throws BookRequestNotFoundException, UserNotFoundException {
+    public BookRequestPaginationDTO viewRequestsByUserName(int pageNumber, int pageSize, String sortBy,
+            String sortDir, String username, String filterBy) throws BookRequestNotFoundException, UserNotFoundException {
 
         boolean isUsernameValid = userRepository.existsByUsername(username);
         if (!isUsernameValid) {
@@ -256,11 +261,13 @@ public class BookRequestService {
 
         Pageable p = PageRequest.of(pageNumber, pageSize, sort);
 
-        Page<BookRequest> bookRequestPage = bookRequestRepository.findAllPendingRequestsByUserName(username, p);
-        logger.debug("Query fired for finding the Pending Requests by username");
+        List<String> statuses =(filterBy!=null) ? Arrays.asList(filterBy) : Arrays.asList("PENDING", "ACCEPTED", "REJECTED", "CANCELLED");
+
+        Page<BookRequest> bookRequestPage = bookRequestRepository.findFilteredRequestsByUserName(statuses,username, p);
+        logger.debug("Query fired for finding the Requests by username");
         if (bookRequestPage.isEmpty()) {
             logger.error("BookRequestNotFound Exception generated !");
-            throw new BookRequestNotFoundException("No pending requests foung for user with given username!!");
+            throw new BookRequestNotFoundException();
         }
 
         List<BookRequest> bookRequests = bookRequestPage.getContent();
@@ -286,7 +293,6 @@ public class BookRequestService {
                 .isLastPage(bookRequestPage.isLast())
                 .build();
     }
-    // TODO Auto-generated method stub
 
 }
 
