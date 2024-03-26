@@ -3,6 +3,7 @@ package com.project.library.management.service;
 import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.BookPaginationDTO;
 import com.project.library.management.entity.Book;
+import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.Publisher;
 import com.project.library.management.exception.BookNotDeletedException;
 import com.project.library.management.exception.BookNotFoundException;
@@ -19,8 +20,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service

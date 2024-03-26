@@ -51,7 +51,5 @@ public class Book {
     private List<BookRequest> bookRequests;
 
 
-
-
     // Getters and setters omitted for brevity
 }
