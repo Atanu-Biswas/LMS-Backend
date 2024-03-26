@@ -53,7 +53,7 @@ public class AdminController {
 
     @PostMapping("/add-book")
     // working
-    protected ResponseEntity<String> addBook(@RequestBody BookDTO bookDTO) throws PublisherNotFoundException {
+    protected ResponseEntity<String> addBook(@RequestBody BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException {
         System.out.println("bookDTO: " + bookDTO);
         bookService.addBook(bookDTO);
         return ResponseEntity.ok("book is added successfully");
@@ -157,7 +157,7 @@ public class AdminController {
    }
 
     @GetMapping("/accept-return")
-    protected ResponseEntity<Boolean> acceptReturn(@RequestParam("issueId") Long issueId){
+    protected ResponseEntity<Boolean> acceptReturn(@RequestParam("issueId") Long issueId) throws BookIssueNotFoundException {
         System.out.println("issueId: "+issueId);
         boolean isReturnAccepted = bookIssueService.acceptReturn(issueId);
 

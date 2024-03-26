@@ -4,9 +4,7 @@ import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.BookPaginationDTO;
 import com.project.library.management.entity.Book;
 import com.project.library.management.entity.Publisher;
-import com.project.library.management.exception.BookNotDeletedException;
-import com.project.library.management.exception.BookNotFoundException;
-import com.project.library.management.exception.PublisherNotFoundException;
+import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.PublisherRepository;
@@ -20,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,18 +31,29 @@ public class BookService {
   private final PublisherService publisherService;
   private final BookIssueRepository bookIssueRepository;
 
-  public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException {
+  public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException{
+
+    if(bookDTO.getQuantityAvailable() <= 0){
+      logger.error("Quantity should be greater than 0");
+      throw new IllegalQuantityException();
+    }
+
+    if(bookDTO.getIsbn().length()!=13){
+      logger.error("ISBN length should be 13 characters.");
+      throw new IsbnLengthException("ISBN length should be 13 characters.");
+    }
     Publisher publisher = publisherRepository.findById(bookDTO.getPublisherId()).orElseThrow(()->new PublisherNotFoundException("Publisher corresponding to given book not found!!"));
     logger.debug("Query fired for getting Publisher by Id");
     Book book = new Book();
     book.setAuthor(bookDTO.getAuthor());
     book.setTitle(bookDTO.getTitle());
-    book.setImageUrl(bookDTO.getImageUrl());
+    book.setGenre(bookDTO.getGenre());
     book.setIsbn(bookDTO.getIsbn());
     book.setPrintYear(bookDTO.getPrintYear());
     book.setQuantityAvailable(bookDTO.getQuantityAvailable());
     book.setActive(bookDTO.isActive());
     book.setPublisher(publisher);
+    book.setDateAdded(new Date());
     bookRepository.save(book);
     logger.debug("Saved the Book details in the database");
     return true;
@@ -83,7 +93,7 @@ public class BookService {
     bookDTO.setBookId(book.getBookId());
     bookDTO.setAuthor(book.getAuthor());
     bookDTO.setTitle(book.getTitle());
-    bookDTO.setImageUrl(book.getImageUrl());
+    bookDTO.setGenre(book.getGenre());
     bookDTO.setIsbn(book.getIsbn());
     bookDTO.setPrintYear(book.getPrintYear());
     bookDTO.setQuantityAvailable(book.getQuantityAvailable());
@@ -131,7 +141,7 @@ public class BookService {
       BookDTO bookDTO = new BookDTO();
       bookDTO.setAuthor(book.getAuthor());
       bookDTO.setTitle(book.getTitle());
-      bookDTO.setImageUrl(book.getImageUrl());
+      bookDTO.setGenre(book.getGenre());
       bookDTO.setIsbn(book.getIsbn());
       bookDTO.setPrintYear(book.getPrintYear());
       bookDTO.setQuantityAvailable(book.getQuantityAvailable());
@@ -177,7 +187,7 @@ public class BookService {
     BookDTO bookDTO = new BookDTO();
     bookDTO.setAuthor(book.getAuthor());
     bookDTO.setTitle(book.getTitle());
-    bookDTO.setImageUrl(book.getImageUrl());
+    bookDTO.setGenre(book.getGenre());
     bookDTO.setIsbn(book.getIsbn());
     bookDTO.setPrintYear(book.getPrintYear());
     bookDTO.setQuantityAvailable(book.getQuantityAvailable());
@@ -194,7 +204,7 @@ public class BookService {
         .author(book.getAuthor())
         .isbn(book.getIsbn())
         .printYear(book.getPrintYear())
-        .imageUrl(book.getImageUrl())
+        .genre(book.getGenre())
         .quantityAvailable(book.getQuantityAvailable())
         .isActive(book.isActive())
         .publisherId(book.getPublisher().getPublisherId())

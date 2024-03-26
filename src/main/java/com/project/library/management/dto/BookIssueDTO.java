@@ -26,6 +26,8 @@ public class BookIssueDTO {
 
     private Date returnDate;
 
+    private Long requestId;
+
     private int fine;
 
     private Fine fineStatus;

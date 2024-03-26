@@ -97,7 +97,7 @@ public class BookRequestService {
 
             issue.setBook(request.getBook());
             issue.setIssueDate(new Date());
-
+            issue.setRequestId(request.getRequestId());
             Date date = new Date();
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);

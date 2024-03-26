@@ -34,6 +34,10 @@ public class BookIssue {
     private Date returnDate;
 
     @Column(nullable = false)
+    private Long requestId;
+
+
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Fine fineStatus;
 

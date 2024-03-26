@@ -5,6 +5,7 @@ import com.project.library.management.dto.RefreshTokenRequestDTO;
 import com.project.library.management.dto.Temp;
 import com.project.library.management.dto.UserDTO;
 import com.project.library.management.entity.AuthenticationResponse;
+import com.project.library.management.exception.PasswordLengthException;
 import com.project.library.management.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +20,8 @@ public class AuthenticationController {
 	private final AuthenticationService authService;
 
 	@PostMapping("/register")
-	public ResponseEntity<AuthenticationResponse> register(@RequestBody UserDTO request) {
-                
+	public ResponseEntity<AuthenticationResponse> register(@RequestBody UserDTO request) throws PasswordLengthException {
+
 		return ResponseEntity.ok(authService.register(request));
 	}
 
