@@ -3,6 +3,7 @@ package com.project.library.management.service;
 import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.BookPaginationDTO;
 import com.project.library.management.entity.Book;
+import com.project.library.management.entity.Genre;
 import com.project.library.management.entity.Publisher;
 import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
@@ -34,7 +35,7 @@ public class BookService {
 
     if(bookDTO.getQuantityAvailable() <= 0){
       logger.error("Quantity should be greater than 0");
-      throw new IllegalQuantityException();
+      throw new IllegalQuantityException("Quantity should be greater than 0");
     }
 
     if(bookDTO.getPrintYear() > new Date().getYear() + 1900 || bookDTO.getPrintYear() < 0){
@@ -51,7 +52,8 @@ public class BookService {
     Book book = new Book();
     book.setAuthor(bookDTO.getAuthor());
     book.setTitle(bookDTO.getTitle());
-    book.setGenre(bookDTO.getGenre());
+    Genre genre = Genre.valueOf(bookDTO.getGenre().toUpperCase());
+    book.setGenre(genre);
     book.setIsbn(bookDTO.getIsbn());
     book.setPrintYear(bookDTO.getPrintYear());
     book.setQuantityAvailable(bookDTO.getQuantityAvailable());
@@ -97,7 +99,7 @@ public class BookService {
     bookDTO.setBookId(book.getBookId());
     bookDTO.setAuthor(book.getAuthor());
     bookDTO.setTitle(book.getTitle());
-    bookDTO.setGenre(book.getGenre());
+    bookDTO.setGenre(String.valueOf(book.getGenre()));
     bookDTO.setIsbn(book.getIsbn());
     bookDTO.setPrintYear(book.getPrintYear());
     bookDTO.setQuantityAvailable(book.getQuantityAvailable());
@@ -191,7 +193,7 @@ public class BookService {
     BookDTO bookDTO = new BookDTO();
     bookDTO.setAuthor(book.getAuthor());
     bookDTO.setTitle(book.getTitle());
-    bookDTO.setGenre(book.getGenre());
+    bookDTO.setGenre(String.valueOf(book.getGenre()));
     bookDTO.setIsbn(book.getIsbn());
     bookDTO.setPrintYear(book.getPrintYear());
     bookDTO.setQuantityAvailable(book.getQuantityAvailable());
@@ -208,7 +210,7 @@ public class BookService {
         .author(book.getAuthor())
         .isbn(book.getIsbn())
         .printYear(book.getPrintYear())
-        .genre(book.getGenre())
+        .genre(String.valueOf(book.getGenre()))
         .quantityAvailable(book.getQuantityAvailable())
         .isActive(book.isActive())
         .publisherId(book.getPublisher().getPublisherId())

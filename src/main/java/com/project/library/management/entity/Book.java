@@ -35,7 +35,8 @@ public class Book {
     private int printYear;  // Changed to int for year
 
     @Column(nullable = false)
-    private String genre;
+    @Enumerated(EnumType.STRING)
+    private Genre genre;
 
     @Column(nullable = false)
     @Min(1)
