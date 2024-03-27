@@ -1,6 +1,7 @@
  package com.project.library.management.controller;
 
 import com.project.library.management.dto.*;
+import com.project.library.management.entity.Genre;
 import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.service.BookIssueService;
@@ -151,6 +152,19 @@ public class UserController {
         BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewRequestsByUserName(pageNumber, pageSize, sortBy, sortDir,username,filterBy);
 
         return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
+    }
+    ///keep this 
+    @GetMapping("/get-book-by-genre" )
+    protected ResponseEntity<BookPaginationDTO> getBooksByGenre (
+        @RequestParam("genre") String genre,
+        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+        @RequestParam(value = "sortBy", defaultValue ="genre", required = false) String sortBy,
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir) throws BookNotFoundException{
+
+        BookPaginationDTO bookPaginationDTO=bookService.getBooksByGenre(genre,pageNumber,pageSize,sortBy,sortDir);
+
+       return ResponseEntity.of(Optional.of(bookPaginationDTO));
     }
 }
 

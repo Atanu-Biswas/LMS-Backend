@@ -261,4 +261,32 @@ public class BookService {
       return true;
 
   }
+
+  //keep this
+  public BookPaginationDTO getBooksByGenre(String genre, int pageNumber, int pageSize, String sortBy, String sortDir) throws BookNotFoundException{
+
+    Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+    Pageable p = PageRequest.of(pageNumber, pageSize, sort);
+   // String genreString = genre.toString();
+    Page<Book> bookPage = bookRepository.findByGenreStartingWithIgnoreCase(genre, p);
+    if (bookPage.isEmpty()) {
+      logger.error("Genre Not Found Exception generated !");
+      throw new BookNotFoundException("No books found by Genre '" + genre + "'");
+    }
+
+    List<Book> books = bookPage.getContent();
+    logger.debug("Query fired for Finding the Book by Genre");
+
+    List<BookDTO> bookDTOs = books.stream().map(book -> convertToDTO(book)).toList();
+
+    return BookPaginationDTO.builder()
+        .content(bookDTOs)
+        .pageNumber(pageNumber)
+        .pageSize(pageSize)
+        .totalElements(bookPage.getTotalElements())
+        .totalPages(bookPage.getTotalPages())
+        .isLastPage(bookPage.isLast())
+        .build();
+  }
 }
