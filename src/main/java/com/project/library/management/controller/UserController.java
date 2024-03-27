@@ -16,6 +16,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -150,6 +151,12 @@ public class UserController {
         BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewPendingRequestsByUserName(pageNumber, pageSize, sortBy, sortDir,username);
 
         return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
+    }
+    @GetMapping("/user-dashboard")
+    public BookDTO getBookOfTheWeek() {
+        Date endDate = new Date();
+        Date startDate = new Date(endDate.getTime() - (7 * 24 * 60 * 60 * 1000));
+        return bookService.getBookOfTheWeek(startDate, endDate);
     }
 }
 

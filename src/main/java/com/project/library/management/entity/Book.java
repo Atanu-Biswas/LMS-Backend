@@ -49,6 +49,9 @@ public class Book {
 
     @OneToMany(mappedBy = "book")
     private List<BookRequest> bookRequests;
+    public Long getId() {
+        return this.bookId;
+    }
 
 
 
