@@ -26,4 +26,6 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
             "ORDER BY issueCount DESC")
     List<Object[]> findByIssueDateBetween(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
+
+
 }

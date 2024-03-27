@@ -29,4 +29,7 @@ public interface BookRepository extends JpaRepository<Book,Long>{
     Book findByBookId(Long id);
 
     void deleteByBookId(Long bookId);
+
+    @Query(value = "SELECT genre, COUNT(*) FROM TABLE ( Book ) GROUP BY genre", nativeQuery = true)
+    List<Object[]> getGenreWiseSplit();
 }

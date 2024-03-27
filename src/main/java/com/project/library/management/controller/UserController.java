@@ -152,12 +152,7 @@ public class UserController {
 
         return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
     }
-    @GetMapping("/user-dashboard")
-    public BookDTO getBookOfTheWeek() {
-        Date endDate = new Date();
-        Date startDate = new Date(endDate.getTime() - (7 * 24 * 60 * 60 * 1000));
-        return bookService.getBookOfTheWeek(startDate, endDate);
-    }
+
 }
 
 

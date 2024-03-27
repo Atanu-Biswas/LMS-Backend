@@ -24,6 +24,7 @@ public class AdminController {
     private final BookRequestRepository bookRequestRepository;
     private final BookService bookService;
     private final UserService userService;
+    private final AdminDashboardService adminDashboardService;
 
     private static final Logger logger = Logger.getLogger(AdminController.class);
 
@@ -185,5 +186,9 @@ public class AdminController {
     System.out.println(isDeleted);
     return ResponseEntity.ok(isDeleted);
  }
-
+   @GetMapping("/admin-dashboard")
+    public ResponseEntity<AdminDashboardDTO> getGenreWiseSplit() {
+        AdminDashboardDTO adminDashboardDTO = adminDashboardService.getGenreWiseSplit();
+        return ResponseEntity.ok(adminDashboardDTO);
+    }
 }
