@@ -1,38 +1,19 @@
 package com.project.library.management.service;
 
+import com.project.library.management.dto.reportDTO.*;
+import com.project.library.management.entity.*;
+import com.project.library.management.repository.*;
+import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
-
-import com.project.library.management.dto.reportDTO.BookIssueReportDTO;
-import com.project.library.management.dto.reportDTO.BookReportDTO;
-import com.project.library.management.dto.reportDTO.BookRequestReportDTO;
-import com.project.library.management.dto.reportDTO.PublisherReportDTO;
-import com.project.library.management.dto.reportDTO.UserReportDTO;
-import com.project.library.management.entity.Book;
-import com.project.library.management.entity.BookIssue;
-import com.project.library.management.entity.BookRequest;
-import com.project.library.management.entity.Publisher;
-import com.project.library.management.entity.User;
-import com.project.library.management.repository.BookIssueRepository;
-import com.project.library.management.repository.BookRepository;
-import com.project.library.management.repository.BookRequestRepository;
-import com.project.library.management.repository.PublisherRepository;
-import com.project.library.management.repository.UserRepository;
-
-import lombok.RequiredArgsConstructor;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
 @RequiredArgsConstructor
@@ -73,7 +54,7 @@ public class ReportService {
                         .bookId(book.getBookId())
                         .title(book.getTitle())
                         .author(book.getAuthor())
-                        .genre(book.getGenre())
+                        .genre(String.valueOf(book.getGenre()))
                         .isbn(book.getIsbn())
                         .printYear(book.getPrintYear())
                         .quantityAvailable(book.getQuantityAvailable())
