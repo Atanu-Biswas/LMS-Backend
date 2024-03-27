@@ -24,6 +24,9 @@ public class Book {
     private String author;
 
     @Column(nullable = false)
+    public String genre;
+
+    @Column(nullable = false)
     private String isbn;
 
     @Column(nullable = false)
