@@ -67,8 +67,13 @@ public class BookRequestService {
         return true;
     }
 
-    public boolean cancelRequest(Long requestId) throws BookRequestNotFoundException {
+    public boolean cancelRequest(Long requestId,String username) throws RequestNotBelongsToTheUserExecption, BookRequestNotFoundException {
         BookRequest request = bookRequestRepository.findById(requestId).orElse(null);
+
+        if(request.getUser().getUsername().equals(username)){
+
+                throw new RequestNotBelongsToTheUserExecption("This request not belongs to the user!!");
+        }
         logger.debug("Query fired for finding the book by Book Id");
         if (request == null) {
             throw new BookRequestNotFoundException("No request with request Id'" + requestId + "found");

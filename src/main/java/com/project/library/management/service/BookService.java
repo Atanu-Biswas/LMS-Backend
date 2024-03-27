@@ -47,6 +47,7 @@ public class BookService {
       logger.error("ISBN length should be 13 characters.");
       throw new IsbnLengthException("ISBN length should be 13 characters.");
     }
+
     Publisher publisher = publisherRepository.findById(bookDTO.getPublisherId()).orElseThrow(()->new PublisherNotFoundException("Publisher corresponding to given book not found!!"));
     logger.debug("Query fired for getting Publisher by Id");
     Book book = new Book();

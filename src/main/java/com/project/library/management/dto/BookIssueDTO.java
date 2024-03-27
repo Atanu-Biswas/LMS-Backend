@@ -18,6 +18,8 @@ public class BookIssueDTO {
 
     private Long bookId;
 
+    private String bookTitle;
+
     private String userId;
 
     private Date issueDate;

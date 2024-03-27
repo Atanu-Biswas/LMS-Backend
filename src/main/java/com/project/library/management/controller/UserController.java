@@ -51,8 +51,8 @@ public class UserController {
     }
     @GetMapping("/cancel-request")
     //working
-    public ResponseEntity<Boolean> declineBookRequest(@Param("requestId") Long requestId) throws BookRequestNotFoundException{
-        boolean isRequestCancelled = bookRequestService.cancelRequest(requestId);
+    public ResponseEntity<Boolean> declineBookRequest(@Param("requestId") Long requestId,HttpServletRequest request) throws BookRequestNotFoundException, RequestNotBelongsToTheUserExecption {
+        boolean isRequestCancelled = bookRequestService.cancelRequest(requestId, request.getUserPrincipal().getName());
         return ResponseEntity.ok(isRequestCancelled);
 
     }

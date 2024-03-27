@@ -49,6 +49,7 @@ public class BookIssueService {
                 BookIssueDTO.builder()
                         .issueId(bookIssue.getIssueId())
                         .bookId(bookIssue.getBook().getBookId())
+                        .bookTitle(bookIssue.getBook().getTitle())
                         .userId(bookIssue.getUser().getUserId())
                         .issueDate(bookIssue.getIssueDate())
                         .dueDate(bookIssue.getDueDate())
