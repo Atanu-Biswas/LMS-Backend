@@ -17,7 +17,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,11 +30,16 @@ public class BookService {
   private final PublisherService publisherService;
   private final BookIssueRepository bookIssueRepository;
 
-  public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException{
+  public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException, IllegalPrintYear{
 
     if(bookDTO.getQuantityAvailable() <= 0){
       logger.error("Quantity should be greater than 0");
       throw new IllegalQuantityException();
+    }
+
+    if(bookDTO.getPrintYear() > new Date().getYear() + 1900 || bookDTO.getPrintYear() < 0){
+      logger.error("Print year should be less than or equal to current year");
+      throw new IllegalPrintYear("Print year should be less than or equal to current year");
     }
 
     if(bookDTO.getIsbn().length()!=13){
@@ -128,30 +132,30 @@ public class BookService {
         .build();
   }
 
-  public List<BookDTO> getBooksByPublisher(String publisherName) throws BookNotFoundException {
-
-    List<Book> books = bookRepository.findByPublisher(publisherName);
-
-    if (books.isEmpty()) {
-      throw new BookNotFoundException("No books found for publisher '" + publisherName + "'");
-    }
-
-    List<BookDTO> bookDTOs = new ArrayList<>();
-    for (Book book : books) {
-      BookDTO bookDTO = new BookDTO();
-      bookDTO.setAuthor(book.getAuthor());
-      bookDTO.setTitle(book.getTitle());
-      bookDTO.setGenre(book.getGenre());
-      bookDTO.setIsbn(book.getIsbn());
-      bookDTO.setPrintYear(book.getPrintYear());
-      bookDTO.setQuantityAvailable(book.getQuantityAvailable());
-      bookDTO.setActive(book.isActive());
-      bookDTO.setPublisherId(book.getPublisher().getPublisherId());
-      bookDTOs.add(bookDTO);
-    }
-
-    return bookDTOs;
-  }
+//  public List<BookDTO> getBooksByPublisher(String publisherName) throws BookNotFoundException {
+//
+//    List<Book> books = bookRepository.findByPublisher(publisherName);
+//
+//    if (books.isEmpty()) {
+//      throw new BookNotFoundException("No books found for publisher '" + publisherName + "'");
+//    }
+//
+//    List<BookDTO> bookDTOs = new ArrayList<>();
+//    for (Book book : books) {
+//      BookDTO bookDTO = new BookDTO();
+//      bookDTO.setAuthor(book.getAuthor());
+//      bookDTO.setTitle(book.getTitle());
+//      bookDTO.setGenre(book.getGenre());
+//      bookDTO.setIsbn(book.getIsbn());
+//      bookDTO.setPrintYear(book.getPrintYear());
+//      bookDTO.setQuantityAvailable(book.getQuantityAvailable());
+//      bookDTO.setActive(book.isActive());
+//      bookDTO.setPublisherId(book.getPublisher().getPublisherId());
+//      bookDTOs.add(bookDTO);
+//    }
+//
+//    return bookDTOs;
+//  }
 
   public boolean enableDisableBook(Long id) throws BookNotFoundException {
     Book book = bookRepository.findById(id).orElseThrow(()->new BookNotFoundException("Book with Id " + id + " not found"));

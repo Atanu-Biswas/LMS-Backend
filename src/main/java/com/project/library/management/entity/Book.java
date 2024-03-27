@@ -3,7 +3,7 @@ package com.project.library.management.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
-import org.hibernate.validator.constraints.ISBN; // Import for ISBN validation
+import org.hibernate.validator.constraints.ISBN;
 import org.springframework.core.annotation.Order;
 
 import java.util.Date;
@@ -29,8 +29,9 @@ public class Book {
     @Column(nullable = false)
     private String author;
 
+
     @Column(nullable = false)
-    @Min(value = 1501, message = "Print year must be greater than 1500")  // Validation message
+    @Min(value = 0)
     private int printYear;  // Changed to int for year
 
     @Column(nullable = false)
@@ -48,8 +49,9 @@ public class Book {
 
     @ManyToOne
     @JoinColumn(name = "publisher_id", nullable = false)
-
     private Publisher publisher;
+
+
 
     @OneToMany(mappedBy = "book")
     private List<BookIssue> bookIssues;

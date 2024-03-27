@@ -2,14 +2,9 @@ package com.project.library.management.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
-import lombok.ToString;
-
 import org.springframework.core.annotation.Order;
 
 import java.util.List;
-
-import org.springframework.core.annotation.Order;
 
 @Data
 @Entity
@@ -22,7 +17,6 @@ public class Publisher {
     private Long publisherId;
 
     @Column(nullable = false)
-    //unique constraint for publisherName needs to be added here
     private String name;
 
     private String email;
@@ -31,6 +25,7 @@ public class Publisher {
 
     @OneToMany(mappedBy = "publisher", cascade = CascadeType.ALL)
     private List<Book> books;
+
 
 
 

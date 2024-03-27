@@ -33,7 +33,12 @@ public class BookRequestService {
     private final BookIssueRepository bookIssueRepository;
     private final UserRepository userRepository;
 
-    public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) throws BookNotFoundException, DisabledBookException, BookAlreadyRequestedExecption {
+    public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) throws BookNotFoundException, DisabledBookException, BookAlreadyRequestedExecption, IllegalWeeksRequestedException {
+
+        if(bookRequestDTO.getWeeksRequested() < 1 || bookRequestDTO.getWeeksRequested() > 3){
+            throw new IllegalWeeksRequestedException("Weeks requested should be between 1 and 3");
+        }
+
         User user = userRepository.findByUsername(username).orElse(null);
         logger.debug("Query fired for finding the User by username");
         Book book = bookRepository.findById(bookRequestDTO.getBookId()).orElseThrow(()->new BookNotFoundException("Requested Book Not Found!!"));
@@ -47,7 +52,7 @@ public class BookRequestService {
 
         for(BookRequest request: bookRequest){
             if(request.getStatus().equals("PENDING") || request.getStatus().equals("ACCEPTED")){
-                throw new BookAlreadyRequestedExecption("This book is already");
+                throw new BookAlreadyRequestedExecption("This book is already requested or borrowed by you!!");
             }
         }
 
@@ -87,11 +92,6 @@ public class BookRequestService {
         }
 
         if (request != null && request.getStatus().equals("PENDING")) {
-            request.setStatus("ACCEPTED");
-            bookRequestRepository.save(request);
-
-
-
 
             BookIssue issue = new BookIssue();
 
@@ -113,6 +113,9 @@ public class BookRequestService {
             System.out.println("Setting values for Book Issue Table done");
             bookIssueRepository.save(issue);//error
             System.out.println("Saved in Book Issue Repository");
+
+            request.setStatus("ACCEPTED");
+            bookRequestRepository.save(request);
 
         }
         return true;
@@ -181,7 +184,7 @@ public class BookRequestService {
             dto.setAuthor(bookRequest.getBook().getAuthor());
             dto.setBookTitle(bookRequest.getBook().getTitle());
             dto.setPrintYear(bookRequest.getBook().getPrintYear());
-            dto.setPublisherName(bookRequest.getBook().getPublisher().getName());
+            dto.setPublisherName(bookRequest.getBook().getPublisher().getName() );
             dto.setRequestDate(bookRequest.getRequestDate());
             dto.setWeeksRequested(bookRequest.getWeeksRequested());
             dto.setStatus(bookRequest.getStatus());

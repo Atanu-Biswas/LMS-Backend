@@ -5,6 +5,7 @@ import com.project.library.management.dto.BookIssuePaginationDTO;
 import com.project.library.management.entity.Book;
 import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.BookRequest;
+import com.project.library.management.entity.Fine;
 import com.project.library.management.exception.BookIssueNotFoundException;
 import com.project.library.management.exception.UserNotFoundException;
 import com.project.library.management.repository.BookIssueRepository;
@@ -74,6 +75,7 @@ public class BookIssueService {
 
         //setting return date as current system date
         bookIssue.setReturnDate(new Date());
+        bookIssue.setFineStatus(Fine.valueOf("PAID"));
 
         //set status of that book as returned in book request table
         Book book= bookIssue.getBook();

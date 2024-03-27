@@ -1,13 +1,10 @@
 package com.project.library.management.repository;
 
 import com.project.library.management.entity.Book;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book,Long>{
 
@@ -22,8 +19,6 @@ public interface BookRepository extends JpaRepository<Book,Long>{
     Page<Book> findByAuthorStartingWithIgnoreCase(String authorName, Pageable p);
 
 
-    @Query("SELECT b FROM Book b WHERE LOWER(b.publisher.name) = LOWER(:publisherName)")
-    List<Book> findByPublisher(String publisherName);
 
 
     Book findByBookId(Long id);

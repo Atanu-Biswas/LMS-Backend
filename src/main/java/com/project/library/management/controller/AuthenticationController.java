@@ -5,7 +5,10 @@ import com.project.library.management.dto.RefreshTokenRequestDTO;
 import com.project.library.management.dto.Temp;
 import com.project.library.management.dto.UserDTO;
 import com.project.library.management.entity.AuthenticationResponse;
+import com.project.library.management.exception.MobileNoExistsException;
 import com.project.library.management.exception.PasswordLengthException;
+import com.project.library.management.exception.RefreshTokenNotFound;
+import com.project.library.management.exception.UserNameExistsExecption;
 import com.project.library.management.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +23,7 @@ public class AuthenticationController {
 	private final AuthenticationService authService;
 
 	@PostMapping("/register")
-	public ResponseEntity<AuthenticationResponse> register(@RequestBody UserDTO request) throws PasswordLengthException {
+	public ResponseEntity<AuthenticationResponse> register(@RequestBody UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption {
 
 		return ResponseEntity.ok(authService.register(request));
 	}
@@ -50,7 +53,7 @@ public class AuthenticationController {
     @PostMapping("/refreshToken")
     public ResponseEntity<AuthenticationResponse> refreshToken(
             @RequestBody RefreshTokenRequestDTO request
-    ) {
+    ) throws RefreshTokenNotFound {
         System.out.println("Got the request"+request);
         AuthenticationResponse authenticationResponse = authService.refreshToken(request);
         return ResponseEntity.ok(authenticationResponse);
@@ -59,7 +62,7 @@ public class AuthenticationController {
     @PostMapping("/logout")
     public ResponseEntity<String> logout(
            @RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO, HttpServletRequest request
-    ) {
+    ) throws RefreshTokenNotFound {
         String username = request.getUserPrincipal().getName();
         authService.logout(username, refreshTokenRequestDTO.getRefreshToken());
         return ResponseEntity.ok("Logged out successfully");

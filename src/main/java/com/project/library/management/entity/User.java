@@ -31,10 +31,9 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false)
     private String address;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false)
     private String mobileNo;
 
     @Column(nullable = false)

@@ -42,7 +42,7 @@ public class UserController {
     }
     @PostMapping("/request-book")
     //working //changed for frontend
-    public ResponseEntity<Boolean> issueBookRequest(@RequestBody BookRequestDTO bookRequestDTO, HttpServletRequest request) throws BookNotFoundException, DisabledBookException, BookAlreadyRequestedExecption {
+    public ResponseEntity<Boolean> issueBookRequest(@RequestBody BookRequestDTO bookRequestDTO, HttpServletRequest request) throws BookNotFoundException, DisabledBookException, BookAlreadyRequestedExecption, IllegalWeeksRequestedException {
         String username = request.getUserPrincipal().getName();
         System.out.println("username: "+username);
         boolean isIssueSuccessful = bookRequestService.issueRequest(username, bookRequestDTO);
