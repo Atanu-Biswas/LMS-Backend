@@ -29,7 +29,6 @@ public class Book {
     @Column(nullable = false)
     private String author;
 
-
     @Column(nullable = false)
     @Min(value = 0)
     private int printYear;  // Changed to int for year

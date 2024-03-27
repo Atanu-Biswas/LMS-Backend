@@ -5,11 +5,14 @@ import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.service.*;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JRException;
+
 import org.apache.log4j.Logger;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +27,7 @@ public class AdminController {
     private final BookRequestRepository bookRequestRepository;
     private final BookService bookService;
     private final UserService userService;
+    private final ReportService reportService;
 
     private static final Logger logger = Logger.getLogger(AdminController.class);
 
@@ -188,5 +192,11 @@ public class AdminController {
     System.out.println(isDeleted);
     return ResponseEntity.ok(isDeleted);
  }
+
+    @GetMapping("generate-report")
+    protected ResponseEntity<String> generateReport(@RequestParam("reportFormat") String reportFormat) throws FileNotFoundException, JRException{
+        String generatedReport=reportService.generateBooksCollectionReport(reportFormat);
+        return ResponseEntity.ok(generatedReport);
+    }
 
 }
