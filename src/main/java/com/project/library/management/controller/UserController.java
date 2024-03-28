@@ -1,19 +1,19 @@
  package com.project.library.management.controller;
 
 import com.project.library.management.dto.*;
+import com.project.library.management.entity.User;
 import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
-import com.project.library.management.service.BookIssueService;
-import com.project.library.management.service.BookRequestService;
-import com.project.library.management.service.BookService;
-import com.project.library.management.service.UserService;
+import com.project.library.management.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -30,6 +30,7 @@ public class UserController {
     private final BookRequestService bookRequestService;
     private final BookService bookService;
     private final BookIssueService bookIssueService;
+    private final UserDashboardService userDashboardService;
 
     @GetMapping("/test")
     protected ResponseEntity<String> test() {
@@ -152,6 +153,29 @@ public class UserController {
         BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewRequestsByUserName(pageNumber, pageSize, sortBy, sortDir,username,filterBy);
 
         return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
+    }
+
+    @GetMapping("/user-dashboard")
+    public ResponseEntity<UserDashboardDTO> userDashboard(HttpServletRequest request) {
+        String username = request.getUserPrincipal().getName();
+        Optional<User> optionalUser = userService.getUserByUsernameforDashboard(username);
+
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+
+            return ResponseEntity.ok(UserDashboardDTO.builder()
+                    .genreWiseSplit(userDashboardService.getGenreWiseSplitForUser(user))
+                    .favoriteBooks(userDashboardService.getFavoriteBooksForUser(user))
+                    .favoriteAuthors(userDashboardService.getFavoriteAuthorsForUser(user))
+                    .totalBooksBorrowed(userDashboardService.getTotalBooksBorrowedByUser(user))
+                    .totalDuesAmount(userDashboardService.getTotalDuesAmountForUser(user))
+                    .build());
+        }
+        else {
+            // Handle case where user is not found
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
 }

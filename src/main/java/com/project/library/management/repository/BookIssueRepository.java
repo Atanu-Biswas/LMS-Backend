@@ -1,6 +1,7 @@
 package com.project.library.management.repository;
 
 import com.project.library.management.entity.BookIssue;
+import com.project.library.management.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,5 +48,35 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
             "SUM(CASE WHEN bi.returnDate IS NULL THEN bi.fine ELSE 0 END) " +
             "FROM BookIssue bi")
     List<Object[]> getTotalFinesPaidAndDue();
+
+    @Query("SELECT b.book.genre, COUNT(b) " +
+            "FROM BookIssue b " +
+            "WHERE b.user = ?1 " +
+            "GROUP BY b.book.genre")
+    List<Object[]> getGenreWiseSplitByUser(User user);
+
+    @Query("SELECT bi.book.title, COUNT(bi) " +
+            "FROM BookIssue bi " +
+            "WHERE bi.user = ?1 " +
+            "GROUP BY bi.book.title " +
+            "ORDER BY COUNT(bi) DESC")
+    List<Object[]> getFavoriteBooksByUser(User user);
+
+    @Query("SELECT bi.book.author, COUNT(bi) " +
+            "FROM BookIssue bi " +
+            "WHERE bi.user = ?1 " +
+            "GROUP BY bi.book.author " +
+            "ORDER BY COUNT(bi) DESC")
+    List<Object[]> getFavoriteAuthorsByUser(User user);
+
+    @Query("SELECT COUNT(bi) " +
+            "FROM BookIssue bi " +
+            "WHERE bi.user = ?1")
+    Long getTotalBooksBorrowedByUser(User user);
+
+    @Query("SELECT SUM(bi.fine) " +
+            "FROM BookIssue bi " +
+            "WHERE bi.user = ?1")
+    Integer getTotalDuesAmountForUser(User user);
 
 }
