@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.core.annotation.Order;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -42,6 +43,6 @@ public class BookIssue {
     private Fine fineStatus;
 
     private int fine = 0;
-   // Getters and setters omitted for brevity
+    // Getters and setters omitted for brevity
 }
 

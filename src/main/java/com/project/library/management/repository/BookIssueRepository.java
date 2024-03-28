@@ -6,9 +6,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+
 
 
 public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
@@ -48,4 +49,12 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
             "FROM BookIssue bi")
     List<Object[]> getTotalFinesPaidAndDue();
 
+
+    @Query(value = "SELECT u.username, COUNT(*) as booksBorrowed " +
+            "FROM BookIssue bi " +
+            "JOIN User u ON bi.user.userId = u.userId " +
+            "GROUP BY u.username " +
+            "ORDER BY booksBorrowed DESC"
+            )
+    List<Object[]> findUserActivity();
 }

@@ -4,10 +4,7 @@ import com.project.library.management.dto.*;
 import com.project.library.management.entity.Genre;
 import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
-import com.project.library.management.service.BookIssueService;
-import com.project.library.management.service.BookRequestService;
-import com.project.library.management.service.BookService;
-import com.project.library.management.service.UserService;
+import com.project.library.management.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -31,6 +29,7 @@ public class UserController {
     private final BookRequestService bookRequestService;
     private final BookService bookService;
     private final BookIssueService bookIssueService;
+    private final UserActivityService userActivityService;
 
     @GetMapping("/test")
     protected ResponseEntity<String> test() {
@@ -166,6 +165,11 @@ public class UserController {
         BookPaginationDTO bookPaginationDTO=bookService.getBooksByGenre(genre,pageNumber,pageSize,sortBy,sortDir);
 
        return ResponseEntity.of(Optional.of(bookPaginationDTO));
+    }
+    @GetMapping("/userActivity")
+    public ResponseEntity<List<UserActivityDTO>> getUserActivityReport() {
+        List<UserActivityDTO> userActivityReport = userActivityService.getUserActivityReport();
+        return ResponseEntity.ok(userActivityReport);
     }
 }
 
