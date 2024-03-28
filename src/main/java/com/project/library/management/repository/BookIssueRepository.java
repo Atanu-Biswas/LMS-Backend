@@ -41,7 +41,8 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
             "FROM BookIssue bi " +
             "JOIN bi.book b " +
             "GROUP BY b.author " +
-            "ORDER BY COUNT(bi) DESC")
+            "ORDER BY COUNT(bi) DESC " +
+            "FETCH FIRST 5 ROWS ONLY")
     List<Object[]> findTopAuthorsWithBooksIssued();
 
     @Query("SELECT SUM(CASE WHEN bi.returnDate IS NOT NULL THEN bi.fine ELSE 0 END), " +
@@ -67,14 +68,16 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
             "FROM BookIssue bi " +
             "WHERE bi.user = ?1 " +
             "GROUP BY bi.book.title " +
-            "ORDER BY COUNT(bi) DESC")
+            "ORDER BY COUNT(bi) DESC " +
+            "FETCH FIRST 5 ROWS ONLY")
     List<Object[]> getFavoriteBooksByUser(User user);
 
     @Query("SELECT bi.book.author, COUNT(bi) " +
             "FROM BookIssue bi " +
             "WHERE bi.user = ?1 " +
             "GROUP BY bi.book.author " +
-            "ORDER BY COUNT(bi) DESC")
+            "ORDER BY COUNT(bi) DESC " +
+            "FETCH FIRST 5 ROWS ONLY")
     List<Object[]> getFavoriteAuthorsByUser(User user);
 
     @Query("SELECT COUNT(bi) " +
