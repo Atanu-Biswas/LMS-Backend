@@ -7,10 +7,7 @@ import com.project.library.management.entity.AuthenticationResponse;
 import com.project.library.management.entity.RefreshToken;
 import com.project.library.management.entity.Role;
 import com.project.library.management.entity.User;
-import com.project.library.management.exception.MobileNoExistsException;
-import com.project.library.management.exception.PasswordLengthException;
-import com.project.library.management.exception.RefreshTokenNotFound;
-import com.project.library.management.exception.UserNameExistsExecption;
+import com.project.library.management.exception.*;
 import com.project.library.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
@@ -38,6 +35,10 @@ public class AuthenticationService {
             throw new UserNameExistsExecption("Username already exists");
         }
 
+        if(userRepository.existsByMobileNo(request.getMobileNo())){
+            throw new MobileNoExistsException("Mobile Number already exists");
+        }
+
 
 
 
@@ -60,7 +61,7 @@ public class AuthenticationService {
         return new AuthenticationResponse(token, refreshTokenToken);
     }
 
-    public AuthenticationResponse authenticate(LoginDTO request) {
+    public AuthenticationResponse authenticate(LoginDTO request) throws InvalidCredentialException {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -70,7 +71,7 @@ public class AuthenticationService {
                 )
         );
 
-        User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
+        User user = userRepository.findByUsername(request.getUsername()).orElseThrow( () -> new InvalidCredentialException("Invalid Credentials!"));
         logger.debug("Query fired for finding the Username for logging in");
         String token = jwtService.generateToken(user);
         logger.info("Generated the Access Token for the user");

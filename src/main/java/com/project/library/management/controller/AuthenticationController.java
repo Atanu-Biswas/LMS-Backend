@@ -5,10 +5,7 @@ import com.project.library.management.dto.RefreshTokenRequestDTO;
 import com.project.library.management.dto.Temp;
 import com.project.library.management.dto.UserDTO;
 import com.project.library.management.entity.AuthenticationResponse;
-import com.project.library.management.exception.MobileNoExistsException;
-import com.project.library.management.exception.PasswordLengthException;
-import com.project.library.management.exception.RefreshTokenNotFound;
-import com.project.library.management.exception.UserNameExistsExecption;
+import com.project.library.management.exception.*;
 import com.project.library.management.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +39,7 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<Temp> login(
             @RequestBody LoginDTO request
-    ) {
+    ) throws InvalidCredentialException {
         Temp temp = new Temp();
         temp.setAuthenticationResponse(authService.authenticate(request));
         temp.setRole(authService.getUserRole(request.getUsername()));

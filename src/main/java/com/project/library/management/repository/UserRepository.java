@@ -18,5 +18,6 @@ public interface UserRepository extends JpaRepository<User, String>{
     int getTotalUsersAvailable();
 
 
+    boolean existsByMobileNo(String mobileNo);
 }
 
