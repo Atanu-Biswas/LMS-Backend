@@ -215,6 +215,7 @@ public class AdminController {
 
     @GetMapping("generate-report")
     protected ResponseEntity<byte[]> generateReport(@RequestParam("reportName") String reportName) throws JRException,FileNotFoundException, ReportGenerationException {
+        System.out.println("Generating report: "+reportName);
         ByteArrayOutputStream byteArrayOutputStream = reportService.getReport(reportName);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_PDF);

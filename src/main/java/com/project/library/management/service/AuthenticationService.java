@@ -62,16 +62,23 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(LoginDTO request) throws InvalidCredentialException {
+        System.out.println("Authenticate Service");
+        try{
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(),
+                            request.getPassword()
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
+                    )
 
-                )
+            );}
+        catch (Exception e){
+            throw new InvalidCredentialException("Invalid Credentials!");
+        }
+
+        User user = userRepository.findByUsername(request.getUsername()).orElseThrow(()->
+                new InvalidCredentialException("User not found")
         );
-
-        User user = userRepository.findByUsername(request.getUsername()).orElseThrow( () -> new InvalidCredentialException("Invalid Credentials!"));
         logger.debug("Query fired for finding the Username for logging in");
         String token = jwtService.generateToken(user);
         logger.info("Generated the Access Token for the user");

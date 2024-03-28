@@ -60,7 +60,7 @@ public class ReportService {
     }
 
     public ByteArrayOutputStream getReport(String reportName) throws FileNotFoundException, ReportGenerationException, JRException{
-
+        System.out.println("Generating report: "+reportName);
         switch(reportName){
             case "BookCollectionReport":
                 return generateBooksCollectionReport();
