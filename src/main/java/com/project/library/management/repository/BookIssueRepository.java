@@ -40,7 +40,8 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
             "FROM BookIssue bi " +
             "JOIN bi.book b " +
             "GROUP BY b.author " +
-            "ORDER BY COUNT(bi) DESC")
+            "ORDER BY COUNT(bi) DESC " +
+            "FETCH FIRST 5 ROWS ONLY")
     List<Object[]> findTopAuthorsWithBooksIssued();
 
     @Query("SELECT SUM(CASE WHEN bi.returnDate IS NOT NULL THEN bi.fine ELSE 0 END), " +

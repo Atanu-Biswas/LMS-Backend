@@ -203,7 +203,7 @@ public class AdminController {
                .mostRequestedBooks(adminDashboardService.calculateAdminDashboardData())
                .totalBooksAvailable(adminDashboardService.getTotalBooksAvailable())
                .totalUsers(adminDashboardService.getTotalUsersAvailable())
-               .TopAuthorsWithBooksIssued(adminDashboardService.getTopAuthorsWithBooksIssued(5))
+               .TopAuthorsWithBooksIssued(adminDashboardService.getTopAuthorsWithBooksIssued())
                .totalFines(adminDashboardService.getTotalFinesPaidVersusDue())
                .build());
     }
