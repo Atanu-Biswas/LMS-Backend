@@ -18,6 +18,8 @@ public class BookIssueDTO {
 
     private Long bookId;
 
+    private String bookTitle;
+
     private String userId;
 
     private Date issueDate;
@@ -25,6 +27,8 @@ public class BookIssueDTO {
     private Date dueDate;
 
     private Date returnDate;
+
+    private Long requestId;
 
     private int fine;
 

@@ -1,7 +1,6 @@
 package com.project.library.management.repository;
 
 import com.project.library.management.entity.Book;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,14 +21,16 @@ public interface BookRepository extends JpaRepository<Book,Long>{
     Page<Book> findByAuthorStartingWithIgnoreCase(String authorName, Pageable p);
 
 
-    @Query("SELECT b FROM Book b WHERE LOWER(b.publisher.name) = LOWER(:publisherName)")
-    List<Book> findByPublisher(String publisherName);
 
 
     Book findByBookId(Long id);
 
     void deleteByBookId(Long bookId);
 
-    @Query(value = "SELECT genre, COUNT(*) FROM TABLE ( Book ) GROUP BY genre", nativeQuery = true)
+    @Query(value = "SELECT genre, COUNT(*) FROM Book GROUP BY genre", nativeQuery = true)
     List<Object[]> getGenreWiseSplit();
+    @Query("SELECT COUNT(b) FROM Book b")
+    int getTotalBooksAvailable();
+
+
 }

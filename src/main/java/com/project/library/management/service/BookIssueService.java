@@ -5,14 +5,13 @@ import com.project.library.management.dto.BookIssuePaginationDTO;
 import com.project.library.management.entity.Book;
 import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.BookRequest;
-import com.project.library.management.entity.User;
+import com.project.library.management.entity.Fine;
 import com.project.library.management.exception.BookIssueNotFoundException;
 import com.project.library.management.exception.UserNotFoundException;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.repository.UserRepository;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -50,6 +49,7 @@ public class BookIssueService {
                 BookIssueDTO.builder()
                         .issueId(bookIssue.getIssueId())
                         .bookId(bookIssue.getBook().getBookId())
+                        .bookTitle(bookIssue.getBook().getTitle())
                         .userId(bookIssue.getUser().getUserId())
                         .issueDate(bookIssue.getIssueDate())
                         .dueDate(bookIssue.getDueDate())
@@ -68,19 +68,19 @@ public class BookIssueService {
                 .build();
     }
 
-    public boolean acceptReturn(Long issueId){
-
+    public boolean acceptReturn(Long issueId) throws BookIssueNotFoundException {
+        System.out.println("issueId: (service)"+issueId);
         boolean isReturnAccepted=false;
 
         BookIssue bookIssue = bookIssueRepository.findById(issueId).orElse(null);
 
         //setting return date as current system date
         bookIssue.setReturnDate(new Date());
+        bookIssue.setFineStatus(Fine.valueOf("PAID"));
 
         //set status of that book as returned in book request table
-        User user= bookIssue.getUser();
         Book book= bookIssue.getBook();
-        BookRequest bookRequest= bookRequestRepository.findByUserAndBook(user,book);
+        BookRequest bookRequest= bookRequestRepository.findById(bookIssue.getRequestId()).orElseThrow(BookIssueNotFoundException::new);
         bookRequest.setStatus("RETURNED");
 
         //increase the quantity available of that book by one

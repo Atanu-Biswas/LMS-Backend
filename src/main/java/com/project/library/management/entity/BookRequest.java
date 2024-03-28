@@ -1,15 +1,12 @@
 package com.project.library.management.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
-
-import lombok.ToString;
-
 import org.springframework.core.annotation.Order;
 
 import java.util.Date;
-
-import org.springframework.core.annotation.Order;
 
 @Data
 @Entity
@@ -33,6 +30,8 @@ public class BookRequest {
     private Date requestDate;
 
     @Column(nullable = false)
+    @Min(1)
+    @Max(3)
     private int weeksRequested;
 
     @Column(nullable = false)

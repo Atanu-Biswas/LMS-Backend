@@ -7,6 +7,10 @@ import com.project.library.management.entity.AuthenticationResponse;
 import com.project.library.management.entity.RefreshToken;
 import com.project.library.management.entity.Role;
 import com.project.library.management.entity.User;
+import com.project.library.management.exception.MobileNoExistsException;
+import com.project.library.management.exception.PasswordLengthException;
+import com.project.library.management.exception.RefreshTokenNotFound;
+import com.project.library.management.exception.UserNameExistsExecption;
 import com.project.library.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
@@ -25,7 +29,19 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse register(UserDTO request) {
+    public AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption{
+        if (request.getPassword().length() < 8 || request.getPassword().length() > 20) {
+            throw new PasswordLengthException("Password length should be between 8 and 20 characters.");
+        }
+
+        if(userRepository.existsByUsername(request.getUsername())){
+            throw new UserNameExistsExecption("Username already exists");
+        }
+
+
+
+
+
         User user = new User();
         user.setUsername(request.getUsername());
         user.setName(request.getName());
@@ -76,7 +92,7 @@ public class AuthenticationService {
 
 
 
-    public AuthenticationResponse refreshToken(RefreshTokenRequestDTO request) {
+    public AuthenticationResponse refreshToken(RefreshTokenRequestDTO request) throws RefreshTokenNotFound {
         RefreshToken refreshToken = refreshTokenService.findByToken(request.getRefreshToken()).orElseThrow(
                 () -> new RuntimeException("Refresh token is not in database!")
         );
@@ -88,6 +104,8 @@ public class AuthenticationService {
         return new AuthenticationResponse(token, request.getRefreshToken());
     }
 
+
+
     public String getUserRole(String username) {
         User user = userRepository.findByUsername(username).orElseThrow();
         logger.debug("Query fired for finding the User by username");
@@ -95,7 +113,7 @@ public class AuthenticationService {
     }
 
 
-    public void logout(String username, String Token) {
+    public void logout(String username, String Token) throws RefreshTokenNotFound {
 
      RefreshToken refreshToken = refreshTokenService.findByToken(Token).orElseThrow(
                 () -> new RuntimeException("Refresh token is not in database!")

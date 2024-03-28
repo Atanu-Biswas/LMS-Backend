@@ -5,11 +5,14 @@ import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.service.*;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JRException;
+
 import org.apache.log4j.Logger;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +28,8 @@ public class AdminController {
     private final BookService bookService;
     private final UserService userService;
     private final AdminDashboardService adminDashboardService;
+    private final ReportService reportService;
+
 
     private static final Logger logger = Logger.getLogger(AdminController.class);
 
@@ -54,21 +59,23 @@ public class AdminController {
 
     @PostMapping("/add-book")
     // working
-    protected ResponseEntity<String> addBook(@RequestBody BookDTO bookDTO) throws PublisherNotFoundException {
+    protected ResponseEntity<Boolean> addBook(@RequestBody BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException, IllegalPrintYear {
         System.out.println("bookDTO: " + bookDTO);
         bookService.addBook(bookDTO);
-        return ResponseEntity.ok("book is added successfully");
+        Boolean isBookAdded = true;
+        return ResponseEntity.ok(isBookAdded);
     }
 
 
-    @GetMapping("/pending-requests")
-    public ResponseEntity<BookRequestPaginationDTO> getPendingRequests(
+    @GetMapping("/view-requests")
+    public ResponseEntity<BookRequestPaginationDTO> getRequests(
         @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
         @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
         @RequestParam(value = "sortBy", defaultValue ="requestDate", required = false) String sortBy,
-        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ) throws BookRequestNotFoundException {
+        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir,
+        @RequestParam(value = "filterBy",required = false) String filterBy) throws BookRequestNotFoundException {
 
-        BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewPendingRequests(pageNumber, pageSize, sortBy, sortDir);
+        BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewRequests(pageNumber, pageSize, sortBy, sortDir,filterBy);
 
         return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
     }
@@ -114,15 +121,16 @@ public class AdminController {
     }
 
 
-   //view pending request by username keeep this also
-   @GetMapping("/pending-requests-by-username")
-   public ResponseEntity<BookRequestPaginationDTO> getPendingRequestsByUser(
+   @GetMapping("/view-requests-by-username")
+   public ResponseEntity<BookRequestPaginationDTO> getRequestsByUsername(
        @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
        @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
        @RequestParam(value = "sortBy", defaultValue ="requestDate", required = false) String sortBy,
        @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir ,
-       @RequestParam("username") String username) throws BookRequestNotFoundException, UserNotFoundException {
-       BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewPendingRequestsByUserName(pageNumber, pageSize, sortBy, sortDir,username);
+       @RequestParam("username") String username, 
+       @RequestParam(value = "filterBy",required = false) String filterBy) throws BookRequestNotFoundException, UserNotFoundException {
+
+       BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewRequestsByUserName(pageNumber, pageSize, sortBy, sortDir,username,filterBy);
 
        return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
    }
@@ -156,7 +164,7 @@ public class AdminController {
    }
 
     @GetMapping("/accept-return")
-    protected ResponseEntity<Boolean> acceptReturn(@RequestParam("issueId") Long issueId){
+    protected ResponseEntity<Boolean> acceptReturn(@RequestParam("issueId") Long issueId) throws BookIssueNotFoundException {
         System.out.println("issueId: "+issueId);
         boolean isReturnAccepted = bookIssueService.acceptReturn(issueId);
 
@@ -186,9 +194,27 @@ public class AdminController {
     System.out.println(isDeleted);
     return ResponseEntity.ok(isDeleted);
  }
+
    @GetMapping("/admin-dashboard")
-    public ResponseEntity<AdminDashboardDTO> getGenreWiseSplit() {
-        AdminDashboardDTO adminDashboardDTO = adminDashboardService.getGenreWiseSplit();
-        return ResponseEntity.ok(adminDashboardDTO);
+    public ResponseEntity<AdminDashboardDTO> adminDashboard() {
+
+       return ResponseEntity.ok(AdminDashboardDTO.builder()
+               .genreWiseSplit(adminDashboardService.getGenreWiseSplit())
+               .mostRequestedBooks(adminDashboardService.calculateAdminDashboardData())
+               .totalBooksAvailable(adminDashboardService.getTotalBooksAvailable())
+               .totalUsers(adminDashboardService.getTotalUsersAvailable())
+               .TopAuthorsWithBooksIssued(adminDashboardService.getTopAuthorsWithBooksIssued(5))
+               .totalFines(adminDashboardService.getTotalFinesPaidVersusDue())
+               .build());
     }
+
+
+
+    @GetMapping("generate-report")
+    protected ResponseEntity<String> generateReport(@RequestParam("reportFormat") String reportFormat) throws FileNotFoundException, JRException{
+        String generatedReport=reportService.generateBooksCollectionReport(reportFormat);
+        return ResponseEntity.ok(generatedReport);
+    }
+
+
 }

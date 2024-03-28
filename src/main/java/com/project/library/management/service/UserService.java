@@ -1,9 +1,6 @@
 package com.project.library.management.service;
 
-import com.project.library.management.dto.FineDTO;
-import com.project.library.management.dto.FinePaginationDTO;
-import com.project.library.management.dto.UserDTO;
-import com.project.library.management.dto.UserPaginationDTO;
+import com.project.library.management.dto.*;
 import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.User;
 import com.project.library.management.exception.NoFineFoundException;
@@ -34,6 +31,17 @@ public class UserService {
         User user = userRepository.findByUsername(username).orElseThrow(null);
 
         return convertToDTO(user);
+    }
+
+    public UserProfile getUserProfile(String username) throws UserNotFoundException{
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found!!"));
+
+        UserProfile userProfile = new UserProfile();
+        userProfile.setAddress(user.getAddress());
+        userProfile.setMobileNo(user.getMobileNo());
+        userProfile.setName(user.getName());
+
+        return userProfile;
     }
 
     private UserDTO convertToDTO(User user) {

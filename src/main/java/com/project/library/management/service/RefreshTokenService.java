@@ -2,9 +2,11 @@ package com.project.library.management.service;
 
 import com.project.library.management.entity.RefreshToken;
 import com.project.library.management.entity.User;
+import com.project.library.management.exception.RefreshTokenNotFound;
 import com.project.library.management.repository.RefreshTokenRepository;
 import com.project.library.management.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -19,7 +21,7 @@ public class RefreshTokenService {
     private UserRepository userRepository;
 
     public RefreshToken createRefreshToken(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow();
+        User user = userRepository.findByUsername(username).orElseThrow( () -> new UsernameNotFoundException("User Not Found to create Refresh Token"));
 
 
         RefreshToken refreshToken = RefreshToken.builder()
@@ -35,7 +37,9 @@ public class RefreshTokenService {
         return refreshToken;
     }
 
-    public Optional<RefreshToken> findByToken(String token) {
+    public Optional<RefreshToken> findByToken(String token) throws RefreshTokenNotFound{
+
+
         return refreshTokenRepository.findByToken(token);
     }
 
@@ -51,7 +55,7 @@ public class RefreshTokenService {
         return refreshToken.getExpiryDate().isBefore(Instant.now());
     }
 
-    public Object deleteByToken(String refreshToken) {
+    public Object deleteByToken(String refreshToken) throws RefreshTokenNotFound {
 
         findByToken(refreshToken).ifPresent(refreshTokenRepository::delete);
         return "Refresh Token Deleted Successfully";
