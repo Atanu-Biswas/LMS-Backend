@@ -59,10 +59,10 @@ public class AdminDashboardService {
         return userRepository.getTotalUsersAvailable();
     }
 
-    public Map<String,Long> getTopAuthorsWithBooksIssued(int limit) {
+    public Map<String,Long> getTopAuthorsWithBooksIssued() {
         List<Object[]> topAuthorsWithBooksIssued = bookIssueRepository.findTopAuthorsWithBooksIssued();
 
-        AdminDashboardDTO adminDashboardDTO = new AdminDashboardDTO();
+
         Map<String, Long> topAuthors = new HashMap<>();
 
         for (Object[] result : topAuthorsWithBooksIssued) {

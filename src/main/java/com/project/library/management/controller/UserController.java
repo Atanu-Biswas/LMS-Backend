@@ -1,5 +1,6 @@
  package com.project.library.management.controller;
 
+
  import com.project.library.management.dto.*;
  import com.project.library.management.entity.User;
  import com.project.library.management.exception.*;
@@ -191,6 +192,18 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
 
+    }
+
+
+    @GetMapping("/newArrivals")
+    public ResponseEntity<BookPaginationDTO> getNewArrivalsBooks(
+            @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue ="dateAdded", required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue ="desc", required = false) String sortDir) {
+
+        BookPaginationDTO newBooks = bookService.getNewArrivalsBooks(pageNumber, pageSize, sortBy, sortDir);
+        return ResponseEntity.ok(newBooks);
     }
 
 }

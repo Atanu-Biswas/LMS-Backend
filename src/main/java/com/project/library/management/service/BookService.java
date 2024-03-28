@@ -21,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+
+import java.util.Calendar;
 import java.util.Date;
 
 import java.util.List;
@@ -327,5 +329,45 @@ public class BookService {
     }
 
     return null; // No books found
+  }
+
+  public BookPaginationDTO getNewArrivalsBooks(int pageNumber, int pageSize, String sortBy,String sortDir) {
+
+    // Calculate the date two weeks ago
+    Calendar calendar = Calendar.getInstance();
+    calendar.add(Calendar.DATE, -14);
+    Date twoWeeksAgo = calendar.getTime();
+
+    Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+    Pageable p = PageRequest.of(pageNumber, pageSize, sort);
+
+    Page<Book> bookPage=bookRepository.findNewArrivalsBooks(twoWeeksAgo, p);
+    List<Book> books=bookPage.getContent();
+    List<BookDTO> bookDTOs=books.stream().map(book->
+            BookDTO.builder()
+                    .bookId(book.getBookId())
+                    .title(book.getTitle())
+                    .author(book.getAuthor())
+                    .isbn(book.getIsbn())
+                    .printYear(book.getPrintYear())
+                    .genre(book.getGenre().toString())
+                    .quantityAvailable(book.getQuantityAvailable())
+                    .isActive(book.isActive())
+                    .dateAdded(book.getDateAdded())
+                    .publisherId(book.getPublisher().getPublisherId())
+                    .build()).toList();
+
+    return BookPaginationDTO.builder()
+            .content(bookDTOs)
+            .pageNumber(pageNumber)
+            .pageSize(pageSize)
+            .totalElements(bookPage.getTotalElements())
+            .totalPages(bookPage.getTotalPages())
+            .isLastPage(bookPage.isLast()).build();
+
+
+    // Retrieve new arrivals books from repository
+//    return bookRepository.findNewArrivalsBooks(twoWeeksAgo);
   }
 }
