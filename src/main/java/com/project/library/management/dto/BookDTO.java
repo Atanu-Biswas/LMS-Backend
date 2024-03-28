@@ -24,4 +24,6 @@ public class BookDTO {
    private Long publisherId;
 
 
+    public void setId(Long mostBorrowedBookId) {
+    }
 }

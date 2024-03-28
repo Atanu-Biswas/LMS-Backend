@@ -27,7 +27,9 @@ public class AdminController {
     private final BookRequestRepository bookRequestRepository;
     private final BookService bookService;
     private final UserService userService;
+    private final AdminDashboardService adminDashboardService;
     private final ReportService reportService;
+
 
     private static final Logger logger = Logger.getLogger(AdminController.class);
 
@@ -193,10 +195,26 @@ public class AdminController {
     return ResponseEntity.ok(isDeleted);
  }
 
+   @GetMapping("/admin-dashboard")
+    public ResponseEntity<AdminDashboardDTO> adminDashboard() {
+
+       return ResponseEntity.ok(AdminDashboardDTO.builder()
+               .genreWiseSplit(adminDashboardService.getGenreWiseSplit())
+               .mostRequestedBooks(adminDashboardService.calculateAdminDashboardData())
+               .totalBooksAvailable(adminDashboardService.getTotalBooksAvailable())
+               .totalUsers(adminDashboardService.getTotalUsersAvailable())
+               .TopAuthorsWithBooksIssued(adminDashboardService.getTopAuthorsWithBooksIssued(5))
+               .totalFines(adminDashboardService.getTotalFinesPaidVersusDue())
+               .build());
+    }
+
+
+
     @GetMapping("generate-report")
     protected ResponseEntity<String> generateReport(@RequestParam("reportFormat") String reportFormat) throws FileNotFoundException, JRException{
         String generatedReport=reportService.generateBooksCollectionReport(reportFormat);
         return ResponseEntity.ok(generatedReport);
     }
+
 
 }

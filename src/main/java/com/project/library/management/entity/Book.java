@@ -58,6 +58,9 @@ public class Book {
 
     @OneToMany(mappedBy = "book")
     private List<BookRequest> bookRequests;
+    public Long getId() {
+        return this.bookId;
+    }
 
     // Getters and setters omitted for brevity
 }

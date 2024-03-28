@@ -289,4 +289,38 @@ public class BookService {
         .isLastPage(bookPage.isLast())
         .build();
   }
+
+  public BookDTO getBookOfTheWeek(Date startDate, Date endDate) {
+//    LocalDate endDate = LocalDate.now();
+//    LocalDate startDate = endDate.minusWeeks(1);
+
+    List<Object[]> bookIssues = bookIssueRepository.findByIssueDateBetween(startDate, endDate);
+
+
+
+//    Map<Long, Long> bookIssueCountMap = bookIssues.stream()
+//            .collect(Collectors.groupingBy(issue -> issue.getBook().getId(), Collectors.counting()));
+    Map<Long, Long> bookIssueCountMap = bookIssues.stream()
+            .collect(Collectors.groupingBy(
+                    objArray -> ((Book) objArray[0]).getId(),
+                    Collectors.counting()
+            ));
+
+    Long mostBorrowedBookId = bookIssueCountMap.entrySet().stream()
+            .max(Map.Entry.comparingByValue())
+            .map(Map.Entry::getKey)
+            .orElse(null);
+
+    // Retrieve the book details for the most borrowed book
+    if (mostBorrowedBookId != null) {
+      // Here, you would retrieve book details from your BookRepository
+      // and convert to a BookDTO
+      BookDTO mostBorrowedBookDTO = new BookDTO();
+      mostBorrowedBookDTO.setId(mostBorrowedBookId);
+      // Set other book details
+      return mostBorrowedBookDTO;
+    }
+
+    return null; // No books found
+  }
 }

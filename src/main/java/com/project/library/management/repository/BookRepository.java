@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface BookRepository extends JpaRepository<Book,Long>{
 
 
@@ -29,4 +31,11 @@ public interface BookRepository extends JpaRepository<Book,Long>{
     Book findByBookId(Long id);
 
     void deleteByBookId(Long bookId);
+
+    @Query(value = "SELECT genre, COUNT(*) FROM Book GROUP BY genre", nativeQuery = true)
+    List<Object[]> getGenreWiseSplit();
+    @Query("SELECT COUNT(b) FROM Book b")
+    int getTotalBooksAvailable();
+
+
 }
