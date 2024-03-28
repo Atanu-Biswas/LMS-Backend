@@ -1,6 +1,7 @@
  package com.project.library.management.controller;
 
 import com.project.library.management.dto.*;
+import com.project.library.management.entity.Book;
 import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.service.BookIssueService;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.query.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
@@ -152,6 +154,18 @@ public class UserController {
         BookRequestPaginationDTO bookRequestPaginationDTO=bookRequestService.viewRequestsByUserName(pageNumber, pageSize, sortBy, sortDir,username,filterBy);
 
         return ResponseEntity.of(Optional.of(bookRequestPaginationDTO));
+    }
+
+
+    @GetMapping("/newArrivals")
+    public ResponseEntity<BookPaginationDTO> getNewArrivalsBooks(
+            @RequestParam(value = "pageNumber", defaultValue ="0", required = false) int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue ="10", required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue ="dateAdded", required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue ="desc", required = false) String sortDir) {
+
+        BookPaginationDTO newBooks = bookService.getNewArrivalsBooks(pageNumber, pageSize, sortBy, sortDir);
+        return ResponseEntity.ok(newBooks);
     }
 
 }

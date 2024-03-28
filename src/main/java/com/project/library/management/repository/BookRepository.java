@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Date;
 import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book,Long>{
@@ -31,6 +32,10 @@ public interface BookRepository extends JpaRepository<Book,Long>{
     List<Object[]> getGenreWiseSplit();
     @Query("SELECT COUNT(b) FROM Book b")
     int getTotalBooksAvailable();
+
+
+    @Query("SELECT b FROM Book b WHERE b.dateAdded >= :twoWeeksAgo")
+    Page<Book> findNewArrivalsBooks(Date twoWeeksAgo, Pageable p);
 
 
 }
