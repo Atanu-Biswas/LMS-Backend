@@ -2,13 +2,21 @@ package com.project.library.management.service;
 
 import com.project.library.management.dto.reportDTO.*;
 import com.project.library.management.entity.*;
+import com.project.library.management.exception.ReportGenerationException;
 import com.project.library.management.repository.*;
+
 import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimplePdfExporterConfiguration;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -25,7 +33,7 @@ public class ReportService {
     private final BookRequestRepository bookRequestRepository;
     private final PublisherRepository publisherRepository;
 
-    public String generateReport(String reportFormat,JRBeanCollectionDataSource dataSource,String jrxmlFileName,String reportFileName) throws FileNotFoundException, JRException{
+    public ByteArrayOutputStream generateReport(JRBeanCollectionDataSource dataSource,String jrxmlFileName) throws FileNotFoundException, JRException, ReportGenerationException{
         //Load jrxml file and compile it.
         File file=ResourceUtils.getFile("classpath:templates\\"+jrxmlFileName);
         JasperReport jasperReport=JasperCompileManager.compileReport(file.getAbsolutePath());
@@ -34,19 +42,35 @@ public class ReportService {
         parameters.put("generatedBy", "Team LMS");
         JasperPrint jasperPrint=JasperFillManager.fillReport(jasperReport,parameters,dataSource);
 
-        String destinationPath="src\\main\\resources\\static";
-        if(reportFormat.equalsIgnoreCase("html")){
-            JasperExportManager.exportReportToHtmlFile(jasperPrint,destinationPath+"\\"+reportFileName+".html");
-            
-        }
-        else if(reportFormat.equalsIgnoreCase("pdf")){
-            JasperExportManager.exportReportToPdfFile(jasperPrint,destinationPath+"\\"+reportFileName+".pdf");
+        ByteArrayOutputStream byteArrayOutputStream= new ByteArrayOutputStream();
+        JRPdfExporter exporter=new JRPdfExporter();
+        SimplePdfExporterConfiguration configuration=new SimplePdfExporterConfiguration();
+        configuration.setCompressed(true);
+
+        exporter.setConfiguration(configuration); 
+        exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(byteArrayOutputStream));
+        exporter.exportReport();  
+        
+        if(byteArrayOutputStream == null || byteArrayOutputStream.size() == 0){
+            throw new ReportGenerationException("Failed to generate report. Report data is empty or null.");
         }
 
-        return "Report generated successfully in path: "+destinationPath;
+        return byteArrayOutputStream;
+    }
+
+    public ByteArrayOutputStream getReport(String reportName) throws FileNotFoundException, ReportGenerationException, JRException{
+
+        switch(reportName){
+            case "BookCollectionReport":
+                return generateBooksCollectionReport();
+
+            default:
+                throw new ReportGenerationException("Failed to generate report. Invalid reportName: "+reportName);
+        }
     }
     
-    public String generateBooksCollectionReport(String reportFormat) throws FileNotFoundException, JRException{
+    public ByteArrayOutputStream generateBooksCollectionReport() throws JRException, FileNotFoundException, ReportGenerationException{
         List<Book> books = bookRepository.findAll();
 
         List<BookReportDTO> bookReportDTOs=books.stream().map(book->
@@ -65,12 +89,11 @@ public class ReportService {
         
         JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(bookReportDTOs);
         String jrxmlFileName="BookCollection.jrxml";
-        String reportFileName="booksCollectionReport";
 
-        return generateReport(reportFormat,dataSource,jrxmlFileName,reportFileName);
+        return generateReport(dataSource,jrxmlFileName);
     }
 
-    public String generateUserDataReport(String reportFormat) throws FileNotFoundException, JRException{
+    public ByteArrayOutputStream generateUserDataReport(String reportFormat) throws FileNotFoundException, JRException, ReportGenerationException{
         List<User> users=userRepository.findAll();
 
         List<UserReportDTO> userReportDTOs=users.stream().map(user->
@@ -85,12 +108,11 @@ public class ReportService {
         
         JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(userReportDTOs);
         String jrxmlFileName="UserData.jrxml";
-        String reportFileName="UserDataReport";
 
-        return generateReport(reportFormat,dataSource,jrxmlFileName,reportFileName);
+        return generateReport(dataSource,jrxmlFileName);
     }
 
-    public String generateBookIssueReport(String reportFormat) throws FileNotFoundException, JRException{
+    public ByteArrayOutputStream generateBookIssueReport(String reportFormat) throws FileNotFoundException, JRException, ReportGenerationException{
         List<BookIssue> bookIssues=bookIssueRepository.findAll();
 
         List<BookIssueReportDTO> bookIssueReportDTOs=bookIssues.stream().map(bookIssue->
@@ -108,12 +130,11 @@ public class ReportService {
         
         JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(bookIssueReportDTOs);
         String jrxmlFileName="BookIssueReport.jrxml";
-        String reportFileName="BookIssueReport";
 
-        return generateReport(reportFormat,dataSource,jrxmlFileName,reportFileName);
+        return generateReport(dataSource,jrxmlFileName);
     }
 
-    public String generateBookRequestReport(String reportFormat) throws FileNotFoundException, JRException{
+    public ByteArrayOutputStream generateBookRequestReport(String reportFormat) throws FileNotFoundException, JRException, ReportGenerationException{
         List<BookRequest> bookRequests=bookRequestRepository.findAll();
 
         List<BookRequestReportDTO> bookRequestReportDTOs=bookRequests.stream().map(bookRequest->
@@ -129,12 +150,11 @@ public class ReportService {
         
         JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(bookRequestReportDTOs);
         String jrxmlFileName="BookRequestReport.jrxml";
-        String reportFileName="BookRequestReport";
 
-        return generateReport(reportFormat,dataSource,jrxmlFileName,reportFileName);
+        return generateReport(dataSource,jrxmlFileName);
     }
 
-    public String generatePublisherReport(String reportFormat) throws FileNotFoundException, JRException{
+    public ByteArrayOutputStream generatePublisherReport(String reportFormat) throws FileNotFoundException, JRException, ReportGenerationException{
         List<Publisher> publishers=publisherRepository.findAll();
 
         List<PublisherReportDTO> publisherReportDTOs=publishers.stream().map(publisher->
@@ -148,8 +168,7 @@ public class ReportService {
         
         JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(publisherReportDTOs);
         String jrxmlFileName="PublisherReport.jrxml";
-        String reportFileName="PublisherReport";
 
-        return generateReport(reportFormat,dataSource,jrxmlFileName,reportFileName);
+        return generateReport(dataSource,jrxmlFileName);
     }
 }
