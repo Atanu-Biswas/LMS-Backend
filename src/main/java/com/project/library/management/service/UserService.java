@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -140,5 +141,9 @@ public class UserService {
 
         System.out.println(finePaginationDTO);
         return finePaginationDTO;
+    }
+
+    public Optional<User> getUserByUsernameforDashboard(String username) {
+        return userRepository.findByUsername(username);
     }
 }

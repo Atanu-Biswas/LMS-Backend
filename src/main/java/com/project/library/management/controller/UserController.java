@@ -2,6 +2,7 @@
 
 import com.project.library.management.dto.*;
 import com.project.library.management.entity.Genre;
+import com.project.library.management.entity.User;
 import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.service.*;
@@ -9,9 +10,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -29,7 +32,6 @@ public class UserController {
     private final BookRequestService bookRequestService;
     private final BookService bookService;
     private final BookIssueService bookIssueService;
-    private final UserActivityService userActivityService;
 
     @GetMapping("/test")
     protected ResponseEntity<String> test() {
@@ -171,6 +173,29 @@ public class UserController {
         List<UserActivityDTO> userActivityReport = userActivityService.getUserActivityReport();
         return ResponseEntity.ok(userActivityReport);
     }
+    @GetMapping("/user-dashboard")
+    public ResponseEntity<UserDashboardDTO> userDashboard(HttpServletRequest request) {
+        String username = request.getUserPrincipal().getName();
+        Optional<User> optionalUser = userService.getUserByUsernameforDashboard(username);
+
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+
+            return ResponseEntity.ok(UserDashboardDTO.builder()
+                    .genreWiseSplit(userDashboardService.getGenreWiseSplitForUser(user))
+                    .favoriteBooks(userDashboardService.getFavoriteBooksForUser(user))
+                    .favoriteAuthors(userDashboardService.getFavoriteAuthorsForUser(user))
+                    .totalBooksBorrowed(userDashboardService.getTotalBooksBorrowedByUser(user))
+                    .totalDuesAmount(userDashboardService.getTotalDuesAmountForUser(user))
+                    .build());
+        }
+        else {
+            // Handle case where user is not found
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
 }
 
 

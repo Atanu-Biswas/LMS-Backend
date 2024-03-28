@@ -1,5 +1,6 @@
 package com.project.library.management.entity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @RequiredArgsConstructor
 public enum Genre {
@@ -10,6 +11,9 @@ public enum Genre {
     EDUCATIONAL("EDUCATIONAL"),
     HISTORICAL_FICTION("HISTORICAL_FICTION"),
     OTHERS("OTHERS");
-    private final String Genre;
 
+    private final String displayName;
+    public String getDisplayName() {
+        return displayName;
+    }
 }
