@@ -9,9 +9,12 @@ import net.sf.jasperreports.engine.JRException;
 
 import org.apache.log4j.Logger;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Optional;
@@ -211,9 +214,11 @@ public class AdminController {
 
 
     @GetMapping("generate-report")
-    protected ResponseEntity<String> generateReport(@RequestParam("reportFormat") String reportFormat) throws FileNotFoundException, JRException{
-        String generatedReport=reportService.generateBooksCollectionReport(reportFormat);
-        return ResponseEntity.ok(generatedReport);
+    protected ResponseEntity<byte[]> generateReport(@RequestParam("reportName") String reportName) throws JRException,FileNotFoundException, ReportGenerationException {
+        ByteArrayOutputStream byteArrayOutputStream = reportService.getReport(reportName);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_PDF);
+        return ResponseEntity.ok().headers(httpHeaders).body(byteArrayOutputStream.toByteArray());
     }
 
 
