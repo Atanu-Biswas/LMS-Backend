@@ -165,11 +165,12 @@ public class UserController {
 
     @GetMapping("generate-report")
     protected ResponseEntity<byte[]> generateReport(HttpServletRequest request,
-        @RequestParam(value = "startDate", required=false) @DateTimeFormat(pattern = "dd-MM-yyyy") Date startDate,
-        @RequestParam(value = "endDate", required=false) @DateTimeFormat(pattern = "dd-MM-yyyy") Date endDate)  throws JRException,FileNotFoundException, ReportGenerationException {
+        @RequestParam("reportName") String reportName,
+        @RequestParam(value = "startDate", required=false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+        @RequestParam(value = "endDate", required=false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate)  throws JRException,FileNotFoundException, ReportGenerationException {
             
         String username=request.getUserPrincipal().getName();
-        ByteArrayOutputStream byteArrayOutputStream = reportService.generateUserSummaryReport(startDate, endDate, username);
+        ByteArrayOutputStream byteArrayOutputStream = reportService.getUserReport(username,reportName,startDate, endDate);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_PDF);
         return ResponseEntity.ok().headers(httpHeaders).body(byteArrayOutputStream.toByteArray());

@@ -62,7 +62,7 @@ public class ReportService {
         return byteArrayOutputStream;
     }
 
-    public ByteArrayOutputStream getReport(String username,String reportName,Date startDate, Date endDate) throws FileNotFoundException, ReportGenerationException, JRException{
+    public ByteArrayOutputStream getAdminReport(String username,String reportName,Date startDate, Date endDate) throws FileNotFoundException, ReportGenerationException, JRException{
 
         switch(reportName){
             case "BookCollectionReport":
@@ -74,16 +74,39 @@ public class ReportService {
             case "BookReturnSummary":
                 return generateBookReturnSummaryReport(startDate,endDate,username);
 
-            case "UserSummary":
-                return generateUserSummaryReport(startDate,endDate,username);
+            case "AllUserDataReport":
+                return generateAllUserDataReport(username);
+
+            case "BookRequestReport":
+                return generateBookRequestReport(startDate,endDate,username);
+
+            case "AllPublisherDataReport":
+                return generateAllPublisherDataReport(username);
+
+            default:
+                throw new ReportGenerationException("Failed to generate report. Invalid reportName: "+reportName);
+        }
+    }
+
+    public ByteArrayOutputStream getUserReport(String username,String reportName,Date startDate, Date endDate) throws FileNotFoundException, ReportGenerationException, JRException{
+
+        switch(reportName){
+            case "BookCollectionReport":
+                return generateBooksCollectionReport(startDate,endDate,username);
+            
+            case "UserBookIssuanceSummary":
+                return generateUserBookIssuanceSummaryReport(startDate,endDate,username);
+
+            case "UserRequestSummary":
+                return generateUserRequestSummaryReport(startDate,endDate,username);
 
             default:
                 throw new ReportGenerationException("Failed to generate report. Invalid reportName: "+reportName);
         }
     }
     
-    public ByteArrayOutputStream generateBooksCollectionReport(Date startDate, Date endDate,String username) throws JRException, FileNotFoundException, ReportGenerationException{
-        List<Book> books = bookRepository.findAll();
+    public ByteArrayOutputStream generateBooksCollectionReport(Date startDate,Date endDate,String username) throws JRException, FileNotFoundException, ReportGenerationException{
+        List<Book> books = bookRepository.findByDateAddedBetween(startDate, endDate);
 
         List<BookReportDTO> bookReportDTOs=books.stream().map(book->
             BookReportDTO.builder()
@@ -141,7 +164,7 @@ public class ReportService {
         return generateReport(dataSource,jrxmlFileName,username,startDate,endDate);
     }
 
-    public ByteArrayOutputStream generateUserSummaryReport(Date startDate, Date endDate,String username) throws FileNotFoundException, ReportGenerationException, JRException{
+    public ByteArrayOutputStream generateUserBookIssuanceSummaryReport(Date startDate, Date endDate,String username) throws FileNotFoundException, ReportGenerationException, JRException{//modify this function and report name
         List<BookIssue> bookIssues=bookIssueRepository.findByUserUsernameAndIssueDateBetweenOrUserUsernameAndReturnDateBetween(username,startDate,endDate,username,startDate,endDate);
 
         List<BookIssueReportDTO> bookIssueReportDTOs=bookIssues.stream().map(bookIssue->
@@ -154,12 +177,31 @@ public class ReportService {
                             .toList();
         
         JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(bookIssueReportDTOs);
-        String jrxmlFileName="UserSummary.jrxml";
+        String jrxmlFileName="UserBookIssuanceSummary.jrxml";
 
         return generateReport(dataSource,jrxmlFileName,username,startDate,endDate);
     }
 
-    public ByteArrayOutputStream generateUserDataReport(Date startDate, Date endDate,String username) throws FileNotFoundException, JRException, ReportGenerationException{
+    public ByteArrayOutputStream generateUserRequestSummaryReport(Date startDate, Date endDate,String username) throws FileNotFoundException, ReportGenerationException, JRException{
+        List<BookRequest> bookRequests=bookRequestRepository.findByUserUsernameAndRequestDateBetween(username,startDate,endDate);
+
+        List<BookRequestReportDTO> bookRequestReportDTOs=bookRequests.stream().map(bookRequest->
+                BookRequestReportDTO.builder()
+                                    .requestId(bookRequest.getRequestId())
+                                    .bookTitle(bookRequest.getBook().getTitle())
+                                    .requestDate(bookRequest.getRequestDate())
+                                    .weeksRequested(bookRequest.getWeeksRequested())
+                                    .status(bookRequest.getStatus())
+                                    .build())
+                                    .toList();
+        
+        JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(bookRequestReportDTOs);
+        String jrxmlFileName="UserRequestSummary.jrxml";
+
+        return generateReport(dataSource,jrxmlFileName,username,startDate,endDate);
+    }
+
+    public ByteArrayOutputStream generateAllUserDataReport(String username) throws FileNotFoundException, JRException, ReportGenerationException{
         List<User> users=userRepository.findAll();
 
         List<UserReportDTO> userReportDTOs=users.stream().map(user->
@@ -168,40 +210,18 @@ public class ReportService {
                         .name(user.getName())
                         .mobileNo(user.getMobileNo())
                         .address(user.getAddress())
-                        .role(user.getRole())
+                        .role(user.getRole().toString())
                         .build())
                         .toList();
         
         JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(userReportDTOs);
-        String jrxmlFileName="UserData.jrxml";
+        String jrxmlFileName="UserDataReport.jrxml";
 
-        return generateReport(dataSource,jrxmlFileName,username,startDate,endDate);
-    }
-
-    public ByteArrayOutputStream generateBookIssueReport(Date startDate, Date endDate,String username) throws FileNotFoundException, JRException, ReportGenerationException{
-        List<BookIssue> bookIssues=bookIssueRepository.findAll();
-
-        List<BookIssueReportDTO> bookIssueReportDTOs=bookIssues.stream().map(bookIssue->
-            BookIssueReportDTO.builder()
-                            .issueId(bookIssue.getIssueId())
-                            .bookTitle(bookIssue.getBook().getTitle())
-                            .username(bookIssue.getUser().getUsername())
-                            .issueDate(bookIssue.getIssueDate())
-                            .dueDate(bookIssue.getDueDate())
-                            .returnDate(bookIssue.getReturnDate())
-                            .fine(bookIssue.getFine())
-                            .fineStatus(bookIssue.getFineStatus())
-                            .build())
-                            .toList();
-        
-        JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(bookIssueReportDTOs);
-        String jrxmlFileName="BookIssueReport.jrxml";
-
-        return generateReport(dataSource,jrxmlFileName,username,startDate,endDate);
+        return generateReport(dataSource,jrxmlFileName,username,null,null);
     }
 
     public ByteArrayOutputStream generateBookRequestReport(Date startDate, Date endDate,String username) throws FileNotFoundException, JRException, ReportGenerationException{
-        List<BookRequest> bookRequests=bookRequestRepository.findAll();
+        List<BookRequest> bookRequests=bookRequestRepository.findByRequestDateBetween(startDate, endDate);
 
         List<BookRequestReportDTO> bookRequestReportDTOs=bookRequests.stream().map(bookRequest->
             BookRequestReportDTO.builder()
@@ -220,7 +240,7 @@ public class ReportService {
         return generateReport(dataSource,jrxmlFileName,username,startDate,endDate);
     }
 
-    public ByteArrayOutputStream generatePublisherReport(Date startDate, Date endDate,String username) throws FileNotFoundException, JRException, ReportGenerationException{
+    public ByteArrayOutputStream generateAllPublisherDataReport(String username) throws FileNotFoundException, JRException, ReportGenerationException{
         List<Publisher> publishers=publisherRepository.findAll();
 
         List<PublisherReportDTO> publisherReportDTOs=publishers.stream().map(publisher->
@@ -233,8 +253,8 @@ public class ReportService {
                             .toList();
         
         JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(publisherReportDTOs);
-        String jrxmlFileName="PublisherReport.jrxml";
+        String jrxmlFileName="PublisherDataReport.jrxml";
 
-        return generateReport(dataSource,jrxmlFileName,username,startDate,endDate);
+        return generateReport(dataSource,jrxmlFileName,username,null,null);
     }
 }
