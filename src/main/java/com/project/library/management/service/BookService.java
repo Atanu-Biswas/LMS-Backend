@@ -301,7 +301,7 @@ public class BookService {
 //    LocalDate endDate = LocalDate.now();
 //    LocalDate startDate = endDate.minusWeeks(1);
 
-    List<Object[]> bookIssues = bookIssueRepository.findByIssueDateBetween(startDate, endDate);
+    List<Object[]> bookIssues = bookIssueRepository.findByWIssueDateBetween(startDate, endDate);
 
 
 

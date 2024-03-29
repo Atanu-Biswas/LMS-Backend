@@ -235,6 +235,6 @@ public class ReportService {
         JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(publisherReportDTOs);
         String jrxmlFileName="PublisherReport.jrxml";
 
-        return generateReport(dataSource,jrxmlFileName);
+        return generateReport(dataSource,jrxmlFileName,username,startDate,endDate);
     }
 }

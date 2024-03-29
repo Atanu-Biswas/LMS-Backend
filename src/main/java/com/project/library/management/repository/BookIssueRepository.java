@@ -2,14 +2,12 @@ package com.project.library.management.repository;
 
 import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.User;
-import java.util.Date;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import java.time.LocalDate;
+
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +26,7 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
             "WHERE bi.issueDate BETWEEN :startDate AND :endDate " +
             "GROUP BY bi.book " +
             "ORDER BY issueCount DESC")
-//    List<Object[]> findByIssueDateBetween(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    List<Object[]> findByWIssueDateBetween(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
 
     @Query(value = "SELECT b.title, COUNT(bi.issueId) AS issueCount " +
