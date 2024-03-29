@@ -21,6 +21,7 @@ public class ExceptionHandlerController {
                         ErrorDTO
                                 .builder()
                                 .message(e.getMessage())
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .timestamp(new Date())
                                 .build(),
                         HttpStatus.INTERNAL_SERVER_ERROR);
