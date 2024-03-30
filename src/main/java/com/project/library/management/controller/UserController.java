@@ -1,28 +1,32 @@
  package com.project.library.management.controller;
 
- import com.project.library.management.dto.*;
- import com.project.library.management.entity.User;
- import com.project.library.management.exception.*;
- import com.project.library.management.repository.BookIssueRepository;
- import com.project.library.management.service.*;
- import jakarta.servlet.http.HttpServletRequest;
- import lombok.RequiredArgsConstructor;
- import net.sf.jasperreports.engine.JRException;
- import org.apache.logging.log4j.LogManager;
- import org.apache.logging.log4j.Logger;
- import org.springframework.beans.factory.annotation.Autowired;
- import org.springframework.data.repository.query.Param;
- import org.springframework.format.annotation.DateTimeFormat;
- import org.springframework.http.HttpHeaders;
- import org.springframework.http.MediaType;
- import org.springframework.http.ResponseEntity;
- import org.springframework.web.bind.annotation.*;
+import com.project.library.management.dto.*;
+import com.project.library.management.exception.*;
+import com.project.library.management.repository.BookIssueRepository;
+import com.project.library.management.service.BookIssueService;
+import com.project.library.management.service.BookRequestService;
+import com.project.library.management.service.BookService;
+import com.project.library.management.service.ReportService;
+import com.project.library.management.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JRException;
 
- import java.io.ByteArrayOutputStream;
- import java.io.FileNotFoundException;
- import java.util.Date;
- import java.util.List;
- import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
@@ -216,11 +220,12 @@ public class UserController {
 
     @GetMapping("generate-report")
     protected ResponseEntity<byte[]> generateReport(HttpServletRequest request,
-        @RequestParam(value = "startDate", required=false) @DateTimeFormat(pattern = "dd-MM-yyyy") Date startDate,
-        @RequestParam(value = "endDate", required=false) @DateTimeFormat(pattern = "dd-MM-yyyy") Date endDate)  throws JRException,FileNotFoundException, ReportGenerationException {
-
+        @RequestParam("reportName") String reportName,
+        @RequestParam(value = "startDate", required=false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+        @RequestParam(value = "endDate", required=false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate)  throws JRException,FileNotFoundException, ReportGenerationException {
+            
         String username=request.getUserPrincipal().getName();
-        ByteArrayOutputStream byteArrayOutputStream = reportService.generateUserSummaryReport(startDate, endDate, username);
+        ByteArrayOutputStream byteArrayOutputStream = reportService.getUserReport(username,reportName,startDate, endDate);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_PDF);
         return ResponseEntity.ok().headers(httpHeaders).body(byteArrayOutputStream.toByteArray());

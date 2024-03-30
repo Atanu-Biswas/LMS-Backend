@@ -37,7 +37,6 @@ public class AdminController {
     private final AdminDashboardService adminDashboardService;
     private final ReportService reportService;
 
-
     private static final Logger logger = Logger.getLogger(AdminController.class);
 
     private final PublisherService publisherService;
@@ -220,15 +219,16 @@ public class AdminController {
     @GetMapping("generate-report")
     protected ResponseEntity<byte[]> generateReport(HttpServletRequest request,
         @RequestParam("reportName") String reportName,
-        @RequestParam(value = "startDate", required=false) @DateTimeFormat(pattern = "dd-MM-yyyy") Date startDate,
-        @RequestParam(value = "endDate", required=false) @DateTimeFormat(pattern = "dd-MM-yyyy") Date endDate) throws JRException,FileNotFoundException, ReportGenerationException {
-
+        @RequestParam(value = "startDate", required=false) @DateTimeFormat(pattern = "yyyy-MM-dd")
+        Date startDate,
+        @RequestParam(value = "endDate", required=false) @DateTimeFormat(pattern = "yyyy-MM-dd")
+        Date endDate) throws JRException,FileNotFoundException, ReportGenerationException {
+            
         String username=request.getUserPrincipal().getName();
-        ByteArrayOutputStream byteArrayOutputStream = reportService.getReport(username,reportName,startDate,endDate);
+        ByteArrayOutputStream byteArrayOutputStream = reportService.getAdminReport(username,reportName,startDate,endDate);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_PDF);
         return ResponseEntity.ok().headers(httpHeaders).body(byteArrayOutputStream.toByteArray());
     }
-
 
 }

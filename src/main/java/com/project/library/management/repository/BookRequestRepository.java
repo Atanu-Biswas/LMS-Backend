@@ -15,6 +15,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Date;
+
 
 public interface BookRequestRepository extends JpaRepository<BookRequest, Long> {
 
@@ -35,5 +37,8 @@ public interface BookRequestRepository extends JpaRepository<BookRequest, Long> 
     @Query("SELECT br FROM BookRequest br WHERE br.user.username= :username AND br.status IN (:statuses)")
     Page<BookRequest> findFilteredRequestsByUserName(List<String> statuses,String username,Pageable p);
 
+    List<BookRequest> findByRequestDateBetween(Date startDate,Date endDate);
+
+    List<BookRequest> findByUserUsernameAndRequestDateBetween(String username,Date startDate,Date endDate);
     
 }

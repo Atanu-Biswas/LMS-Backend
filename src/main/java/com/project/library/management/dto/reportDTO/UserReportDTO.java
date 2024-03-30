@@ -16,6 +16,6 @@ public class UserReportDTO {
     private String name;
     private String mobileNo;
     private String address;
-    private Role role;
+    private String role;
     
 }
