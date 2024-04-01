@@ -3,6 +3,8 @@ package com.project.library.management.service;
 import com.project.library.management.dto.*;
 import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.User;
+import com.project.library.management.exception.IllegalMobileNoException;
+import com.project.library.management.exception.MobileNoExistsException;
 import com.project.library.management.exception.NoFineFoundException;
 import com.project.library.management.exception.UserNotFoundException;
 import com.project.library.management.repository.BookIssueRepository;
@@ -145,5 +147,25 @@ public class UserService {
 
     public Optional<User> getUserByUsernameforDashboard(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public UserProfile updateUser(String username,UserProfile userProfile) throws UserNotFoundException, IllegalMobileNoException, MobileNoExistsException{
+        User user = userRepository.findByUsername(username).orElseThrow(()->new UserNotFoundException());
+
+        if(userProfile.getMobileNo().length()!=10){
+            throw new IllegalMobileNoException();
+        }
+
+        if(userRepository.existsByMobileNo(userProfile.getMobileNo())){
+            throw new MobileNoExistsException();
+        }
+
+        user.setName(userProfile.getName());
+        user.setAddress(userProfile.getAddress());
+        user.setMobileNo(userProfile.getMobileNo());
+
+        userRepository.save(user);
+        
+        return userProfile;
     }
 }

@@ -55,6 +55,14 @@ public class UserController {
         logger.debug("Debug message");
         return ResponseEntity.ok(userService.isUsernameAvailable(username));
     }
+
+    @PutMapping("/update-user")
+    protected ResponseEntity<UserProfile> updateUser(HttpServletRequest request,@RequestBody UserProfile userProfile) throws UserNotFoundException, IllegalMobileNoException, MobileNoExistsException{
+        String username=request.getUserPrincipal().getName();
+        UserProfile updatedUserProfile=userService.updateUser(username,userProfile);
+        return ResponseEntity.ok().body(updatedUserProfile);
+    }
+
     @PostMapping("/request-book")
     //working //changed for frontend
     public ResponseEntity<Boolean> issueBookRequest(@RequestBody BookRequestDTO bookRequestDTO, HttpServletRequest request) throws BookNotFoundException, DisabledBookException, BookAlreadyRequestedExecption, IllegalWeeksRequestedException {
