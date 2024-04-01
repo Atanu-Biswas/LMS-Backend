@@ -78,7 +78,7 @@ public class BookService {
     Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
     Pageable p = PageRequest.of(pageNumber, pageSize, sort);
-    Page<Book> bookPage = bookRepository.findByTitleStartingWithIgnoreCase(title, p);
+    Page<Book> bookPage = bookRepository.findByTitleContainingIgnoreCase(title, p);
     logger.debug("Query fired for getting the Book by title");
     if (bookPage.isEmpty()) {
       logger.error("Book Not Found Exception generated !");
@@ -121,7 +121,7 @@ public class BookService {
     Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
     Pageable p = PageRequest.of(pageNumber, pageSize, sort);
-    Page<Book> bookPage = bookRepository.findByAuthorStartingWithIgnoreCase(author, p);
+    Page<Book> bookPage = bookRepository.findByAuthorContainingIgnoreCase(author, p);
     if (bookPage.isEmpty()) {
       logger.error("Author Not Found Exception generated !");
       throw new BookNotFoundException("No books found by author '" + author + "'");
@@ -196,19 +196,6 @@ public class BookService {
     bookRepository.save(book);
   }
 
-  public BookDTO getBookByName(String name) {
-    Book book = bookRepository.findBookByTitle(name);
-    BookDTO bookDTO = new BookDTO();
-    bookDTO.setAuthor(book.getAuthor());
-    bookDTO.setTitle(book.getTitle());
-    bookDTO.setGenre(String.valueOf(book.getGenre()));
-    bookDTO.setIsbn(book.getIsbn());
-    bookDTO.setPrintYear(book.getPrintYear());
-    bookDTO.setQuantityAvailable(book.getQuantityAvailable());
-    bookDTO.setActive(book.isActive());
-    bookDTO.setPublisherId(book.getPublisher().getPublisherId());
-    return bookDTO;
-  }
 
   private BookDTO convertToDTO(Book book) {
 
@@ -276,7 +263,7 @@ public class BookService {
 
     Pageable p = PageRequest.of(pageNumber, pageSize, sort);
    // String genreString = genre.toString();
-    Page<Book> bookPage = bookRepository.findByGenreStartingWithIgnoreCase(genre, p);
+    Page<Book> bookPage = bookRepository.findByGenreContainingIgnoreCase(genre, p);
     if (bookPage.isEmpty()) {
       logger.error("Genre Not Found Exception generated !");
       throw new BookNotFoundException("No books found by Genre '" + genre + "'");

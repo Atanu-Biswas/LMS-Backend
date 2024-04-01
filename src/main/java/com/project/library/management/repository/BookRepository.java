@@ -17,18 +17,15 @@ public interface BookRepository extends JpaRepository<Book,Long>{
 
 
 
-    Page<Book> findByTitleStartingWithIgnoreCase(String title, Pageable p);
+    Page<Book> findByTitleContainingIgnoreCase(String title, Pageable p);
 
-    @Query("select book from Book book where lower(book.title) like lower(concat('%', :title, '%'))")
-    Book  findBookByTitle(String title);
-
-    Page<Book> findByAuthorStartingWithIgnoreCase(String authorName, Pageable p);
+    Page<Book> findByAuthorContainingIgnoreCase(String authorName, Pageable p);
 
     List<Book> findByDateAddedBetween(Date startDate, Date endDate);
 
     //keep this also
-   @Query("SELECT b FROM Book b WHERE UPPER(b.genre) LIKE CONCAT('%', UPPER(:genre), '%')")
-    Page<Book> findByGenreStartingWithIgnoreCase(String genre, Pageable p);
+    @Query("SELECT b FROM Book b WHERE UPPER(b.genre) LIKE CONCAT('%', UPPER(:genre), '%')")
+    Page<Book> findByGenreContainingIgnoreCase(String genre, Pageable p);
 
 
     Book findByBookId(Long id);
