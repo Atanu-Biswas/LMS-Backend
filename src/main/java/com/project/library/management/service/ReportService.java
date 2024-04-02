@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -82,6 +83,9 @@ public class ReportService {
 
             case "AllPublisherDataReport":
                 return generateAllPublisherDataReport(username);
+
+            case "FineSummaryReport":
+                return generateFineSummaryReport(username);
 
             default:
                 throw new ReportGenerationException("Failed to generate report. Invalid reportName: "+reportName);
@@ -202,7 +206,7 @@ public class ReportService {
     }
 
     public ByteArrayOutputStream generateAllUserDataReport(String username) throws FileNotFoundException, JRException, ReportGenerationException{
-        List<User> users=userRepository.findAll();
+        List<User> users=userRepository.findAllUsersWithUserRole();
 
         List<UserReportDTO> userReportDTOs=users.stream().map(user->
             UserReportDTO.builder()
@@ -254,6 +258,30 @@ public class ReportService {
         
         JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(publisherReportDTOs);
         String jrxmlFileName="PublisherDataReport.jrxml";
+
+        return generateReport(dataSource,jrxmlFileName,username,null,null);
+    }
+
+    public ByteArrayOutputStream generateFineSummaryReport(String username) throws FileNotFoundException, ReportGenerationException, JRException{
+        List<Object[]> usersWithTotalFineAmountPaidAndDue=bookIssueRepository.getUsersWithTotalFineAmountPaidAndDue(Fine.PAID,Fine.UNPAID);
+
+        List<FineReportDTO> fineReportDTOs=usersWithTotalFineAmountPaidAndDue.stream().map(data->{
+            String username2= (String)data[0];
+            Optional<User> userOptional=userRepository.findByUsername(username2);
+            String name=userOptional.map(user->user.getName()).orElse("Unknown User");
+            Long totalFineAmountPaid= (Long)data[1];
+            Long totalFineAmountDue=(Long)data[2];
+
+            return FineReportDTO.builder()
+                                .username(username2)
+                                .name(name)
+                                .totalFineAmountPaid(totalFineAmountPaid)
+                                .totalFineAmountDue(totalFineAmountDue)
+                                .build();
+        }).toList();
+
+        JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(fineReportDTOs);
+        String jrxmlFileName="FineSummaryReport.jrxml";
 
         return generateReport(dataSource,jrxmlFileName,username,null,null);
     }
