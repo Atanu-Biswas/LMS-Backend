@@ -1,8 +1,7 @@
 package com.project.library.management.service;
 
-import com.project.library.management.dto.UserDTO;
-import com.project.library.management.dto.UserPaginationDTO;
-import com.project.library.management.dto.UserProfile;
+import com.project.library.management.dto.*;
+import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.User;
 import com.project.library.management.exception.IllegalMobileNoException;
 import com.project.library.management.exception.MobileNoExistsException;

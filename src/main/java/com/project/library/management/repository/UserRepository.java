@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, String> {
@@ -15,6 +15,9 @@ public interface UserRepository extends JpaRepository<User, String> {
     boolean existsByUsername(String username);
 
     boolean existsByUsernameContainingIgnoreCase(String username);
+
+    @Query("SELECT u FROM User u WHERE u.role = Role.USER")
+    List<User> findAllUsersWithUserRole();
 
     Page<User> findByUsernameStartingWithIgnoreCase(String username, Pageable p);
 
