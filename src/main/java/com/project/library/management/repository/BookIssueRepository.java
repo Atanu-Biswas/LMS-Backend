@@ -1,6 +1,7 @@
 package com.project.library.management.repository;
 
 import com.project.library.management.entity.BookIssue;
+import com.project.library.management.entity.Fine;
 import com.project.library.management.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -87,9 +88,16 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
 
     @Query("SELECT SUM(bi.fine) " +
             "FROM BookIssue bi " +
-            "WHERE bi.user = ?1")
+            "WHERE bi.user = ?1")//check this
     Integer getTotalDuesAmountForUser(User user);
 
+    @Query("SELECT bi.user.username, " +
+            "SUM(CASE WHEN bi.fineStatus = :paidStatus THEN bi.fine ELSE 0 END) as totalFinePaid, " +
+            "SUM(CASE WHEN bi.fineStatus = :unpaidStatus THEN bi.fine ELSE 0 END) as totalFineDue " +
+            "FROM BookIssue bi " +
+            "WHERE bi.fineStatus IN (:paidStatus, :unpaidStatus) " +
+            "GROUP BY bi.user.username")
+    List<Object[]> getUsersWithTotalFineAmountPaidAndDue(Fine paidStatus,Fine unpaidStatus);
 
     List<BookIssue> findByIssueDateBetween(Date startDate, Date endDate);
 
