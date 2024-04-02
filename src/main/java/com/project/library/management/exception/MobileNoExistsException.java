@@ -5,4 +5,8 @@ public class MobileNoExistsException extends LMSException{
     public  MobileNoExistsException(String message) {
         super(message);
     }
+
+    public MobileNoExistsException(){
+        super("The entered Mobile No. already exists. Please try with another Mobile No.");
+    }
 }
