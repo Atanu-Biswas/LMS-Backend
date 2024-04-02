@@ -99,6 +99,8 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
             "GROUP BY bi.user.username")
     List<Object[]> getUsersWithTotalFineAmountPaidAndDue(Fine paidStatus,Fine unpaidStatus);
 
+    List<BookIssue> findByFineStatus(Fine fineStatus);
+    
     List<BookIssue> findByIssueDateBetween(Date startDate, Date endDate);
 
     List<BookIssue> findByReturnDateBetween(Date startDate, Date endDate);

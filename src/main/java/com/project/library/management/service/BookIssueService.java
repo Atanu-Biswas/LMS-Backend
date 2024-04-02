@@ -40,8 +40,8 @@ public class BookIssueService {
 
         Pageable p = PageRequest.of(pageNumber, pageSize, sort);
         Page<BookIssue> bookIssuePage= bookIssueRepository.findByUserUsername(username,p);
-        if(bookIssuePage==null){
-            throw new BookIssueNotFoundException("No borrowed books found for given user!!");
+        if(bookIssuePage.isEmpty()){
+            throw new BookIssueNotFoundException("No borrowed books found!!");
         }
 
         List<BookIssue> bookIssues = bookIssuePage.getContent();

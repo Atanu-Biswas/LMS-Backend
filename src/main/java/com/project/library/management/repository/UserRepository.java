@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("SELECT u FROM User u WHERE u.role = Role.USER")
     List<User> findAllUsersWithUserRole();
 
-    Page<User> findByUsernameStartingWithIgnoreCase(String username, Pageable p);
+    Page<User> findByUsernameContainingIgnoreCase(String username, Pageable p);
 
     @Query("SELECT COUNT(u) FROM User u")
     int getTotalUsersAvailable();

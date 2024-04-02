@@ -9,6 +9,7 @@ import com.project.library.management.entity.Publisher;
 import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.repository.BookRepository;
+import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.repository.PublisherRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
@@ -37,6 +38,7 @@ public class BookService {
   private final PublisherRepository publisherRepository;
   private final PublisherService publisherService;
   private final BookIssueRepository bookIssueRepository;
+  private final BookRequestRepository bookRequestRepository;
 
   public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException, IllegalPrintYear{
 
@@ -45,9 +47,9 @@ public class BookService {
       throw new IllegalQuantityException("Quantity should be greater than 0");
     }
 
-    if(bookDTO.getPrintYear() > new Date().getYear() + 1900 || bookDTO.getPrintYear() < 0){
-      logger.error("Print year should be less than or equal to current year");
-      throw new IllegalPrintYear("Print year should be less than or equal to current year");
+    if(bookDTO.getPrintYear() > new Date().getYear() + 1900 || bookDTO.getPrintYear() < 1000){
+      logger.error("Print year should be greater than 1000 and less than or equal to current year");
+      throw new IllegalPrintYear("Print year should be greater than 1000 and less than or equal to current year");
     }
 
     if(bookDTO.getIsbn().length()!=13){
@@ -265,11 +267,21 @@ if(!publisher.getPublisherId().equals(updateBookRequest.getPublisherId())){
 
   // keep this service
   @Transactional
-  public boolean deleteBook(Long bookId) throws BookNotDeletedException {
-    boolean isBookIssued=bookIssueRepository.existsByBookId(bookId);
+  public boolean deleteBook(Long bookId) throws BookNotDeletedException, BookNotFoundException {
+    if(!bookRepository.existsById(bookId)){
+      throw new BookNotFoundException("Book with Id " + bookId + " Not Found");
+    }
 
-    if(isBookIssued==true){
-      throw new BookNotDeletedException("Book with ID " + bookId + " can not be deleted");
+    boolean isBookIssued=bookIssueRepository.existsByBookId(bookId);
+    boolean isBookRequested=bookRequestRepository.existsByBookId(bookId);
+
+    if(isBookIssued){
+      throw new BookNotDeletedException("Book with Id " + bookId + " is already issued to a user, so it can't be deleted");
+    }
+
+    if(isBookRequested){
+      System.out.println("indide isBookRequested block");
+      throw new BookNotDeletedException("Book with Id " + bookId + " is already requested by a user, so it can't be deleted");
     }
 
       bookRepository.deleteByBookId(bookId);
