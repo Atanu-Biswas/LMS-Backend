@@ -1,9 +1,9 @@
 package com.project.library.management.service;
 
-import com.project.library.management.dto.*;
-import com.project.library.management.entity.BookIssue;
+import com.project.library.management.dto.UserDTO;
+import com.project.library.management.dto.UserPaginationDTO;
+import com.project.library.management.dto.UserProfile;
 import com.project.library.management.entity.User;
-import com.project.library.management.exception.NoFineFoundException;
 import com.project.library.management.exception.UserNotFoundException;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.repository.UserRepository;
@@ -115,33 +115,7 @@ public class UserService {
     }
 
     // keep this
-    public FinePaginationDTO viewFine(int pageNumber, int pageSize, String sortBy, String sortDir, String username) throws NoFineFoundException {
-        Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
-        Pageable p = PageRequest.of(pageNumber, pageSize, sort);
-
-        Page<BookIssue> finePage = bookIssueRepository.calculateFinesByUserName(username, p);
-        if (finePage.isEmpty()) {
-            throw new NoFineFoundException();
-        }
-        List<BookIssue> fines = finePage.getContent();
-        List<FineDTO> fineDTOs = fines.stream().map((BookIssue bookIssue) -> FineDTO.builder()
-                .issueId(bookIssue.getIssueId())
-                .fine(bookIssue.getFine())
-                .bookName(bookIssue.getBook().getTitle())
-                .build()).toList();
-
-        FinePaginationDTO finePaginationDTO = new FinePaginationDTO();
-        finePaginationDTO.setContent(fineDTOs);
-        finePaginationDTO.setPageNumber(pageNumber);
-        finePaginationDTO.setPageSize(pageSize);
-        finePaginationDTO.setTotalElements(finePage.getTotalElements());
-        finePaginationDTO.setTotalPages(finePage.getTotalPages());
-        finePaginationDTO.setLastPage(finePage.isLast());
-
-        System.out.println(finePaginationDTO);
-        return finePaginationDTO;
-    }
 
     public Optional<User> getUserByUsernameforDashboard(String username) {
         return userRepository.findByUsername(username);

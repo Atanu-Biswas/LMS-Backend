@@ -1,16 +1,13 @@
 package com.project.library.management.repository;
 
 import com.project.library.management.entity.Book;
-import com.project.library.management.entity.Genre;
-
-
-import java.util.Date;
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.Date;
+import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book,Long>{
 

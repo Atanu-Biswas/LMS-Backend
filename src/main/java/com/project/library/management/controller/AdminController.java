@@ -36,6 +36,7 @@ public class AdminController {
     private final UserService userService;
     private final AdminDashboardService adminDashboardService;
     private final ReportService reportService;
+    private final FineService fineService;
 
     private static final Logger logger = Logger.getLogger(AdminController.class);
 
@@ -187,7 +188,7 @@ public class AdminController {
                                                           @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir) throws NoFineFoundException {
 
 
-        FinePaginationDTO finePaginationDTO = userService.viewFine(pageNumber, pageSize, sortBy, sortDir,username);
+        FinePaginationDTO finePaginationDTO = fineService.viewFine(pageNumber, pageSize, sortBy, sortDir,username);
 
         return ResponseEntity.ok(finePaginationDTO);
     }
