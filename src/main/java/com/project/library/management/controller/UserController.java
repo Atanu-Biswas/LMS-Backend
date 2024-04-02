@@ -1,12 +1,15 @@
  package com.project.library.management.controller;
 
 import com.project.library.management.dto.*;
+import com.project.library.management.entity.User;
 import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.service.BookIssueService;
 import com.project.library.management.service.BookRequestService;
 import com.project.library.management.service.BookService;
 import com.project.library.management.service.ReportService;
+import com.project.library.management.service.UserActivityService;
+import com.project.library.management.service.UserDashboardService;
 import com.project.library.management.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

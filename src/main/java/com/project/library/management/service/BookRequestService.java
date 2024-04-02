@@ -257,7 +257,7 @@ public class BookRequestService {
     public BookRequestPaginationDTO viewRequestsByUserName(int pageNumber, int pageSize, String sortBy,
             String sortDir, String username, String filterBy) throws BookRequestNotFoundException, UserNotFoundException {
 
-        boolean isUsernameValid = userRepository.existsByUsername(username);
+        boolean isUsernameValid = userRepository.existsByUsernameContainingIgnoreCase(username);
         if (!isUsernameValid) {
             throw new UserNotFoundException("User with username '" + username + "' does not exist!!");
         }
