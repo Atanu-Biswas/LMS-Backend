@@ -34,7 +34,7 @@ public interface BookRequestRepository extends JpaRepository<BookRequest, Long> 
     @Query("SELECT br FROM BookRequest br WHERE br.status IN (:statuses)")
     Page<BookRequest> findFilteredRequests(List<String> statuses,Pageable p);
 
-    @Query("SELECT br FROM BookRequest br WHERE br.user.username= :username AND br.status IN (:statuses)")
+    @Query("SELECT br FROM BookRequest br WHERE LOWER(br.user.username) LIKE CONCAT('%', LOWER(:username), '%') AND br.status IN (:statuses)")
     Page<BookRequest> findFilteredRequestsByUserName(List<String> statuses,String username,Pageable p);
 
     List<BookRequest> findByRequestDateBetween(Date startDate,Date endDate);

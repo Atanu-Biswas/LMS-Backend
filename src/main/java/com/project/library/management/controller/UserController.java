@@ -4,7 +4,13 @@ import com.project.library.management.dto.*;
 import com.project.library.management.entity.User;
 import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
-import com.project.library.management.service.*;
+import com.project.library.management.service.BookIssueService;
+import com.project.library.management.service.BookRequestService;
+import com.project.library.management.service.BookService;
+import com.project.library.management.service.ReportService;
+import com.project.library.management.service.UserActivityService;
+import com.project.library.management.service.UserDashboardService;
+import com.project.library.management.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.JRException;
@@ -38,7 +44,7 @@ public class UserController {
     private final ReportService reportService;
     private final UserActivityService userActivityService;
     private final UserDashboardService userDashboardService;
-    private final FineService fineService;
+
 
     @GetMapping("/test")
     protected ResponseEntity<String> test() {
@@ -141,7 +147,7 @@ public class UserController {
     @RequestParam(value = "sortDir", defaultValue ="asc", required = false) String sortDir) throws NoFineFoundException {
         String username = request.getUserPrincipal().getName();
 
-        FinePaginationDTO finePaginationDTO = fineService.viewFine(pageNumber, pageSize, sortBy, sortDir,username);
+        FinePaginationDTO finePaginationDTO = userService.viewFine(pageNumber, pageSize, sortBy, sortDir,username);
 
         return ResponseEntity.ok(finePaginationDTO);
     }
