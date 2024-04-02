@@ -186,13 +186,34 @@ public class BookService {
     return !isEnable;
   }
 
-  public void updateBook(Long bookId, BookDTO updateBookRequest) throws BookNotFoundException {
-    Book book = bookRepository.findById(bookId).orElseThrow(()->new BookNotFoundException());
+  public void updateBook(BookDTO updateBookRequest) throws BookNotFoundException, IllegalPrintYear, IsbnLengthException, IllegalQuantityException, PublisherNotFoundException {
+    if(updateBookRequest.getQuantityAvailable() <= 0){
+      logger.error("Quantity should be greater than 0");
+      throw new IllegalQuantityException("Quantity should be greater than 0");
+    }
 
+    if(updateBookRequest.getPrintYear() > new Date().getYear() + 1900 || updateBookRequest.getPrintYear() < 0){
+      logger.error("Print year should be less than or equal to current year");
+      throw new IllegalPrintYear("Print year should be less than or equal to current year");
+    }
+
+    if(updateBookRequest.getIsbn().length()!=13){
+      logger.error("ISBN length should be 13 characters.");
+      throw new IsbnLengthException("ISBN length should be 13 characters.");
+    }
+    Long bookId= updateBookRequest.getBookId();
+    Book book = bookRepository.findById(bookId).orElseThrow(()->new BookNotFoundException());
+    Publisher publisher = publisherRepository.findById(updateBookRequest.getPublisherId()).orElseThrow(()->new PublisherNotFoundException("Publisher corresponding to given book not found!!"));
+if(!publisher.getPublisherId().equals(updateBookRequest.getPublisherId())){
+  book.setPublisher(publisher);
+}
     // Update book properties based on DTO values
     book.setTitle(updateBookRequest.getTitle());
     book.setAuthor(updateBookRequest.getAuthor());
-
+  book.setIsbn(updateBookRequest.getIsbn());
+  book.setPrintYear(updateBookRequest.getPrintYear());
+  book.setGenre(Genre.valueOf(updateBookRequest.getGenre()));
+  book.setQuantityAvailable(updateBookRequest.getQuantityAvailable());
     bookRepository.save(book);
   }
 
