@@ -231,4 +231,14 @@ public class AdminController {
         return ResponseEntity.ok().headers(httpHeaders).body(byteArrayOutputStream.toByteArray());
     }
 
+    @PostMapping("/updateBook")
+    public void updateBook(@RequestBody BookDTO updateBookRequest) throws BookNotFoundException, IllegalPrintYear, IsbnLengthException, IllegalQuantityException, PublisherNotFoundException {
+        try {
+            bookService.updateBook(updateBookRequest);
+        } catch (BookNotFoundException | IllegalPrintYear | IsbnLengthException | IllegalQuantityException | PublisherNotFoundException e) {
+            logger.error("Error occurred while updating book");
+            throw e;
+        }
+    }
+
 }
