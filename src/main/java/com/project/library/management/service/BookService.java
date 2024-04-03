@@ -427,14 +427,12 @@ if(!publisher.getPublisherId().equals(updateBookRequest.getPublisherId())){
   }
 
   @Transactional
-  public void updateBookQuantity(Long bookId, int quantity) {
-    Optional<Book> optionalBook = bookRepository.findById(bookId);
-    if (optionalBook.isPresent()) {
-      Book book = optionalBook.get();
-      book.setQuantity(quantity);
+  public void updateBookQuantity(Long bookId, int quantity) throws BookNotFoundException, IllegalQuantityException {
+      Book book = bookRepository.findById(bookId).orElseThrow(()->new BookNotFoundException("Book with Id: "+bookId+" Not found!!"));
+      if(quantity<1){
+        throw new IllegalQuantityException("Quantity should be atleast 1");
+      }
+      book.setQuantityAvailable(quantity);
       bookRepository.save(book);
-    } else {
-      throw new IllegalArgumentException("Book not found with ID: " + bookId);
-    }
   }
 }
