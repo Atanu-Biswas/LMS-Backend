@@ -18,7 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.util.regex.Pattern;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,22 +31,29 @@ public class BookService {
   private final PublisherService publisherService;
   private final BookIssueRepository bookIssueRepository;
   private final BookRequestRepository bookRequestRepository;
+  Pattern specialCharPattern = Pattern.compile("[^a-zA-Z0-9 ]");
 
-  public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException, IllegalPrintYear, IllegalAuthorNameException, IllegalTitleException, InvalidIsbnException, BookAlreadyExistsException {
+  public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException, IllegalPrintYear, IllegalAuthorNameException, IllegalTitleException, InvalidIsbnException, BookAlreadyExistsException, SpecialCharacterNotAllowedException {
 
     if (bookDTO.getQuantityAvailable() <= 0) {
       logger.error("Quantity should be greater than 0");
       throw new IllegalQuantityException("Quantity should be greater than 0");
     }
 
-    if (bookDTO.getPrintYear() > new Date().getYear() + 1900 || bookDTO.getPrintYear() < 1000) {
-      logger.error("Print year should be greater than 1000 and less than or equal to current year");
-      throw new IllegalPrintYear("Print year should be greater than 1000 and less than or equal to current year");
+    if (bookDTO.getPrintYear() > new Date().getYear() + 1900 || bookDTO.getPrintYear() < 1400) {
+      logger.error("Print year should be greater than 1400 and less than or equal to current year");
+      throw new IllegalPrintYear("Print year should be greater than 1400 and less than or equal to current year");
     }
       if (bookDTO.getAuthor().length() < 3 || bookDTO.getAuthor().length() > 50) {
         logger.error("Author name should be between 3 and 50 characters.");
         throw new IllegalAuthorNameException();
       }
+      if(specialCharPattern.matcher(bookDTO.getAuthor()).find()){
+        logger.error("Author name should not contain special characters.");
+        throw new SpecialCharacterNotAllowedException("Author name should not contain special characters.");
+      }
+
+
 
       if (bookDTO.getTitle().length() < 3 || bookDTO.getTitle().length() > 50) {
         logger.error("Title should be between 3 and 50 characters.");
