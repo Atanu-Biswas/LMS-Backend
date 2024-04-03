@@ -90,7 +90,7 @@ public class UserService {
         Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
         Pageable p = PageRequest.of(pageNumber, pageSize, sort);
-        Page<User> userPage = userRepository.findByUsernameStartingWithIgnoreCase(username, p);
+        Page<User> userPage = userRepository.findByUsernameContainingIgnoreCase(username, p);
         if(userPage.isEmpty()){
             throw new UserNotFoundException();
         }

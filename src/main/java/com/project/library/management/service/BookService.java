@@ -4,6 +4,7 @@ import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.BookPaginationDTO;
 import com.project.library.management.entity.Book;
 import com.project.library.management.entity.Genre;
+import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.Publisher;
 import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
@@ -18,7 +19,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+
+import java.util.Calendar;
+import java.util.Date;
+
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,15 +37,20 @@ public class BookService {
   private final PublisherRepository publisherRepository;
   private final PublisherService publisherService;
   private final BookIssueRepository bookIssueRepository;
+  private final BookRequestRepository bookRequestRepository;
 
-  public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException, IllegalPrintYear, IllegalAuthorNameException, IllegalTitleException, InvalidIsbnException {
+  public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException, IllegalPrintYear{
 
-    if (bookDTO.getQuantityAvailable() <= 0) {
+    if(bookDTO.getQuantityAvailable() <= 0){
       logger.error("Quantity should be greater than 0");
       throw new IllegalQuantityException("Quantity should be greater than 0");
     }
 
-    if (bookDTO.getAuthor().length() < 3 || bookDTO.getAuthor().length() > 50) {
+    if(bookDTO.getPrintYear() > new Date().getYear() + 1900 || bookDTO.getPrintYear() < 1000){
+      logger.error("Print year should be greater than 1000 and less than or equal to current year");
+      throw new IllegalPrintYear("Print year should be greater than 1000 and less than or equal to current year");
+
+      if (bookDTO.getAuthor().length() < 3 || bookDTO.getAuthor().length() > 50) {
       logger.error("Author name should be between 3 and 50 characters.");
       throw new IllegalAuthorNameException();
     }
@@ -52,24 +65,22 @@ public class BookService {
       throw new IllegalPrintYear("Print year should be less than or equal to the current year");
     }
 
-    if (bookDTO.getIsbn().length() != 10 && bookDTO.getIsbn().length() != 13) {
-      logger.error("ISBN length should be either 10 or 13 characters.");
-      throw new IsbnLengthException("ISBN length should be either 10 or 13 characters.");
-    }
 
-    if (!isValidIsbn(bookDTO.getIsbn())) {
-      logger.error("Invalid ISBN.");
-      throw new InvalidIsbnException();
+
+    if(bookDTO.getIsbn().length()!=13){
+      logger.error("ISBN length should be 13 characters.");
+      throw new IsbnLengthException("ISBN length should be 13 characters.");
     }
+        if (!isValidIsbn(bookDTO.getIsbn())) {
+            logger.error("Invalid ISBN.");
+            throw new InvalidIsbnException();
 //    bookRepository.existsByIsbn(bookDTO.getIsbn()).ifPresent(book -> {
 //      throw new ISBNExistsException();
 //    });
 
 
-
-    Publisher publisher = publisherRepository.findById(bookDTO.getPublisherId()).orElseThrow(() -> new PublisherNotFoundException("Publisher corresponding to the given book not found!!"));
+    Publisher publisher = publisherRepository.findById(bookDTO.getPublisherId()).orElseThrow(()->new PublisherNotFoundException("Publisher corresponding to given book not found!!"));
     logger.debug("Query fired for getting Publisher by Id");
-
     Book book = new Book();
     book.setAuthor(bookDTO.getAuthor());
     book.setTitle(bookDTO.getTitle());
@@ -312,11 +323,20 @@ if(!publisher.getPublisherId().equals(updateBookRequest.getPublisherId())){
 
   // keep this service
   @Transactional
-  public boolean deleteBook(Long bookId) throws BookNotDeletedException {
+  public boolean deleteBook(Long bookId) throws BookNotDeletedException, BookNotFoundException {
+    if(!bookRepository.existsById(bookId)){
+      throw new BookNotFoundException("Book with Id " + bookId + " Not Found");
+    }
+
     boolean isBookIssued=bookIssueRepository.existsByBookId(bookId);
 
-    if(isBookIssued==true){
-      throw new BookNotDeletedException("Book with ID " + bookId + " can not be deleted");
+    if(isBookIssued){
+      throw new BookNotDeletedException("Book with Id " + bookId + " is already issued to a user, so it can't be deleted");
+    }
+
+    if(isBookRequested){
+      System.out.println("indide isBookRequested block");
+      throw new BookNotDeletedException("Book with Id " + bookId + " is already requested by a user, so it can't be deleted");
     }
 
       bookRepository.deleteByBookId(bookId);

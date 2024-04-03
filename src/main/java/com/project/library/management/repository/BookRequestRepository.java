@@ -40,5 +40,7 @@ public interface BookRequestRepository extends JpaRepository<BookRequest, Long> 
     List<BookRequest> findByRequestDateBetween(Date startDate,Date endDate);
 
     List<BookRequest> findByUserUsernameAndRequestDateBetween(String username,Date startDate,Date endDate);
-    
+
+    @Query("SELECT COUNT(br) > 0 FROM BookRequest br WHERE br.book.bookId = :bookId")
+    boolean existsByBookId(Long bookId);
 }

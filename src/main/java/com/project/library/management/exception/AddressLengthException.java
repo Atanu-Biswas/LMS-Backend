@@ -1,7 +1,11 @@
 package com.project.library.management.exception;
 
-public class AddressLengthException extends LMSException {
-    public AddressLengthException() {
-        super("Address should be less than 30 characters");
+public class AddressLengthException extends ValidationException {
+    public AddressLengthException(String message){
+        super(message);
+    }
+
+    public AddressLengthException(){
+        super("Length of Address should be less than or equal to 100 characters!!");
     }
 }

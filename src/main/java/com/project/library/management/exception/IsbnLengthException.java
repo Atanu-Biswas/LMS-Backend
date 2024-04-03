@@ -1,6 +1,6 @@
 package com.project.library.management.exception;
 
-public class IsbnLengthException extends LMSException{
+public class IsbnLengthException extends ValidationException{
 
     public IsbnLengthException() {
         super("ISBN must be 13 characters long");

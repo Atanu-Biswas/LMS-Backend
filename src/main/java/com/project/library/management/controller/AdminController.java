@@ -196,7 +196,7 @@ public class AdminController {
 
  //keep this
  @DeleteMapping("/delete-book")
- protected ResponseEntity<Boolean> deleteBook(@RequestParam("bookId") Long bookId )throws BookNotDeletedException{
+ protected ResponseEntity<Boolean> deleteBook(@RequestParam("bookId") Long bookId )throws BookNotDeletedException, BookNotFoundException{
 
     boolean isDeleted=bookService.deleteBook(bookId);
     System.out.println(isDeleted);
