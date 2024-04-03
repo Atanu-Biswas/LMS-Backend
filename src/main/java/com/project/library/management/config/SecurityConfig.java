@@ -34,7 +34,6 @@ public class SecurityConfig {
                                     .permitAll()
                                     .requestMatchers("/admin/**").hasAnyRole(Role.ADMIN.name())
                                     .requestMatchers("/user/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
-                                    .requestMatchers("/auth/logout").authenticated()
                                     .anyRequest()
                                     .authenticated()
                     )
