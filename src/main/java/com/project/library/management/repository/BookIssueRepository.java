@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -106,4 +107,6 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
     List<BookIssue> findByReturnDateBetween(Date startDate, Date endDate);
 
     List<BookIssue> findByUserUsernameAndIssueDateBetweenOrUserUsernameAndReturnDateBetween(String username, Date issueStartDate, Date issueEndDate,String userName, Date returnStartDate, Date returnEndDate);
+
+
 }

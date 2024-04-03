@@ -1,6 +1,7 @@
 package com.project.library.management.repository;
 
 import com.project.library.management.entity.Book;
+import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.BookRequest;
 import com.project.library.management.entity.User;
 import org.springframework.data.domain.Page;
