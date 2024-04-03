@@ -307,15 +307,15 @@ public class BookService {
         }
 
         boolean isBookIssued = bookIssueRepository.existsByBookId(bookId);
-
+        boolean isBookRequested = bookRequestRepository.existsByBookId(bookId);
         if (isBookIssued) {
           throw new BookNotDeletedException("Book with Id " + bookId + " is already issued to a user, so it can't be deleted");
         }
 
-//        if (isBookRequested) {
-//          System.out.println("indide isBookRequested block");
-//          throw new BookNotDeletedException("Book with Id " + bookId + " is already requested by a user, so it can't be deleted");
-//        }
+        if (isBookRequested) {
+
+          throw new BookNotDeletedException("Book with Id " + bookId + " is already requested by a user, so it can't be deleted");
+        }
 
         bookRepository.deleteByBookId(bookId);
         return true;

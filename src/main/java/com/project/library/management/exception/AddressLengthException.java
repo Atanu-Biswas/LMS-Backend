@@ -6,6 +6,6 @@ public class AddressLengthException extends ValidationException {
     }
 
     public AddressLengthException(){
-        super("Length of Address should be less than or equal to 100 characters!!");
+        super("Length of Address should be less 30 characters!!");
     }
 }

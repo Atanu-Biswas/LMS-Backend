@@ -39,11 +39,11 @@ public class AuthenticationService {
             throw new MobileNoExistsException("Mobile Number already exists");
         }
 
-        if(request.getMobileNo().length()!=10){
+        if(request.getMobileNo().length() != 10){
             throw new IllegalMobileNoException();
         }
 
-        if(request.getAddress().length()<=30){
+        if(request.getAddress().length()>=30){
             throw new AddressLengthException();
         }
 
