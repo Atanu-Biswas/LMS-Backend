@@ -3,6 +3,7 @@ package com.project.library.management.service;
 import com.project.library.management.dto.FineDTO;
 import com.project.library.management.dto.FinePaginationDTO;
 import com.project.library.management.entity.BookIssue;
+import com.project.library.management.entity.Fine;
 import com.project.library.management.exception.NoFineFoundException;
 import com.project.library.management.repository.BookIssueRepository;
 import lombok.RequiredArgsConstructor;
@@ -52,19 +53,27 @@ public class FineService {
     //@Scheduled(cron = "0 */2 * * * ?")  //Every 2 minutes
     public void runDailyTask() {
         System.out.println("Running scheduler task");
-        List<BookIssue> bookIssueList = bookIssueRepository.findAll();
-
+        List<BookIssue> bookIssueListNoFine = bookIssueRepository.findByFineStatus(Fine.valueOf("NOFINE"));
+        List<BookIssue> bookIssueListUnPaid = bookIssueRepository.findByFineStatus(Fine.valueOf("UNPAID"));
         Date currentDate = new Date(); // Set current date
 
-        bookIssueList.forEach(bookIssue -> {
-            if(!bookIssue.getFineStatus().equals("PAID")){
+        bookIssueListNoFine.forEach(bookIssue -> {
+
                 if (bookIssue.getDueDate().before(currentDate)) {
+                bookIssue.setFineStatus(Fine.valueOf("UNPAID"));
                 long diff = currentDate.getTime() - bookIssue.getDueDate().getTime();
                 long diffDays = diff / (24 * 60 * 60 * 1000);
                 bookIssue.setFine((int) diffDays * 10);
-            }}
+            }
         });
-        bookIssueRepository.saveAll(bookIssueList);
-        System.out.println("job  scheduler task");
+        bookIssueRepository.saveAll(bookIssueListNoFine);
+
+        bookIssueListUnPaid.forEach(bookIssue -> {
+            long diff = currentDate.getTime() - bookIssue.getDueDate().getTime();
+            long diffDays = diff / (24 * 60 * 60 * 1000);
+            bookIssue.setFine((int) diffDays * 10);
+        });
+        bookIssueRepository.saveAll(bookIssueListUnPaid);
+
     }
 }
