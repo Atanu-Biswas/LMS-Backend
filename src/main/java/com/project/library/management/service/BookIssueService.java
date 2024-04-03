@@ -39,13 +39,13 @@ public class BookIssueService {
         Sort sort= (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
         Pageable p = PageRequest.of(pageNumber, pageSize, sort);
-        Page<BookIssue> bookIssuePage= bookIssueRepository.findByUserUsername(username,p);
+        Page<BookIssue> bookIssuePage= bookIssueRepository.findByUserUsernameAndReturnDateIsNull(username,p);
         if(bookIssuePage==null){
             throw new BookIssueNotFoundException("No borrowed books found for given user!!");
         }
 
         List<BookIssue> bookIssues = bookIssuePage.getContent();
-        List<BookIssueDTO> borrowedBooks = bookIssues.stream().filter(bookIssue -> bookIssue.getReturnDate() == null).map(bookIssue->
+        List<BookIssueDTO> borrowedBooks = bookIssues.stream().map(bookIssue->
                 BookIssueDTO.builder()
                         .issueId(bookIssue.getIssueId())
                         .bookId(bookIssue.getBook().getBookId())
@@ -76,7 +76,7 @@ public class BookIssueService {
 
         //setting return date as current system date
         bookIssue.setReturnDate(new Date());
-        bookIssue.setFineStatus(Fine.valueOf("PAID"));
+        if(bookIssue.getFine()>0) bookIssue.setFineStatus(Fine.valueOf("PAID"));
 
         //set status of that book as returned in book request table
         Book book= bookIssue.getBook();
