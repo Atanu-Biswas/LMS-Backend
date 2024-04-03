@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -239,6 +240,20 @@ public class AdminController {
         } catch (BookNotFoundException | IllegalPrintYear | IsbnLengthException | IllegalQuantityException | PublisherNotFoundException e) {
             logger.error("Error occurred while updating book");
             throw e;
+        }
+    }
+
+    @PutMapping("/quantity")
+    public ResponseEntity<String> updateBookQuantity(
+            @RequestParam Long bookId,
+            @RequestParam int quantity) {
+
+        try {
+            bookService.updateBookQuantity(bookId, quantity);
+            return ResponseEntity.ok("Book quantity updated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to update book quantity: " + e.getMessage());
         }
     }
 
