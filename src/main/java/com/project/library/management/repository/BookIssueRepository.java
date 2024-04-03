@@ -108,5 +108,6 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
 
     List<BookIssue> findByUserUsernameAndIssueDateBetweenOrUserUsernameAndReturnDateBetween(String username, Date issueStartDate, Date issueEndDate,String userName, Date returnStartDate, Date returnEndDate);
 
+    List<BookIssue> findByUserUsernameAndFineStatus(String username ,Fine fineStatus);
 
 }
