@@ -4,6 +4,8 @@
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Sample DB"/>
 	<parameter name="generatedBy" class="java.lang.String"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
 	<field name="requestId" class="java.lang.Long"/>
 	<field name="bookTitle" class="java.lang.String"/>
 	<field name="username" class="java.lang.String"/>
@@ -43,7 +45,22 @@
 		</band>
 	</title>
 	<pageHeader>
-		<band height="13"/>
+		<band height="36">
+			<textField>
+				<reportElement x="396" y="4" width="158" height="16" uuid="3b694f58-d47e-47ce-b9d7-76cdde954d62"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Start Date: "+$P{startDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="396" y="21" width="158" height="15" uuid="68ca3aa7-7fac-45f5-8f86-1d9653deb7ef"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["End Date: "+$P{endDate}]]></textFieldExpression>
+			</textField>
+		</band>
 	</pageHeader>
 	<columnHeader>
 		<band height="42">

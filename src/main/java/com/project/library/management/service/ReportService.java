@@ -19,6 +19,7 @@ import org.springframework.util.ResourceUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +64,18 @@ public class ReportService {
         return byteArrayOutputStream;
     }
 
+    public Date setTimeInEndDate(Date endDate, int hour, int minute, int second){
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(endDate);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, second);
+        return calendar.getTime();
+    }
+
     public ByteArrayOutputStream getAdminReport(String username,String reportName,Date startDate, Date endDate) throws FileNotFoundException, ReportGenerationException, JRException{
+        //Setting Time in endDate as 23.59.59 hours
+        if(endDate!=null) endDate=setTimeInEndDate(endDate, 23, 59, 59);
 
         switch(reportName){
             case "BookCollectionReport":
@@ -93,7 +105,9 @@ public class ReportService {
     }
 
     public ByteArrayOutputStream getUserReport(String username,String reportName,Date startDate, Date endDate) throws FileNotFoundException, ReportGenerationException, JRException{
-
+        //Setting Time in endDate as 23.59.59 hours
+        if(endDate!=null) endDate=setTimeInEndDate(endDate, 23, 59, 59);
+        
         switch(reportName){
             case "BookCollectionReport":
                 return generateBooksCollectionReport(startDate,endDate,username);

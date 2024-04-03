@@ -39,9 +39,9 @@ public class BookIssueService {
         Sort sort= (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
         Pageable p = PageRequest.of(pageNumber, pageSize, sort);
-        Page<BookIssue> bookIssuePage= bookIssueRepository.findByUserUsername(username,p);
-        if(bookIssuePage.isEmpty()){
-            throw new BookIssueNotFoundException("No borrowed books found!!");
+        Page<BookIssue> bookIssuePage= bookIssueRepository.findByUserUsernameAndReturnDateIsNull(username,p);
+        if(bookIssuePage==null){
+            throw new BookIssueNotFoundException("No borrowed books found for given user!!");
         }
 
         List<BookIssue> bookIssues = bookIssuePage.getContent();
