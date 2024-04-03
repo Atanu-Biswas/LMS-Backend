@@ -210,7 +210,7 @@ public class UserController {
                     .favoriteBooks(userDashboardService.getFavoriteBooksForUser(user))
                     .favoriteAuthors(userDashboardService.getFavoriteAuthorsForUser(user))
                     .totalBooksBorrowed(userDashboardService.getTotalBooksBorrowedByUser(user))
-                    .totalDuesAmount(userDashboardService.getTotalDuesAmountForUser(user))
+                    .totalDuesAmount(userDashboardService.getTotalDuesAmountForUser(username))
                     .build());
         }
         else {

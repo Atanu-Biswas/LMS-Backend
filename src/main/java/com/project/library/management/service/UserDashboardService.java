@@ -1,6 +1,7 @@
 package com.project.library.management.service;
 
 import com.project.library.management.dto.UserDashboardDTO;
+import com.project.library.management.entity.Fine;
 import com.project.library.management.entity.Genre;
 import com.project.library.management.entity.User;
 import com.project.library.management.repository.BookIssueRepository;
@@ -63,7 +64,11 @@ public class UserDashboardService {
     public Long getTotalBooksBorrowedByUser(User user) {
         return bookIssueRepository.getTotalBooksBorrowedByUser(user);
     }
-    public Integer getTotalDuesAmountForUser(User user) {
-        return bookIssueRepository.getTotalDuesAmountForUser(user);
+    public Integer getTotalDuesAmountForUser(String username) {
+        Integer totalFineAmountDue= bookIssueRepository.getUsersWithTotalFineAmountDue(Fine.UNPAID,username);
+        if(totalFineAmountDue == null){
+            return 0;
+        }
+        return totalFineAmountDue;
     }
 }
