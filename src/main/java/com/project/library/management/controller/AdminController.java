@@ -66,7 +66,7 @@ public class AdminController {
 
     @PostMapping("/add-book")
     // working
-    protected ResponseEntity<Boolean> addBook(@RequestBody BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException, IllegalPrintYear {
+    protected ResponseEntity<Boolean> addBook(@RequestBody BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException, IllegalPrintYear, IllegalAuthorNameException, IllegalTitleException, InvalidIsbnException {
         System.out.println("bookDTO: " + bookDTO);
         bookService.addBook(bookDTO);
         Boolean isBookAdded = true;

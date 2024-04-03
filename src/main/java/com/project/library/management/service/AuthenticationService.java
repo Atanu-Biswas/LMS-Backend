@@ -26,7 +26,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption{
+    public AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, IllegalMobileNoException, AddressLengthException {
         if (request.getPassword().length() < 8 || request.getPassword().length() > 20) {
             throw new PasswordLengthException("Password length should be between 8 and 20 characters.");
         }
@@ -39,6 +39,13 @@ public class AuthenticationService {
             throw new MobileNoExistsException("Mobile Number already exists");
         }
 
+        if(request.getMobileNo().length()!=10){
+            throw new IllegalMobileNoException();
+        }
+
+        if(request.getAddress().length()!=30){
+            throw new AddressLengthException();
+        }
 
 
 

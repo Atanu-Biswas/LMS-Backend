@@ -4,7 +4,6 @@ import com.project.library.management.dto.BookDTO;
 import com.project.library.management.dto.BookPaginationDTO;
 import com.project.library.management.entity.Book;
 import com.project.library.management.entity.Genre;
-import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.Publisher;
 import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
@@ -19,12 +18,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-
 import java.util.Calendar;
 import java.util.Date;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,25 +33,46 @@ public class BookService {
   private final PublisherService publisherService;
   private final BookIssueRepository bookIssueRepository;
 
-  public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException, IllegalPrintYear{
+  public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException, IllegalPrintYear, IllegalAuthorNameException, IllegalTitleException, InvalidIsbnException {
 
-    if(bookDTO.getQuantityAvailable() <= 0){
+    if (bookDTO.getQuantityAvailable() <= 0) {
       logger.error("Quantity should be greater than 0");
       throw new IllegalQuantityException("Quantity should be greater than 0");
     }
 
-    if(bookDTO.getPrintYear() > new Date().getYear() + 1900 || bookDTO.getPrintYear() < 0){
-      logger.error("Print year should be less than or equal to current year");
-      throw new IllegalPrintYear("Print year should be less than or equal to current year");
+    if (bookDTO.getAuthor().length() < 3 || bookDTO.getAuthor().length() > 50) {
+      logger.error("Author name should be between 3 and 50 characters.");
+      throw new IllegalAuthorNameException();
     }
 
-    if(bookDTO.getIsbn().length()!=13){
-      logger.error("ISBN length should be 13 characters.");
-      throw new IsbnLengthException("ISBN length should be 13 characters.");
+    if (bookDTO.getTitle().length() < 3 || bookDTO.getTitle().length() > 50) {
+      logger.error("Title should be between 3 and 50 characters.");
+      throw new IllegalTitleException();
     }
 
-    Publisher publisher = publisherRepository.findById(bookDTO.getPublisherId()).orElseThrow(()->new PublisherNotFoundException("Publisher corresponding to given book not found!!"));
+    if (bookDTO.getPrintYear() > new Date().getYear() + 1900 || bookDTO.getPrintYear() < 0) {
+      logger.error("Print year should be less than or equal to the current year");
+      throw new IllegalPrintYear("Print year should be less than or equal to the current year");
+    }
+
+    if (bookDTO.getIsbn().length() != 10 && bookDTO.getIsbn().length() != 13) {
+      logger.error("ISBN length should be either 10 or 13 characters.");
+      throw new IsbnLengthException("ISBN length should be either 10 or 13 characters.");
+    }
+
+    if (!isValidIsbn(bookDTO.getIsbn())) {
+      logger.error("Invalid ISBN.");
+      throw new InvalidIsbnException();
+    }
+//    bookRepository.existsByIsbn(bookDTO.getIsbn()).ifPresent(book -> {
+//      throw new ISBNExistsException();
+//    });
+
+
+
+    Publisher publisher = publisherRepository.findById(bookDTO.getPublisherId()).orElseThrow(() -> new PublisherNotFoundException("Publisher corresponding to the given book not found!!"));
     logger.debug("Query fired for getting Publisher by Id");
+
     Book book = new Book();
     book.setAuthor(bookDTO.getAuthor());
     book.setTitle(bookDTO.getTitle());
@@ -72,6 +88,40 @@ public class BookService {
     logger.debug("Saved the Book details in the database");
     return true;
   }
+  private boolean isValidIsbn(String isbn) {
+    // Remove any non-digit characters from the ISBN
+    isbn = isbn.replaceAll("[^0-9]", "");
+
+    if (isbn.length() == 10) {
+      int sum = 0;
+      for (int i = 0; i < 9; i++) {
+        sum += (i + 1) * Character.getNumericValue(isbn.charAt(i));
+      }
+
+      int checksum = Character.getNumericValue(isbn.charAt(9));
+      if (checksum == sum % 11 || (checksum == 10 && isbn.charAt(9) == 'X')) {
+        return true;
+      }
+    } else if (isbn.length() == 13) {
+      int sum = 0;
+      for (int i = 0; i < 12; i++) {
+        if (i % 2 == 0) {
+          sum += Character.getNumericValue(isbn.charAt(i));
+        } else {
+          sum += Character.getNumericValue(isbn.charAt(i)) * 3;
+        }
+      }
+
+      int checksum = Character.getNumericValue(isbn.charAt(12));
+      if (checksum == (10 - (sum % 10)) % 10) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+
 
   public BookPaginationDTO getBookListByTitle(String title, int pageNumber, int pageSize, String sortBy, String sortDir)
       throws BookNotFoundException {

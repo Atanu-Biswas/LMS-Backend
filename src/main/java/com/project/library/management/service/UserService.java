@@ -3,10 +3,7 @@ package com.project.library.management.service;
 import com.project.library.management.dto.*;
 import com.project.library.management.entity.BookIssue;
 import com.project.library.management.entity.User;
-import com.project.library.management.exception.IllegalMobileNoException;
-import com.project.library.management.exception.MobileNoExistsException;
-import com.project.library.management.exception.NoFineFoundException;
-import com.project.library.management.exception.UserNotFoundException;
+import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookIssueRepository;
 import com.project.library.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -149,16 +146,21 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    public UserProfile updateUser(String username,UserProfile userProfile) throws UserNotFoundException, IllegalMobileNoException, MobileNoExistsException{
+    public UserProfile updateUser(String username,UserProfile userProfile) throws UserNotFoundException, IllegalMobileNoException, MobileNoExistsException, NothingToUpdateException {
         User user = userRepository.findByUsername(username).orElseThrow(()->new UserNotFoundException());
+        System.out.println(userProfile.getMobileNo().length());
+        if(userProfile.getName().equals(user.getName()) && userProfile.getAddress().equals(user.getAddress()) && userProfile.getMobileNo().equals(user.getMobileNo())){
+            throw new NothingToUpdateException();
+        }
+
 
         if(userProfile.getMobileNo().length()!=10){
             throw new IllegalMobileNoException();
         }
 
-        if(userRepository.existsByMobileNo(userProfile.getMobileNo())){
-            throw new MobileNoExistsException();
-        }
+
+
+
 
         user.setName(userProfile.getName());
         user.setAddress(userProfile.getAddress());

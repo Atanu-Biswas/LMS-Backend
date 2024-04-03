@@ -38,5 +38,6 @@ public interface BookRepository extends JpaRepository<Book,Long>{
     @Query("SELECT b FROM Book b WHERE b.dateAdded >= :twoWeeksAgo")
     Page<Book> findNewArrivalsBooks(Date twoWeeksAgo, Pageable p);
 
+    boolean existsByIsbn(String isbn);
 
 }

@@ -58,8 +58,10 @@ public class UserController {
     }
 
     @PutMapping("/update-user")
-    protected ResponseEntity<UserProfile> updateUser(HttpServletRequest request,@RequestBody UserProfile userProfile) throws UserNotFoundException, IllegalMobileNoException, MobileNoExistsException{
+    protected ResponseEntity<UserProfile> updateUser(HttpServletRequest request,@RequestBody UserProfile userProfile) throws UserNotFoundException, IllegalMobileNoException, MobileNoExistsException, NothingToUpdateException {
         String username=request.getUserPrincipal().getName();
+        System.out.println("username: "+username);
+        System.out.println("userProfile: "+userProfile);
         UserProfile updatedUserProfile=userService.updateUser(username,userProfile);
         return ResponseEntity.ok().body(updatedUserProfile);
     }
