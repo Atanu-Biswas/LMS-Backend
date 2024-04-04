@@ -243,18 +243,15 @@ public class AdminController {
         }
     }
 
-    @PutMapping("/quantity")
+    @PutMapping("/update-book-quantity")
     public ResponseEntity<String> updateBookQuantity(
             @RequestParam Long bookId,
-            @RequestParam int quantity) {
+            @RequestParam int quantity) throws BookNotFoundException, IllegalQuantityException {
 
-        try {
+
             bookService.updateBookQuantity(bookId, quantity);
             return ResponseEntity.ok("Book quantity updated successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to update book quantity: " + e.getMessage());
-        }
+
     }
 
 }

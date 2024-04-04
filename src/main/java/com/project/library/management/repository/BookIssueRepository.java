@@ -82,15 +82,9 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
             "FETCH FIRST 5 ROWS ONLY")
     List<Object[]> getFavoriteAuthorsByUser(User user);
 
-    @Query("SELECT COUNT(bi) " +
-            "FROM BookIssue bi " +
-            "WHERE bi.user = ?1")
+    @Query("SELECT COUNT(bi) FROM BookIssue bi WHERE bi.user = :user AND bi.returnDate IS NULL")
     Long getTotalBooksBorrowedByUser(User user);
 
-    @Query("SELECT SUM(bi.fine) " +
-            "FROM BookIssue bi " +
-            "WHERE bi.user = ?1")//check this
-    Integer getTotalDuesAmountForUser(User user);
 
     @Query("SELECT bi.user.username, " +
             "SUM(CASE WHEN bi.fineStatus = :paidStatus THEN bi.fine ELSE 0 END) as totalFinePaid, " +
@@ -99,6 +93,11 @@ public interface BookIssueRepository extends JpaRepository<BookIssue, Long>{
             "WHERE bi.fineStatus IN (:paidStatus, :unpaidStatus) " +
             "GROUP BY bi.user.username")
     List<Object[]> getUsersWithTotalFineAmountPaidAndDue(Fine paidStatus,Fine unpaidStatus);
+    @Query("SELECT SUM(CASE WHEN bi.fineStatus = :unpaidStatus THEN bi.fine ELSE 0 END) as totalDuesAmount " +
+            "FROM BookIssue bi " +
+            "WHERE bi.fineStatus = :unpaidStatus AND bi.user.username = :username")
+    Integer getUsersWithTotalFineAmountDue(Fine unpaidStatus,String username);
+
 
     List<BookIssue> findByFineStatus(Fine fineStatus);
     
