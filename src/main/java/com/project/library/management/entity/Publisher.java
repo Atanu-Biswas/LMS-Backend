@@ -16,7 +16,7 @@ public class Publisher {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long publisherId;
 
-    @Column(nullable = false)
+    @Column(name = "publisher_name", nullable = false)
     private String name;
 
     private String email;

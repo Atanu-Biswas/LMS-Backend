@@ -18,13 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -130,11 +124,17 @@ public class BookRequestService {
             int bookQuantity = book.getQuantityAvailable();
             book.setQuantityAvailable(bookQuantity - 1);
             System.out.println("Setting values for Book Issue Table done");
-            bookIssueRepository.save(issue);// error
-            System.out.println("Saved in Book Issue Repository");
+//            System.out.println(issue);
+            try {
+                bookIssueRepository.save(issue);
+                System.out.println("Saved in Book Issue Repository");
 
-            request.setStatus("ACCEPTED");
-            bookRequestRepository.save(request);
+                request.setStatus("ACCEPTED");
+                bookRequestRepository.save(request);
+            }catch (Exception e){
+                System.out.println("Exception in saving in Book Issue Repository");
+                e.printStackTrace();
+            }
 
         }
         return true;

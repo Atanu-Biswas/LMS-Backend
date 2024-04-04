@@ -85,7 +85,7 @@ public class BookIssueService {
 
         //increase the quantity available of that book by one
         book.setQuantityAvailable(book.getQuantityAvailable()+1);
-
+        System.out.println(bookIssue);
         bookIssueRepository.save(bookIssue);
         bookRequestRepository.save(bookRequest);
         bookRepository.save(book);

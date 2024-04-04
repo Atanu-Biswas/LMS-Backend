@@ -18,7 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.regex.Pattern;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,7 +31,7 @@ public class BookService {
   private final PublisherService publisherService;
   private final BookIssueRepository bookIssueRepository;
   private final BookRequestRepository bookRequestRepository;
-  Pattern specialCharPattern = Pattern.compile("[^a-zA-Z0-9 ]");
+
 
   public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException, IllegalPrintYear, IllegalAuthorNameException, IllegalTitleException, InvalidIsbnException, BookAlreadyExistsException, SpecialCharacterNotAllowedException {
 
@@ -48,10 +48,7 @@ public class BookService {
         logger.error("Author name should be between 3 and 50 characters.");
         throw new IllegalAuthorNameException();
       }
-      if(specialCharPattern.matcher(bookDTO.getAuthor()).find()){
-        logger.error("Author name should not contain special characters.");
-        throw new SpecialCharacterNotAllowedException("Author name should not contain special characters.");
-      }
+
 
 
 

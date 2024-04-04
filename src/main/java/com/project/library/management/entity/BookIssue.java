@@ -44,4 +44,3 @@ public class BookIssue {
     private int fine = 0;
     // Getters and setters omitted for brevity
 }
-
