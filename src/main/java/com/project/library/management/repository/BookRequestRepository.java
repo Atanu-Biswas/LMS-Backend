@@ -44,4 +44,7 @@ public interface BookRequestRepository extends JpaRepository<BookRequest, Long> 
 
     @Query("SELECT COUNT(br) > 0 FROM BookRequest br WHERE br.book.bookId = :bookId")
     boolean existsByBookId(Long bookId);
+     
+    // @Query("SELECT br WHERE br.requestId =  :requestId")
+    // BookRequest getUserUsernameByRequestId(Long requestId);
 }

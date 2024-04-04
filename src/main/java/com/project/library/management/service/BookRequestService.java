@@ -30,10 +30,23 @@ public class BookRequestService {
     private final UserRepository userRepository;
 
     public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) throws BookNotFoundException,
-            DisabledBookException, BookAlreadyRequestedExecption, IllegalWeeksRequestedException {
+            DisabledBookException, BookAlreadyRequestedExecption, IllegalWeeksRequestedException ,FineLimitExcededException ,RequestedLimitExcededException {
 
         if (bookRequestDTO.getWeeksRequested() < 1 || bookRequestDTO.getWeeksRequested() > 3) {
             throw new IllegalWeeksRequestedException("Weeks requested should be between 1 and 3");
+        }
+
+        List<BookIssue> bookIssues = bookIssueRepository.findByUserUsernameAndFineStatus(username, Fine.UNPAID);
+
+        int fine = 0;
+
+        for (BookIssue bookIssue : bookIssues) {
+            fine += bookIssue.getFine();
+        }
+
+        if (fine >= 60) {
+            throw new FineLimitExcededException(
+                    "Fine Limit Exceded..Please Pay Your Unpaid Fine !!");
         }
 
         User user = userRepository.findByUsername(username).orElse(null);
@@ -46,8 +59,8 @@ public class BookRequestService {
         List<BookRequest> bookRequestbetween = bookRequestRepository.findByUserUsernameAndRequestDateBetween(username,
                 yesterdayStart, todayStart);
 
-        if (bookRequestbetween.size() >= 5) {
-            throw new IllegalWeeksRequestedException(
+        if (bookRequestbetween.size() >=5) {
+            throw new RequestedLimitExcededException(
                     "You have already requested the maximum number of books for today!!");
         }
 
@@ -93,7 +106,7 @@ public class BookRequestService {
     }
 
     public boolean acceptRequest(Long requestId)
-            throws BookRequestNotFoundException, BookNotFoundException, DisabledBookException {
+            throws BookRequestNotFoundException, BookNotFoundException, DisabledBookException,FineLimitExcededException {
         BookRequest request = bookRequestRepository.findById(requestId).orElseThrow(
                 () -> new BookRequestNotFoundException("Book request with request Id: " + requestId + " not found"));
 
@@ -102,6 +115,22 @@ public class BookRequestService {
 
         if (!book.isActive()) {
             throw new DisabledBookException("The requested book is disabled!!");
+        }
+        BookRequest br=bookRequestRepository.findById(requestId).orElse(null);
+           
+        String username=br.getUser().getUsername();
+        List<BookIssue> bookIssues = bookIssueRepository.findByUserUsernameAndFineStatus(username, Fine.UNPAID);
+
+        int fine = 0;
+
+        for (BookIssue bookIssue : bookIssues) {
+            fine += bookIssue.getFine();
+        }
+
+        System.out.println(fine);
+        if (fine >= 20) {
+            throw new FineLimitExcededException(
+                    "Fine Limit Exceded..Please Pay Your Unpaid Fine !!");
         }
 
         if (request != null && request.getStatus().equals("PENDING")) {
