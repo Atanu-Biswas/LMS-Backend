@@ -146,7 +146,7 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    public UserProfile updateUser(String username,UserProfile userProfile) throws UserNotFoundException, IllegalMobileNoException, MobileNoExistsException, NothingToUpdateException {
+    public UserProfile updateUser(String username,UserProfile userProfile) throws UserNotFoundException, IllegalMobileNoException, MobileNoExistsException, NothingToUpdateException, AddressLengthException {
         User user = userRepository.findByUsername(username).orElseThrow(()->new UserNotFoundException());
         System.out.println(userProfile.getMobileNo().length());
         if(userProfile.getName().equals(user.getName()) && userProfile.getAddress().equals(user.getAddress()) && userProfile.getMobileNo().equals(user.getMobileNo())){
@@ -156,6 +156,9 @@ public class UserService {
 
         if(userProfile.getMobileNo().length()!=10){
             throw new IllegalMobileNoException();
+        }
+        if(userProfile.getAddress().length()>=30){
+            throw new AddressLengthException();
         }
 
 

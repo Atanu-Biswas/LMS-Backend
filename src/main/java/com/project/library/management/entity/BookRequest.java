@@ -3,6 +3,7 @@ package com.project.library.management.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.springframework.core.annotation.Order;
 
@@ -32,9 +33,11 @@ public class BookRequest {
     @Column(nullable = false)
     @Min(1)
     @Max(3)
+    @Size(max = 1)
     private int weeksRequested;
 
     @Column(nullable = false)
+    @Size(max = 10)
     private String status = "PENDING";
     // Getters and setters omitted for brevity
 }

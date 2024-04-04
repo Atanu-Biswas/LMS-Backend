@@ -35,9 +35,9 @@ public class BookService {
 
   public boolean addBook(BookDTO bookDTO) throws PublisherNotFoundException, IsbnLengthException, IllegalQuantityException, IllegalPrintYear, IllegalAuthorNameException, IllegalTitleException, InvalidIsbnException, BookAlreadyExistsException, SpecialCharacterNotAllowedException {
 
-    if (bookDTO.getQuantityAvailable() <= 0) {
+    if (bookDTO.getQuantityAvailable() <= 0 || bookDTO.getQuantityAvailable() >= 100){
       logger.error("Quantity should be greater than 0");
-      throw new IllegalQuantityException("Quantity should be greater than 0");
+      throw new IllegalQuantityException("Quantity should be greater than 0 and less than 100");
     }
 
     if (bookDTO.getPrintYear() > new Date().getYear() + 1900 || bookDTO.getPrintYear() < 1400) {
@@ -52,6 +52,8 @@ public class BookService {
         logger.error("Author name should not contain special characters.");
         throw new SpecialCharacterNotAllowedException("Author name should not contain special characters.");
       }
+
+
 
 
 
@@ -425,14 +427,17 @@ public class BookService {
       }
 
       @Transactional
-      public void updateBookQuantity (Long bookId,int quantity){
+      public void updateBookQuantity (Long bookId,int quantity) throws IllegalQuantityException, BookNotFoundException {
+        if(quantity < 0 || quantity >= 100){
+          throw new IllegalQuantityException("Quantity should be greater than 0 and less than 100");
+        }
         Optional<Book> optionalBook = bookRepository.findById(bookId);
         if (optionalBook.isPresent()) {
           Book book = optionalBook.get();
           book.setQuantity(quantity);
           bookRepository.save(book);
         } else {
-          throw new IllegalArgumentException("Book not found with ID: " + bookId);
+          throw new BookNotFoundException("Book with Id " + bookId + " not found");
         }
       }
     }

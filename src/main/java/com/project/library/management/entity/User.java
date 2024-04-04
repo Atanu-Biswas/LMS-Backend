@@ -1,11 +1,10 @@
 package com.project.library.management.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
-
 import org.springframework.core.annotation.Order;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,14 +25,19 @@ public class User implements UserDetails {
     private String userId;
 
     @Column(nullable = false)
+    @Size(max = 100)
     private String name;
 
     @Column(nullable = false, unique = true)
+    @Size(max = 10)
     private String username;
 
+    @Column(nullable = false)
+    @Size(max = 100)
     private String address;
 
     @Column(nullable = false)
+    @Size(max = 10)
     private String mobileNo;
 
     @Column(nullable = false)

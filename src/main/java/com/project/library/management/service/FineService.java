@@ -63,7 +63,8 @@ public class FineService {
                 bookIssue.setFineStatus(Fine.valueOf("UNPAID"));
                 long diff = currentDate.getTime() - bookIssue.getDueDate().getTime();
                 long diffDays = diff / (24 * 60 * 60 * 1000);
-                bookIssue.setFine((int) diffDays * 10);
+                    bookIssue.setFine(Math.min(((int) diffDays * 10), Integer.MAX_VALUE));
+
             }
         });
         bookIssueRepository.saveAll(bookIssueListNoFine);
@@ -71,7 +72,7 @@ public class FineService {
         bookIssueListUnPaid.forEach(bookIssue -> {
             long diff = currentDate.getTime() - bookIssue.getDueDate().getTime();
             long diffDays = diff / (24 * 60 * 60 * 1000);
-            bookIssue.setFine((int) diffDays * 10);
+            bookIssue.setFine(Math.min(((int) diffDays * 10), Integer.MAX_VALUE));
         });
         bookIssueRepository.saveAll(bookIssueListUnPaid);
 

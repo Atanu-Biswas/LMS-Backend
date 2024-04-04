@@ -2,6 +2,7 @@ package com.project.library.management.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.validator.constraints.ISBN;
 import org.springframework.core.annotation.Order;
@@ -19,18 +20,20 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookId;
 
-    @Column(nullable = false, unique = true) // Enforce ISBN uniqueness
+    @Column(nullable = false, unique = true, length = 13) // Enforce ISBN uniqueness
     @ISBN  // Add ISBN validation annotation
     private String isbn;
 
     @Column(nullable = false)
+    @Size(max = 50)
     private String title;
 
     @Column(nullable = false)
+    @Size(max = 50)
     private String author;
 
     @Column(nullable = false)
-    @Min(value = 0)
+    @Min(value = 1400)
     private int printYear;  // Changed to int for year
 
     @Column(nullable = false)

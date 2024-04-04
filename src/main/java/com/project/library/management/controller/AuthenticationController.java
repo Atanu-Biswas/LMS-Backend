@@ -20,7 +20,7 @@ public class AuthenticationController {
 	private final AuthenticationService authService;
 
 	@PostMapping("/register")
-	public ResponseEntity<AuthenticationResponse> register(@RequestBody UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, AddressLengthException,IllegalMobileNoException {
+	public ResponseEntity<AuthenticationResponse> register(@RequestBody UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, AddressLengthException, IllegalMobileNoException, UsernameLengthException, NameLengthException {
 
 		return ResponseEntity.ok(authService.register(request));
 	}

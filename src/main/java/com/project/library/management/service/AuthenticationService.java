@@ -26,9 +26,16 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, IllegalMobileNoException, AddressLengthException {
+    public AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, IllegalMobileNoException, AddressLengthException, UsernameLengthException, NameLengthException {
         if (request.getPassword().length() < 8 || request.getPassword().length() > 20) {
             throw new PasswordLengthException("Password length should be between 8 and 20 characters.");
+        }
+        if (request.getUsername().length() <= 3 || request.getUsername().length() >= 10) {
+            throw new UsernameLengthException();
+        }
+
+        if (request.getName().length() <= 3 || request.getName().length() >= 100) {
+            throw new NameLengthException();
         }
 
         if(userRepository.existsByUsername(request.getUsername())){
@@ -43,7 +50,7 @@ public class AuthenticationService {
             throw new IllegalMobileNoException();
         }
 
-        if(request.getAddress().length()>=30){
+        if(request.getAddress().length()>=100){
             throw new AddressLengthException();
         }
 

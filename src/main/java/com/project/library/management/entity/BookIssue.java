@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.core.annotation.Order;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 @Data
