@@ -69,13 +69,14 @@ public class BookIssueService {
     }
 
     public boolean acceptReturn(Long issueId) throws BookIssueNotFoundException {
-        System.out.println("issueId: (service)"+issueId);
+
         boolean isReturnAccepted=false;
 
         BookIssue bookIssue = bookIssueRepository.findById(issueId).orElse(null);
 
         //setting return date as current system date
         bookIssue.setReturnDate(new Date());
+
         bookIssue.setFineStatus(Fine.valueOf("PAID"));
 
         //set status of that book as returned in book request table
@@ -83,9 +84,10 @@ public class BookIssueService {
         BookRequest bookRequest= bookRequestRepository.findById(bookIssue.getRequestId()).orElseThrow(BookIssueNotFoundException::new);
         bookRequest.setStatus("RETURNED");
 
+
         //increase the quantity available of that book by one
         book.setQuantityAvailable(book.getQuantityAvailable()+1);
-        System.out.println(bookIssue);
+
         bookIssueRepository.save(bookIssue);
         bookRequestRepository.save(bookRequest);
         bookRepository.save(book);

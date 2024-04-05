@@ -128,7 +128,7 @@ public class BookRequestService {
         }
 
         System.out.println(fine);
-        if (fine >= 20) {
+        if (fine >= 1000) {
             throw new FineLimitExcededException(
                     "Fine Limit Exceded..Please Pay Your Unpaid Fine !!");
         }
