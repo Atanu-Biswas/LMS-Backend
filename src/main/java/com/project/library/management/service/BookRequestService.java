@@ -12,6 +12,7 @@ import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +29,10 @@ public class BookRequestService {
     private final BookRepository bookRepository;
     private final BookIssueRepository bookIssueRepository;
     private final UserRepository userRepository;
+    private final MailService mailService;
+    @Value("${spring.mail.username}")
+    private String mail;
+
 
     public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) throws BookNotFoundException,
             DisabledBookException, BookAlreadyRequestedExecption, IllegalWeeksRequestedException ,FineLimitExcededException ,RequestedLimitExcededException {
@@ -117,7 +122,7 @@ public class BookRequestService {
             throw new DisabledBookException("The requested book is disabled!!");
         }
         BookRequest br=bookRequestRepository.findById(requestId).orElse(null);
-           
+
         String username=br.getUser().getUsername();
         List<BookIssue> bookIssues = bookIssueRepository.findByUserUsernameAndFineStatus(username, Fine.UNPAID);
 
@@ -133,6 +138,14 @@ public class BookRequestService {
                     "Fine Limit Exceded..Please Pay Your Unpaid Fine !!");
         }
 
+
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int daysToAdd = request.getWeeksRequested() * 7;
+        calendar.add(Calendar.DATE, daysToAdd);
+        Date dueDate = calendar.getTime();
+
         if (request != null && request.getStatus().equals("PENDING")) {
 
             BookIssue issue = new BookIssue();
@@ -140,12 +153,7 @@ public class BookRequestService {
             issue.setBook(request.getBook());
             issue.setIssueDate(new Date());
             issue.setRequestId(request.getRequestId());
-            Date date = new Date();
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date);
-            int daysToAdd = request.getWeeksRequested() * 7;
-            calendar.add(Calendar.DATE, daysToAdd);
-            Date dueDate = calendar.getTime();
+
             issue.setDueDate(dueDate);
             issue.setFineStatus(Fine.valueOf("NOFINE"));
             issue.setUser(request.getUser());
@@ -153,19 +161,27 @@ public class BookRequestService {
             int bookQuantity = book.getQuantityAvailable();
             book.setQuantityAvailable(bookQuantity - 1);
             System.out.println("Setting values for Book Issue Table done");
-//            System.out.println(issue);
-            try {
+//
                 bookIssueRepository.save(issue);
                 System.out.println("Saved in Book Issue Repository");
 
                 request.setStatus("ACCEPTED");
                 bookRequestRepository.save(request);
-            }catch (Exception e){
-                System.out.println("Exception in saving in Book Issue Repository");
-                e.printStackTrace();
-            }
+
+
 
         }
+        //String to="atanubiswas690@gmail.com";
+        User user = userRepository.findByUsername(username).orElse(null);
+        String to=user.getEmail();
+
+        String myVariable;
+
+        String subject=request.getBook().getTitle() + " "+"is issued to you";
+        String body=request.getBook().getTitle() + " "+"is issued to you for" + " "+ request.getWeeksRequested() + " " + "weeks & the due date is" + " " + dueDate;
+
+        mailService.sendEmail(to,mail,subject,body);
+
         return true;
     }
 

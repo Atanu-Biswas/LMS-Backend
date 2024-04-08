@@ -7,9 +7,12 @@ import com.project.library.management.dto.UserDTO;
 import com.project.library.management.entity.AuthenticationResponse;
 import com.project.library.management.exception.*;
 import com.project.library.management.service.AuthenticationService;
+import com.project.library.management.service.MailService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @CrossOrigin("http://localhost:4200")
@@ -19,16 +22,20 @@ public class AuthenticationController {
 
 	private final AuthenticationService authService;
 
+
 	@PostMapping("/register")
-	public ResponseEntity<AuthenticationResponse> register(@RequestBody UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, AddressLengthException, IllegalMobileNoException, UsernameLengthException, NameLengthException {
+	public ResponseEntity<AuthenticationResponse> register(@RequestBody UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, AddressLengthException, IllegalMobileNoException, UsernameLengthException, NameLengthException, InvalidEmailException {
 
 		return ResponseEntity.ok(authService.register(request));
 	}
 
-    public AuthenticationController(AuthenticationService authService) {
+    public AuthenticationController(AuthenticationService authService, MailService mailService) {
         this.authService = authService;
 
+
     }
+
+
 
 
 
@@ -63,5 +70,32 @@ public class AuthenticationController {
         String username = request.getUserPrincipal().getName();
         authService.logout(username, refreshTokenRequestDTO.getRefreshToken());
         return ResponseEntity.ok("Logged out successfully");
+    }
+
+    @PostMapping("/forgotPassword")
+    public ResponseEntity<String> forgotPassword(
+            @RequestParam String email
+    ) throws UserNotFoundException {
+        authService.forgetPassword(email);
+        return ResponseEntity.ok("Mail sent successfully");
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<String> verifyOtp(
+            @RequestParam String email,
+            @RequestParam String otp
+    ) throws  OTPException {
+        UUID token = authService.verifyOtp(email, otp);
+        return ResponseEntity.ok(token.toString());
+
+    }
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity<String> resetPassword(
+            @RequestParam String token,
+            @RequestParam String password
+    ) throws OTPException {
+        authService.resetPassword(UUID.fromString(token), password);
+        return ResponseEntity.ok("Password reset successfully");
     }
 }

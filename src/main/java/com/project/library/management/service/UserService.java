@@ -52,6 +52,7 @@ public class UserService {
         userDTO.setMobileNo(user.getMobileNo());
         userDTO.setPassword(user.getPassword());
         userDTO.setRole(user.getRole().toString());
+        userDTO.setEmail(user.getEmail());
         return userDTO;
     }
 

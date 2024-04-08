@@ -2,10 +2,7 @@ package com.project.library.management.service;
 
 import com.project.library.management.dto.BookIssueDTO;
 import com.project.library.management.dto.BookIssuePaginationDTO;
-import com.project.library.management.entity.Book;
-import com.project.library.management.entity.BookIssue;
-import com.project.library.management.entity.BookRequest;
-import com.project.library.management.entity.Fine;
+import com.project.library.management.entity.*;
 import com.project.library.management.exception.BookIssueNotFoundException;
 import com.project.library.management.exception.UserNotFoundException;
 import com.project.library.management.repository.BookIssueRepository;
@@ -13,6 +10,7 @@ import com.project.library.management.repository.BookRepository;
 import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +27,9 @@ public class BookIssueService {
     private final BookRequestRepository bookRequestRepository;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
+    private final MailService mailService;
+    @Value("${spring.mail.username}")
+    private String mail;
 
     public BookIssuePaginationDTO viewBorrowedBooks(String username, int pageNumber, int pageSize, String sortBy, String sortDir) throws BookIssueNotFoundException, UserNotFoundException {
         boolean isUsernameValid = userRepository.existsByUsername(username);
@@ -91,6 +92,11 @@ public class BookIssueService {
         bookIssueRepository.save(bookIssue);
         bookRequestRepository.save(bookRequest);
         bookRepository.save(book);
+        User user= bookIssue.getUser();
+        String to=user.getEmail();
+        String subject="Book Return Confirmation";
+        String body="Your book with title '"+book.getTitle()+"' has been successfully returned. Thank you for using our services.";
+        mailService.sendEmail(to,mail,subject,body);
 
         isReturnAccepted=true;
 

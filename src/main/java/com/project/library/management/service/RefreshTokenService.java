@@ -60,4 +60,7 @@ public class RefreshTokenService {
         findByToken(refreshToken).ifPresent(refreshTokenRepository::delete);
         return "Refresh Token Deleted Successfully";
     }
+
+    public void deleteAllByUsername(String username) {
+    }
 }
