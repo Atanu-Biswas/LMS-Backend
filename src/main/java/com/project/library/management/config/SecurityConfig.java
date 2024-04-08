@@ -2,7 +2,7 @@ package com.project.library.management.config;
 
 import com.project.library.management.entity.Role;
 import com.project.library.management.filter.JwtAuthenticationFilter;
-import com.project.library.management.service.UserDetailsServiceImp;
+import com.project.library.management.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final UserDetailsServiceImp userDetailsServiceImp;
+    private final UserDetailsServiceImpl userDetailsServiceImpl;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -37,7 +37,7 @@ public class SecurityConfig {
                                     .anyRequest()
                                     .authenticated()
                     )
-                    .userDetailsService(userDetailsServiceImp)
+                    .userDetailsService(userDetailsServiceImpl)
                     .sessionManagement(session->session
                             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     )

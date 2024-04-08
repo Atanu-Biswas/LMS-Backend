@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 
 //import UserRepository from repository package
 @Service
-public class UserDetailsServiceImp implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
 
     private final UserRepository repository;
 
-    public UserDetailsServiceImp(UserRepository repository) {
+    public UserDetailsServiceImpl(UserRepository repository) {
         this.repository = repository;
     }
 
