@@ -34,6 +34,9 @@ public class BookRequest {
     @Max(3)
     private int weeksRequested;
 
+    @OneToOne(mappedBy = "bookRequest")
+    private BookIssue bookIssue;
+
     @Column(nullable = false)
     private String status = "PENDING";
     // Getters and setters omitted for brevity

@@ -33,8 +33,10 @@ public class BookIssue {
     @Column(nullable = true)
     private Date returnDate;
 
-    @Column(nullable = false)
-    private Long requestId;
+    // @Column(nullable = false)
+    @OneToOne
+    @JoinColumn(name = "request_id", nullable = false)
+    private BookRequest bookRequest;
 
 
     @Column(nullable = false)

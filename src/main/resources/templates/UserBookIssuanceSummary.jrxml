@@ -9,7 +9,7 @@
 	<field name="issueId" class="java.lang.Long"/>
 	<field name="bookTitle" class="java.lang.String"/>
 	<field name="issueDate" class="java.util.Date"/>
-	<field name="returnDate" class="java.util.Date"/>
+	<field name="dueDate" class="java.util.Date"/>
 	<sortField name="issueDate" order="Descending"/>
 	<background>
 		<band/>
@@ -26,7 +26,7 @@
 					<text><![CDATA[LMS Report]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="380" y="43" width="194" height="20" forecolor="#7B3F00" uuid="fa3d0e8d-717b-4814-b87a-e04d12db4c8f"/>
+					<reportElement x="300" y="43" width="274" height="20" forecolor="#7B3F00" uuid="fa3d0e8d-717b-4814-b87a-e04d12db4c8f"/>
 					<textElement textAlignment="Right">
 						<font fontName="Times New Roman" size="14" isBold="false"/>
 					</textElement>
@@ -99,7 +99,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Return Date]]></text>
+				<text><![CDATA[Due Date]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -142,7 +142,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($F{returnDate}==null)?"N/A":$F{returnDate}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{dueDate}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
