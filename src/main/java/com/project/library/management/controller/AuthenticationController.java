@@ -72,29 +72,33 @@ public class AuthenticationController {
         return ResponseEntity.ok("Logged out successfully");
     }
 
-    @PostMapping("/forgotPassword")
+    @GetMapping("/forgotPassword")
     public ResponseEntity<String> forgotPassword(
-            @RequestParam String email
+            @RequestParam("email") String email
     ) throws UserNotFoundException {
+        System.out.println("Email is "+email);
         authService.forgetPassword(email);
+        System.out.println("Mail sent successfully");
         return ResponseEntity.ok("Mail sent successfully");
     }
 
-    @PostMapping("/verify-otp")
+    @GetMapping("/verify-otp")
     public ResponseEntity<String> verifyOtp(
-            @RequestParam String email,
-            @RequestParam String otp
+            @RequestParam("email") String email,
+            @RequestParam("otp") String otp
     ) throws  OTPException {
+        System.out.println("Email is "+email);
+        System.out.println("OTP is "+otp);
         UUID token = authService.verifyOtp(email, otp);
         return ResponseEntity.ok(token.toString());
-
     }
 
-    @PostMapping("/resetPassword")
+    @GetMapping("/reset-password")
     public ResponseEntity<String> resetPassword(
-            @RequestParam String token,
-            @RequestParam String password
+            @RequestParam("token") String token,
+            @RequestParam("password") String password
     ) throws OTPException {
+        System.out.println("Token is "+token);
         authService.resetPassword(UUID.fromString(token), password);
         return ResponseEntity.ok("Password reset successfully");
     }

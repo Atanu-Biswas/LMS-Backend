@@ -21,7 +21,7 @@ public class OTP {
     private Instant expiry;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
     private UUID token;

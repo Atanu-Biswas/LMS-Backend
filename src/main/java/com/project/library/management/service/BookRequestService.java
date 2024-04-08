@@ -37,11 +37,14 @@ public class BookRequestService {
     public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) throws BookNotFoundException,
             DisabledBookException, BookAlreadyRequestedExecption, IllegalWeeksRequestedException ,FineLimitExcededException ,RequestedLimitExcededException {
 
+
+
         if (bookRequestDTO.getWeeksRequested() < 1 || bookRequestDTO.getWeeksRequested() > 3) {
             throw new IllegalWeeksRequestedException("Weeks requested should be between 1 and 3");
         }
 
         List<BookIssue> bookIssues = bookIssueRepository.findByUserUsernameAndFineStatus(username, Fine.UNPAID);
+
 
         int fine = 0;
 
@@ -53,6 +56,8 @@ public class BookRequestService {
             throw new FineLimitExcededException(
                     "Fine Limit Exceded..Please Pay Your Unpaid Fine !!");
         }
+
+
 
         User user = userRepository.findByUsername(username).orElse(null);
 

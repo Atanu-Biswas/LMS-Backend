@@ -177,6 +177,10 @@ public class AuthenticationService {
         logger.debug("Query fired for finding the User by email");
         int otp = generateRandomFourDigit();
         logger.info("Generated the OTP for the user");
+        OTP existingOtp = otpRepository.findByUserEmail(email).orElse(null);
+        if(existingOtp!=null){
+            otpRepository.delete(existingOtp);
+        }
         OTP otpEntity = new OTP();
         otpEntity.setUser(user);
         otpEntity.setOtp(String.valueOf(otp));
@@ -194,6 +198,7 @@ public class AuthenticationService {
 
 
     public UUID verifyOtp(String email, String otp) throws OTPException {
+        System.out.println("Email is "+email);
         OTP otpEntity = otpRepository.findByUserEmail(email).orElseThrow(
                 () -> new OTPException("OTP not found"));
 
