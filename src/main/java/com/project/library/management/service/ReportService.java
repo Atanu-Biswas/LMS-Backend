@@ -19,7 +19,9 @@ public interface ReportService {
 
     ByteArrayOutputStream getUserReport(String username, String reportName, Date startDate, Date endDate) throws FileNotFoundException, ReportGenerationException, JRException;
 
-    ByteArrayOutputStream generateBooksCollectionReport(Date startDate, Date endDate, String username) throws JRException, FileNotFoundException, ReportGenerationException;
+    ByteArrayOutputStream generateAdminBooksCollectionReport(Date startDate, Date endDate, String username) throws JRException, FileNotFoundException, ReportGenerationException;
+
+    ByteArrayOutputStream generateUserBooksCollectionReport(Date startDate,Date endDate,String username) throws JRException, FileNotFoundException, ReportGenerationException;
 
     ByteArrayOutputStream generateBookIssuanceSummaryReport(Date startDate, Date endDate, String username) throws FileNotFoundException, ReportGenerationException, JRException;
 

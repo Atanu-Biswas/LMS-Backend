@@ -80,7 +80,7 @@ public class ReportServiceImpl implements ReportService{
 
         switch(reportName){
             case "BookCollectionReport":
-                return generateBooksCollectionReport(startDate,endDate,username);
+                return generateAdminBooksCollectionReport(startDate,endDate,username);
 
             case "BookIssuanceSummary":
                 return generateBookIssuanceSummaryReport(startDate,endDate,username);
@@ -111,7 +111,7 @@ public class ReportServiceImpl implements ReportService{
         
         switch(reportName){
             case "BookCollectionReport":
-                return generateBooksCollectionReport(startDate,endDate,username);
+                return generateUserBooksCollectionReport(startDate,endDate,username);
             
             case "UserBookIssuanceSummary":
                 return generateUserBookIssuanceSummaryReport(startDate,endDate,username);
@@ -124,7 +124,7 @@ public class ReportServiceImpl implements ReportService{
         }
     }
     
-    public ByteArrayOutputStream generateBooksCollectionReport(Date startDate,Date endDate,String username) throws JRException, FileNotFoundException, ReportGenerationException{
+    public ByteArrayOutputStream generateAdminBooksCollectionReport(Date startDate,Date endDate,String username) throws JRException, FileNotFoundException, ReportGenerationException{
         List<Book> books = bookRepository.findByDateAddedBetween(startDate, endDate);
 
         if(books.isEmpty()){
@@ -147,6 +147,31 @@ public class ReportServiceImpl implements ReportService{
         
         JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(bookReportDTOs);
         String jrxmlFileName="BookCollection.jrxml";
+
+        return generateReport(dataSource,jrxmlFileName,username,startDate,endDate);
+    }
+
+    public ByteArrayOutputStream generateUserBooksCollectionReport(Date startDate,Date endDate,String username) throws JRException, FileNotFoundException, ReportGenerationException{
+        List<Book> books = bookRepository.findByDateAddedBetweenAndIsActiveIsTrueAndQuantityAvailableGreaterThan(startDate, endDate,1);
+
+        if(books.isEmpty()){
+            throw new ReportGenerationException("No Data Found");
+        }
+
+        List<BookReportDTO> bookReportDTOs=books.stream().map(book->
+            BookReportDTO.builder()
+                        .bookId(book.getBookId())
+                        .title(book.getTitle())
+                        .author(book.getAuthor())
+                        .genre(String.valueOf(book.getGenre()))
+                        .isbn(book.getIsbn())
+                        .printYear(book.getPrintYear())
+                        .publisherName(book.getPublisher().getName())
+                        .build())
+                        .toList();
+        
+        JRBeanCollectionDataSource dataSource=new JRBeanCollectionDataSource(bookReportDTOs);
+        String jrxmlFileName="UserBookCollection.jrxml";
 
         return generateReport(dataSource,jrxmlFileName,username,startDate,endDate);
     }
@@ -207,7 +232,7 @@ public class ReportServiceImpl implements ReportService{
                             .issueId(bookIssue.getIssueId())
                             .bookTitle(bookIssue.getBook().getTitle())
                             .issueDate(bookIssue.getIssueDate())
-                            .returnDate(bookIssue.getReturnDate())
+                            .dueDate(bookIssue.getDueDate())
                             .build())
                             .toList();
 

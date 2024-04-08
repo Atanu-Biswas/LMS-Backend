@@ -20,6 +20,8 @@ public interface BookRepository extends JpaRepository<Book,Long>{
 
     List<Book> findByDateAddedBetween(Date startDate, Date endDate);
 
+    List<Book> findByDateAddedBetweenAndIsActiveIsTrueAndQuantityAvailableGreaterThan(Date startDate, Date endDate, int quantityAvailable);
+
     //keep this also
     @Query("SELECT b FROM Book b WHERE UPPER(b.genre) LIKE CONCAT('%', UPPER(:genre), '%')")
     Page<Book> findByGenreContainingIgnoreCase(String genre, Pageable p);
