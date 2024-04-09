@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface OtpRepository extends JpaRepository<OTP, String> {
+public interface OtpRepository extends JpaRepository<OTP, Long> {
 
     Optional<OTP> findByUserEmail(String email);
 
