@@ -9,7 +9,7 @@ import com.project.library.management.exception.*;
 import java.util.UUID;
 
 public interface AuthenticationService {
-    AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, IllegalMobileNoException, AddressLengthException, UsernameLengthException, NameLengthException, InvalidEmailException;
+    AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, IllegalMobileNoException, AddressLengthException, UsernameLengthException, NameLengthException, InvalidEmailException, InvalidPasswordException;
 
     AuthenticationResponse authenticate(LoginDTO request) throws InvalidCredentialException;
 
@@ -23,7 +23,7 @@ public interface AuthenticationService {
 
     int forgetPassword(String email) throws UserNotFoundException;
 
-    void resetPassword(UUID token, String password) throws OTPException;
+    void resetPassword(UUID token, String password) throws OTPException, InvalidPasswordException;
     UUID verifyOtp(String email, String otp) throws OTPException;
 
 

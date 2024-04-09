@@ -36,7 +36,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private String mail;
 
 
-    public AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, IllegalMobileNoException, AddressLengthException, UsernameLengthException, NameLengthException, InvalidEmailException {
+    public AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, IllegalMobileNoException, AddressLengthException, UsernameLengthException, NameLengthException, InvalidEmailException, InvalidPasswordException {
         if (request.getPassword().length() < 8 || request.getPassword().length() > 20) {
             throw new PasswordLengthException("Password length should be between 8 and 20 characters.");
         }
@@ -68,6 +68,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new InvalidEmailException();
         }
 
+        if(!validatePassword(request.getPassword())){
+            throw new InvalidPasswordException("Password should contain atleast one uppercase, one lowercase, one digit and one special character");
+        }
 
 
 
@@ -78,14 +81,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setAddress(request.getAddress());
         user.setMobileNo(request.getMobileNo());
-
-
+        user.setEmail(request.getEmail());
         user.setRole(Role.USER);
         user = userRepository.save(user);
         logger.debug("Registered a new user into our LMS Portal !");
         String token = jwtService.generateToken(user);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
         String refreshTokenToken = refreshToken.getToken();
+
+        String subject = "Registration Successful";
+        String body = "Welcome to the Library Management System. Your registration is successful. You can now login to the system.";
+        String to = user.getEmail();
+
+
+        mailServiceImpl.sendEmail(to, mail, subject, body);
 
         return new AuthenticationResponse(token, refreshTokenToken);
     }
@@ -94,6 +103,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@[\\w-]+(?:\\.[\\w-]+)*$";
         return Pattern.matches(regex, email);
     }
+
+    public boolean validatePassword (String email) {
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+{}|<>?]).{8,20}$";
+        return Pattern.matches(regex, email);
+    }
+
 
     public AuthenticationResponse authenticate(LoginDTO request) throws InvalidCredentialException {
         System.out.println("Authenticate Service");
@@ -198,7 +213,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public UUID verifyOtp(String email, String otp) throws OTPException {
         System.out.println("Email is "+email);
         OTP otpEntity = otpRepository.findByUserEmail(email).orElseThrow(
-                () -> new OTPException("OTP not found"));
+                () -> new OTPException("Invalid OTP"));
 
         logger.debug("Query fired for finding the OTP by email");
         if(otpEntity.getExpiry().isBefore(Instant.now())){
@@ -220,7 +235,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
     @Transactional
-    public void resetPassword(UUID token, String password) throws OTPException {
+    public void resetPassword(UUID token, String password) throws OTPException, InvalidPasswordException {
         OTP otpEntity = otpRepository.findByToken(token).orElseThrow(
                 () -> new OTPException("Token not found"));
 
@@ -232,6 +247,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = otpEntity.getUser();
         if (passwordEncoder.matches(password, user.getPassword())) {
             throw new OTPException("New password cannot be the same as the current password");
+        }
+        if(!validatePassword(password)){
+            throw new InvalidPasswordException("Password should contain atleast one uppercase, one lowercase, one digit and one special character");
         }
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);

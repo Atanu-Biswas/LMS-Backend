@@ -24,8 +24,8 @@ public class AuthenticationController {
 
 
 	@PostMapping("/register")
-	public ResponseEntity<AuthenticationResponse> register(@RequestBody UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, AddressLengthException, IllegalMobileNoException, UsernameLengthException, NameLengthException, InvalidEmailException {
-
+	public ResponseEntity<AuthenticationResponse> register(@RequestBody UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, AddressLengthException, IllegalMobileNoException, UsernameLengthException, NameLengthException, InvalidEmailException, InvalidPasswordException {
+        System.out.println("Got the request"+request.getEmail());
 		return ResponseEntity.ok(authService.register(request));
 	}
 
@@ -97,7 +97,7 @@ public class AuthenticationController {
     public ResponseEntity<String> resetPassword(
             @RequestParam("token") String token,
             @RequestParam("password") String password
-    ) throws OTPException {
+    ) throws OTPException, InvalidPasswordException {
         System.out.println("Token is "+token);
         authService.resetPassword(UUID.fromString(token), password);
         return ResponseEntity.ok("Password reset successfully");
