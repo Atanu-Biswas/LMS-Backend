@@ -151,7 +151,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     public AuthenticationResponse refreshToken(RefreshTokenRequestDTO request) throws RefreshTokenNotFound {
         RefreshToken refreshToken = refreshTokenService.findByToken(request.getRefreshToken()).orElseThrow(
-                () -> new RuntimeException("Refresh token is not in database!")
+                () -> new RuntimeException("You are logged out! Please login again.")
         );
         refreshTokenService.verifyExpiration(refreshToken);
 
