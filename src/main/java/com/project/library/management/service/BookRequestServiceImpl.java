@@ -12,6 +12,7 @@ import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,9 +29,13 @@ public class BookRequestServiceImpl implements BookRequestService {
     private final BookRepository bookRepository;
     private final BookIssueRepository bookIssueRepository;
     private final UserRepository userRepository;
+    private final MailServiceImpl mailServiceImpl;
+    @Value("${spring.mail.username}")
+    private String mail;
+
 
     public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) throws BookNotFoundException,
-            DisabledBookException, BookAlreadyRequestedExecption, IllegalWeeksRequestedException ,FineLimitExcededException ,RequestedLimitExcededException {
+            DisabledBookException, BookAlreadyRequestedExecption, IllegalWeeksRequestedException, FineLimitExcededException, RequestedLimitExcededException {
 
         if (bookRequestDTO.getWeeksRequested() < 1 || bookRequestDTO.getWeeksRequested() > 3) {
             throw new IllegalWeeksRequestedException("Weeks requested should be between 1 and 3");
@@ -53,13 +58,13 @@ public class BookRequestServiceImpl implements BookRequestService {
 
         Date todayStart = new Date();
         Date yesterdayStart = new Date(todayStart.getTime() - (1000 * 60 * 60 * 24)); // Adding 24 hours to get the
-                                                                                      // start
-                                                                                      // of tomorrow
+        // start
+        // of tomorrow
 
         List<BookRequest> bookRequestbetween = bookRequestRepository.findByUserUsernameAndRequestDateBetween(username,
                 yesterdayStart, todayStart);
 
-        if (bookRequestbetween.size() >20) {
+        if (bookRequestbetween.size() > 20) {
             throw new RequestedLimitExcededException(
                     "You have already requested the maximum number of books for today!!");
         }
@@ -106,10 +111,10 @@ public class BookRequestServiceImpl implements BookRequestService {
     }
 
     public boolean acceptRequest(Long requestId)
-            throws BookRequestNotFoundException, BookNotFoundException, DisabledBookException,FineLimitExcededException {
+            throws BookRequestNotFoundException, BookNotFoundException, DisabledBookException, FineLimitExcededException {
         BookRequest request = bookRequestRepository.findById(requestId).orElseThrow(
                 () -> new BookRequestNotFoundException("Book request with request Id: " + requestId + " not found"));
-
+        User user = userRepository.findByUsername(request.getUser().getUsername()).orElse(null);
         Book book = bookRepository.findById(request.getBook().getBookId())
                 .orElseThrow(() -> new BookNotFoundException());
 
@@ -117,8 +122,8 @@ public class BookRequestServiceImpl implements BookRequestService {
             throw new DisabledBookException("The requested book is disabled!!");
         }
         // BookRequest br=bookRequestRepository.findById(requestId).orElse(null);
-           
-        String username=request.getUser().getUsername();
+
+        String username = request.getUser().getUsername();
         List<BookIssue> bookIssues = bookIssueRepository.findByUserUsernameAndFineStatus(username, Fine.UNPAID);
 
         int fine = 0;
@@ -145,13 +150,14 @@ public class BookRequestServiceImpl implements BookRequestService {
             issue.setBookRequest(request);
 
 
-
             Date date = new Date();
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
             int daysToAdd = request.getWeeksRequested() * 7;
             calendar.add(Calendar.DATE, daysToAdd);
             Date dueDate = calendar.getTime();
+
+
             issue.setDueDate(dueDate);
             issue.setFineStatus(Fine.valueOf("NOFINE"));
             issue.setUser(request.getUser());
@@ -168,12 +174,19 @@ public class BookRequestServiceImpl implements BookRequestService {
                 bookRequestRepository.save(request);
 
                 bookRepository.save(book);
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.out.println("Exception in saving in Book Issue Repository");
                 e.printStackTrace();
             }
+            String subject = request.getBook().getTitle() + " " + "is issued to you";
+            String body = request.getBook().getTitle() + " " + "is issued to you for" + " " + request.getWeeksRequested() + " " + "weeks & the due date is" + " " + dueDate;
+            String to = user.getEmail();
 
+
+            mailServiceImpl.sendEmail(to, mail, subject, body);
         }
+
+
         return true;
     }
 
@@ -189,7 +202,7 @@ public class BookRequestServiceImpl implements BookRequestService {
     }
 
     public BookRequestPaginationDTO viewRequests(int pageNumber, int pageSize, String sortBy, String sortDir,
-            String filterBy) throws BookRequestNotFoundException {
+                                                 String filterBy) throws BookRequestNotFoundException {
 
         Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
@@ -207,15 +220,15 @@ public class BookRequestServiceImpl implements BookRequestService {
         List<BookRequest> bookRequests = bookRequestPage.getContent();
 
         List<BookRequestDTO> bookRequestDTOs = bookRequests.stream().map(bookRequest -> BookRequestDTO.builder()
-                .bookId(bookRequest.getBook().getBookId())
-                .bookTitle(bookRequest.getBook().getTitle())
-                .weeksRequested(bookRequest.getWeeksRequested())
-                .status(bookRequest.getStatus())
-                .requestId(bookRequest.getRequestId())
-                .username(bookRequest.getUser().getUsername())
-                .requestDate(bookRequest.getRequestDate())
-                .quantityAvailable(bookRequest.getBook().getQuantityAvailable())
-                .build())
+                        .bookId(bookRequest.getBook().getBookId())
+                        .bookTitle(bookRequest.getBook().getTitle())
+                        .weeksRequested(bookRequest.getWeeksRequested())
+                        .status(bookRequest.getStatus())
+                        .requestId(bookRequest.getRequestId())
+                        .username(bookRequest.getUser().getUsername())
+                        .requestDate(bookRequest.getRequestDate())
+                        .quantityAvailable(bookRequest.getBook().getQuantityAvailable())
+                        .build())
                 .toList();
 
         return BookRequestPaginationDTO.builder()
@@ -304,7 +317,7 @@ public class BookRequestServiceImpl implements BookRequestService {
 
     // add this service
     public BookRequestPaginationDTO viewRequestsByUserName(int pageNumber, int pageSize, String sortBy,
-            String sortDir, String username, String filterBy)
+                                                           String sortDir, String username, String filterBy)
             throws BookRequestNotFoundException, UserNotFoundException {
 
         boolean isUsernameValid = userRepository.existsByUsernameContainingIgnoreCase(username);
@@ -329,15 +342,15 @@ public class BookRequestServiceImpl implements BookRequestService {
         List<BookRequest> bookRequests = bookRequestPage.getContent();
 
         List<BookRequestDTO> bookRequestDTOs = bookRequests.stream().map(bookRequest -> BookRequestDTO.builder()
-                .bookId(bookRequest.getBook().getBookId())
-                .bookTitle(bookRequest.getBook().getTitle())
-                .weeksRequested(bookRequest.getWeeksRequested())
-                .status(bookRequest.getStatus())
-                .requestId(bookRequest.getRequestId())
-                .username(bookRequest.getUser().getUsername())
-                .requestDate(bookRequest.getRequestDate())
-                .quantityAvailable(bookRequest.getBook().getQuantityAvailable())
-                .build())
+                        .bookId(bookRequest.getBook().getBookId())
+                        .bookTitle(bookRequest.getBook().getTitle())
+                        .weeksRequested(bookRequest.getWeeksRequested())
+                        .status(bookRequest.getStatus())
+                        .requestId(bookRequest.getRequestId())
+                        .username(bookRequest.getUser().getUsername())
+                        .requestDate(bookRequest.getRequestDate())
+                        .quantityAvailable(bookRequest.getBook().getQuantityAvailable())
+                        .build())
                 .toList();
 
         return BookRequestPaginationDTO.builder()

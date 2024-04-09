@@ -7,7 +7,7 @@ import com.project.library.management.dto.UserDTO;
 import com.project.library.management.entity.AuthenticationResponse;
 import com.project.library.management.exception.*;
 import com.project.library.management.service.AuthenticationService;
-import com.project.library.management.service.MailService;
+import com.project.library.management.service.MailServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +29,7 @@ public class AuthenticationController {
 		return ResponseEntity.ok(authService.register(request));
 	}
 
-    public AuthenticationController(AuthenticationService authService, MailService mailService) {
+    public AuthenticationController(AuthenticationService authService, MailServiceImpl mailServiceImpl) {
         this.authService = authService;
 
 

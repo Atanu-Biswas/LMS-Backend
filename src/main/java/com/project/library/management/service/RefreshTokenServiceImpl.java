@@ -60,4 +60,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
         findByToken(refreshToken).ifPresent(refreshTokenRepository::delete);
         return "Refresh Token Deleted Successfully";
     }
+
+    public void deleteAllByUsername(String username){
+        User user = userRepository.findByUsername(username).orElseThrow( () -> new UsernameNotFoundException("User Not Found to delete Refresh Token"));
+        refreshTokenRepository.deleteAllByUser(user);
+    }
 }

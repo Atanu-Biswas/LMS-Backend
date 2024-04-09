@@ -16,4 +16,6 @@ public interface RefreshTokenService {
     Object verifyExpiration(RefreshToken refreshToken);
 
     Object deleteByToken(String refreshToken) throws RefreshTokenNotFound;
+
+    void deleteAllByUsername(String username);
 }

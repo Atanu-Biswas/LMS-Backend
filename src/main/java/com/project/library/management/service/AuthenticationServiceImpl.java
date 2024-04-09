@@ -3,18 +3,23 @@ package com.project.library.management.service;
 import com.project.library.management.dto.LoginDTO;
 import com.project.library.management.dto.RefreshTokenRequestDTO;
 import com.project.library.management.dto.UserDTO;
-import com.project.library.management.entity.AuthenticationResponse;
-import com.project.library.management.entity.RefreshToken;
-import com.project.library.management.entity.Role;
-import com.project.library.management.entity.User;
+import com.project.library.management.entity.*;
 import com.project.library.management.exception.*;
+import com.project.library.management.repository.OtpRepository;
 import com.project.library.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.util.Random;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +30,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final OtpRepository otpRepository;
+    private final MailServiceImpl mailServiceImpl;
+    @Value("${spring.mail.username}")
+    private String mail;
 
-    public AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, IllegalMobileNoException, AddressLengthException, UsernameLengthException, NameLengthException {
+
+    public AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, IllegalMobileNoException, AddressLengthException, UsernameLengthException, NameLengthException, InvalidEmailException {
         if (request.getPassword().length() < 8 || request.getPassword().length() > 20) {
             throw new PasswordLengthException("Password length should be between 8 and 20 characters.");
         }
@@ -54,6 +64,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AddressLengthException();
         }
 
+        if (!validateEmail(request.getEmail())) {
+            throw new InvalidEmailException();
+        }
+
+
 
 
 
@@ -73,6 +88,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String refreshTokenToken = refreshToken.getToken();
 
         return new AuthenticationResponse(token, refreshTokenToken);
+    }
+
+    public boolean validateEmail (String email) {
+        String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@[\\w-]+(?:\\.[\\w-]+)*$";
+        return Pattern.matches(regex, email);
     }
 
     public AuthenticationResponse authenticate(LoginDTO request) throws InvalidCredentialException {
@@ -148,4 +168,97 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new RuntimeException("Token not belongs to the user");
         }
 }
+    public int forgetPassword(String email) throws UserNotFoundException {
+        User user = userRepository.findByEmail(email).orElseThrow(()->
+                new UserNotFoundException("User not found")
+        );
+        logger.debug("Query fired for finding the User by email");
+        int otp = generateRandomFourDigit();
+        logger.info("Generated the OTP for the user");
+        OTP existingOtp = otpRepository.findByUserEmail(email).orElse(null);
+        if(existingOtp!=null){
+            otpRepository.delete(existingOtp);
+        }
+        OTP otpEntity = new OTP();
+        otpEntity.setUser(user);
+        otpEntity.setOtp(String.valueOf(otp));
+        otpEntity.setExpiry(Instant.now().plusSeconds(120));
+        otpRepository.save(otpEntity);
+        logger.info("Saved the OTP in the database");
+        String subject = "OTP for Password Reset";
+        String body = "Your OTP for password reset is: "+otp;
+        mailServiceImpl.sendEmail(email,mail,subject,body);
+
+        return otp;
+
+    }
+
+
+
+    public UUID verifyOtp(String email, String otp) throws OTPException {
+        System.out.println("Email is "+email);
+        OTP otpEntity = otpRepository.findByUserEmail(email).orElseThrow(
+                () -> new OTPException("OTP not found"));
+
+        logger.debug("Query fired for finding the OTP by email");
+        if(otpEntity.getExpiry().isBefore(Instant.now())){
+            otpRepository.delete(otpEntity);
+            throw new OTPException("OTP has expired");
+        }
+        if(otpEntity.getOtp().equals(otp)){
+            UUID token = UUID.randomUUID();
+
+            otpEntity.setToken(token);
+            otpEntity.setTokenExpiryTime(Instant.now().plusSeconds(120));
+            otpRepository.save(otpEntity);
+            return token;
+        }
+        else {
+            throw new OTPException("OTP not found");
+        }
+    }
+
+
+    @Transactional
+    public void resetPassword(UUID token, String password) throws OTPException {
+        OTP otpEntity = otpRepository.findByToken(token).orElseThrow(
+                () -> new OTPException("Token not found"));
+
+        logger.debug("Query fired for finding the OTP by token");
+        if(otpEntity.getTokenExpiryTime().isBefore(Instant.now())){
+            otpRepository.delete(otpEntity);
+            throw new OTPException("Token has expired");
+        }
+        User user = otpEntity.getUser();
+        if (passwordEncoder.matches(password, user.getPassword())) {
+            throw new OTPException("New password cannot be the same as the current password");
+        }
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+
+        otpRepository.delete(otpEntity);
+        logoutfromalldevices(user.getUsername());
+
+
+    }
+
+    public void logoutfromalldevices(String username) {
+
+        refreshTokenService.deleteAllByUsername(username);
+    }
+
+    public static int generateRandomFourDigit() {
+        // Define minimum and maximum values for a 4-digit number (inclusive)
+        int min = 1000;
+        int max = 9999;
+
+        // Create a random number generator object
+        Random random = new Random();
+
+        // Generate a random integer between min (inclusive) and max (exclusive)
+        int randomNumber = random.nextInt(max - min + 1) + min;
+
+        return randomNumber;
+    }
+
 }

@@ -5,12 +5,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class Testmail {
 
-    private final MailService mailService;
+    private final MailServiceImpl mailServiceImpl;
 
 
 
 
     public void sendEmail(String to, String from, String subject, String body) {
-        mailService.sendEmail(to, from, subject, body);
+        mailServiceImpl.sendEmail(to, from, subject, body);
     }
 }
