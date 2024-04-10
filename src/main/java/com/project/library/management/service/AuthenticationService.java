@@ -21,7 +21,7 @@ public interface AuthenticationService {
 
     void logout(String username, String Token) throws RefreshTokenNotFound;
 
-    int forgetPassword(String email) throws UserNotFoundException, OTPException;
+    int forgetPassword(String email) throws UserNotFoundException;
 
     void resetPassword(UUID token, String password) throws OTPException, InvalidPasswordException;
     UUID verifyOtp(String email, String otp) throws OTPException;
