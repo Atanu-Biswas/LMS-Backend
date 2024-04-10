@@ -8,6 +8,9 @@ import com.project.library.management.exception.PublisherNotFoundException;
 import com.project.library.management.repository.PublisherRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.AllArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -54,5 +57,25 @@ public class PublisherServiceImpl implements PublisherService{
     public void deletePublisher(Long publisherId) throws PublisherNotFoundException{
         Publisher publisher= publisherRepository.findById(publisherId).orElseThrow(()->new PublisherNotFoundException());
         publisherRepository.deleteById(publisherId);
+    }
+
+    public PublisherDTO convertToDTO(Publisher publisher){
+        return PublisherDTO.builder()
+                           .publisherId(publisher.getPublisherId())
+                           .name(publisher.getName())
+                           .email(publisher.getEmail())
+                           .phoneNo(publisher.getPhoneNo())
+                           .build();
+    }
+
+    public List<PublisherDTO> getAllPublishers() throws PublisherNotFoundException{
+        List<Publisher> publishers=publisherRepository.findAll();
+        
+        if(publishers.isEmpty()){
+            throw new PublisherNotFoundException();
+        }
+
+        List<PublisherDTO> publisherDTOs=publishers.stream().map(publisher->convertToDTO(publisher)).toList();
+        return publisherDTOs;
     }
 }

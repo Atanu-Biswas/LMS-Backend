@@ -254,4 +254,11 @@ public class AdminController {
 
     }
 
+    @GetMapping("/view-all-publishers")
+    protected ResponseEntity<List<PublisherDTO>> getAllPublishers() throws PublisherNotFoundException{
+        List<PublisherDTO> publisherDTOs=publisherService.getAllPublishers();
+
+        return ResponseEntity.of(Optional.of(publisherDTOs));
+    }
+
 }

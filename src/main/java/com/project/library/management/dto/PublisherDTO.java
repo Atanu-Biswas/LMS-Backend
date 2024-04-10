@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PublisherDTO {
+    private Long publisherId;
+
     private String name;
 
     private String email;
