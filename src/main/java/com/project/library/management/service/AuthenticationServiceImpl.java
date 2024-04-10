@@ -183,14 +183,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new RuntimeException("Token not belongs to the user");
         }
 }
-    public int forgetPassword(String email) throws UserNotFoundException {
+    public int forgetPassword(String email) throws UserNotFoundException, OTPException {
         User user = userRepository.findByEmail(email).orElseThrow(()->
                 new UserNotFoundException("User not found")
         );
         logger.debug("Query fired for finding the User by email");
         int otp = generateRandomFourDigit();
         logger.info("Generated the OTP for the user");
-        OTP existingOtp = otpRepository.findByUserEmail(email).orElse(null);
+        OTP existingOtp = otpRepository.findByUserEmail(email).orElseThrow(()->
+                new OTPException("OTP not found")
+        );
         if(existingOtp!=null){
             otpRepository.delete(existingOtp);
         }

@@ -75,7 +75,7 @@ public class AuthenticationController {
     @GetMapping("/forgotPassword")
     public ResponseEntity<String> forgotPassword(
             @RequestParam("email") String email
-    ) throws UserNotFoundException {
+    ) throws UserNotFoundException, OTPException {
         System.out.println("Email is "+email);
         authService.forgetPassword(email);
         System.out.println("Mail sent successfully");
