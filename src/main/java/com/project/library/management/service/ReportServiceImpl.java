@@ -2,10 +2,8 @@ package com.project.library.management.service;
 
 import com.project.library.management.dto.reportDTO.*;
 import com.project.library.management.entity.*;
-import com.project.library.management.exception.BookNotFoundException;
 import com.project.library.management.exception.ReportGenerationException;
 import com.project.library.management.repository.*;
-
 import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -13,19 +11,13 @@ import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.export.SimplePdfExporterConfiguration;
-
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -221,7 +213,7 @@ public class ReportServiceImpl implements ReportService{
     }
 
     public ByteArrayOutputStream generateUserBookIssuanceSummaryReport(Date startDate, Date endDate,String username) throws FileNotFoundException, ReportGenerationException, JRException{//modify this function and report name
-        List<BookIssue> bookIssues=bookIssueRepository.findByUserUsernameAndIssueDateBetweenOrUserUsernameAndReturnDateBetween(username,startDate,endDate,username,startDate,endDate);
+        List<BookIssue> bookIssues=bookIssueRepository.findByUserUsernameAndIssueDateBetweenOrUserUsernameAndDueDateBetween(username,startDate,endDate,username,startDate,endDate);
 
         if(bookIssues.isEmpty()){
             throw new ReportGenerationException("No Data Found");

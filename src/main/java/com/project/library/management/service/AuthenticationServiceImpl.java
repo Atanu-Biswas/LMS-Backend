@@ -269,7 +269,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRepository.save(user);
 
         otpRepository.delete(otpEntity);
-        logoutfromalldevices(user.getUsername());
+
 
 
     }
