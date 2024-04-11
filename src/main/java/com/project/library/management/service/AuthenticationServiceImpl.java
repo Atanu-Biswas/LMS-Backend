@@ -49,7 +49,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         if(!validateName(request.getName())){
-            throw new InvalidNameException("Name should contain only alphabets");
+            throw new InvalidNameException("Name should contain only alphabets and dots");
         }
 
         if(userRepository.existsByUsername(request.getUsername())){
@@ -119,7 +119,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return Pattern.matches(regex, email);
     }
     public boolean validateName (String name) {
-        String regex = "^[a-zA-Z\\\\s]+$";
+        String regex = "^[a-zA-Z\\\\s.]+$";
         return Pattern.matches(regex, name);
     }
 
