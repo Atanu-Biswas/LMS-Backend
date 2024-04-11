@@ -53,7 +53,7 @@ public class FineServiceImpl implements FineService{
     }
     private final BookIssueRepository bookIssueRepository;
     @Scheduled(cron = "0 0 0 * * ?") //12 AM (Midnight)
-    //@Scheduled(cron = "0 */2 * * * ?")  //Every 2 minutes
+    //@Scheduled(cron = "0 */1 * * * ?")  //Every 2 minutes
     public void runDailyTask() {
         System.out.println("Running scheduler task");
         List<BookIssue> bookIssueListNoFine = bookIssueRepository.findByFineStatus(Fine.valueOf("NOFINE"));
