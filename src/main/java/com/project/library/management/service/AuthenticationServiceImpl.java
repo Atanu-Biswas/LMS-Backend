@@ -243,7 +243,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return token;
         }
         else {
-            throw new OTPException("OTP not found");
+            throw new OTPException("Invalid OTP");
         }
     }
 
