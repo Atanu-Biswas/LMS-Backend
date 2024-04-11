@@ -32,6 +32,10 @@ public class BookRequestServiceImpl implements BookRequestService {
     private final MailServiceImpl mailServiceImpl;
     @Value("${spring.mail.username}")
     private String mail;
+    @Value("${max.request.limit}")
+    private int maxRequestLimit;
+    @Value("${max.fine.limit}")
+    private int maxFineLimit;
 
 
     public boolean issueRequest(String username, BookRequestDTO bookRequestDTO) throws BookNotFoundException,
@@ -49,7 +53,7 @@ public class BookRequestServiceImpl implements BookRequestService {
             fine += bookIssue.getFine();
         }
 
-        if (fine >= 60) {
+        if (fine >= maxFineLimit) {
             throw new FineLimitExcededException(
                     "Fine Limit Exceded..Please Pay Your Unpaid Fine !!");
         }
@@ -64,7 +68,7 @@ public class BookRequestServiceImpl implements BookRequestService {
         List<BookRequest> bookRequestbetween = bookRequestRepository.findByUserUsernameAndRequestDateBetween(username,
                 yesterdayStart, todayStart);
 
-        if (bookRequestbetween.size() > 20) {
+        if (bookRequestbetween.size() > maxRequestLimit) {
             throw new RequestedLimitExcededException(
                     "You have already requested the maximum number of books for today!!");
         }
@@ -111,7 +115,7 @@ public class BookRequestServiceImpl implements BookRequestService {
     }
 
     public boolean acceptRequest(Long requestId)
-            throws BookRequestNotFoundException, BookNotFoundException, DisabledBookException, FineLimitExcededException {
+            throws BookRequestNotFoundException, BookNotFoundException, DisabledBookException, FineLimitExcededException, BookOutOfStockException {
         BookRequest request = bookRequestRepository.findById(requestId).orElseThrow(
                 () -> new BookRequestNotFoundException("Book request with request Id: " + requestId + " not found"));
         User user = userRepository.findByUsername(request.getUser().getUsername()).orElse(null);
@@ -133,7 +137,7 @@ public class BookRequestServiceImpl implements BookRequestService {
         }
 
         System.out.println(fine);
-        if (fine >= 1000) {
+        if (fine >= maxFineLimit) {
             throw new FineLimitExcededException(
                     "Fine Limit Exceded..Please Pay Your Unpaid Fine !!");
         }
@@ -163,6 +167,9 @@ public class BookRequestServiceImpl implements BookRequestService {
             issue.setUser(request.getUser());
 
             int bookQuantity = book.getQuantityAvailable();
+            if(bookQuantity==1){
+                throw new BookOutOfStockException("Book is out of stock");
+            }
             book.setQuantityAvailable(bookQuantity - 1);
             System.out.println("Setting values for Book Issue Table done");
 //            System.out.println(issue);

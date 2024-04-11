@@ -1,6 +1,5 @@
 package com.project.library.management.service;
 
-import com.project.library.management.dto.BookIssueDTO;
 import com.project.library.management.dto.BookIssuePaginationDTO;
 import com.project.library.management.exception.BookIssueNotFoundException;
 import com.project.library.management.exception.UserNotFoundException;

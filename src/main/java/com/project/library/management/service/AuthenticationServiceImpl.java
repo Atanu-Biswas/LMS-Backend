@@ -36,11 +36,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private String mail;
 
 
-    public AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, IllegalMobileNoException, AddressLengthException, UsernameLengthException, NameLengthException, InvalidEmailException, InvalidPasswordException {
+    public AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, IllegalMobileNoException, AddressLengthException, UsernameLengthException, NameLengthException, InvalidEmailException, InvalidPasswordException, EmailExistsException, InvalidNameException {
         if (request.getPassword().length() < 8 || request.getPassword().length() > 20) {
             throw new PasswordLengthException("Password length should be between 8 and 20 characters.");
         }
-        if (request.getUsername().length() <= 3 || request.getUsername().length() >= 10) {
+        if (request.getUsername().length() <= 3 || request.getUsername().length() > 10) {
             throw new UsernameLengthException();
         }
 
@@ -48,8 +48,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new NameLengthException();
         }
 
+        if(!validateName(request.getName())){
+            throw new InvalidNameException("Name should contain only alphabets");
+        }
+
         if(userRepository.existsByUsername(request.getUsername())){
             throw new UserNameExistsExecption("Username already exists");
+        }
+
+        if(userRepository.findByEmail(request.getEmail()).isPresent()){
+            throw new EmailExistsException("Email already exists");
         }
 
         if(userRepository.existsByMobileNo(request.getMobileNo())){
@@ -71,6 +79,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if(!validatePassword(request.getPassword())){
             throw new InvalidPasswordException("Password should contain atleast one uppercase, one lowercase, one digit and one special character");
         }
+
+
 
 
 
@@ -107,6 +117,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public boolean validatePassword (String email) {
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+{}|<>?]).{8,20}$";
         return Pattern.matches(regex, email);
+    }
+    public boolean validateName (String name) {
+        String regex = "^[a-zA-Z\\\\s]+$";
+        return Pattern.matches(regex, name);
     }
 
 

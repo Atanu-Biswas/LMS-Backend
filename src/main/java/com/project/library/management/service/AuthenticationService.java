@@ -9,7 +9,7 @@ import com.project.library.management.exception.*;
 import java.util.UUID;
 
 public interface AuthenticationService {
-    AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, IllegalMobileNoException, AddressLengthException, UsernameLengthException, NameLengthException, InvalidEmailException, InvalidPasswordException;
+    AuthenticationResponse register(UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, IllegalMobileNoException, AddressLengthException, UsernameLengthException, NameLengthException, InvalidEmailException, InvalidPasswordException, EmailExistsException, InvalidNameException;
 
     AuthenticationResponse authenticate(LoginDTO request) throws InvalidCredentialException;
 

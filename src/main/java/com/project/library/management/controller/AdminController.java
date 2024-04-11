@@ -4,16 +4,13 @@ import com.project.library.management.dto.*;
 import com.project.library.management.exception.*;
 import com.project.library.management.repository.BookRequestRepository;
 import com.project.library.management.service.*;
-
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.JRException;
-
 import org.apache.log4j.Logger;
 import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,7 +50,7 @@ public class AdminController {
 
     @GetMapping("/accept-request")
     // working //edited for front-end
-    protected ResponseEntity<Boolean> acceptRequest(@Param("requestId") Long requestId) throws BookRequestNotFoundException, BookNotFoundException, DisabledBookException ,FineLimitExcededException{
+    protected ResponseEntity<Boolean> acceptRequest(@Param("requestId") Long requestId) throws BookRequestNotFoundException, BookNotFoundException, DisabledBookException, FineLimitExcededException, BookOutOfStockException {
         boolean isRequestAccepted = bookRequestService.acceptRequest(requestId);
         return ResponseEntity.ok(isRequestAccepted);
     }

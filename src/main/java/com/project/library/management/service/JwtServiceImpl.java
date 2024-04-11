@@ -14,6 +14,8 @@ import java.util.function.Function;
 
 @Service
 public class JwtServiceImpl implements JwtService {
+
+
     private final String SECRET_KEY = "688375d9db05c1b200ca96b1d90943c7244a27ba1ed842410f4d45e61dfb2193";
 
 

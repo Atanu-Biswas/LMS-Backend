@@ -24,7 +24,7 @@ public class AuthenticationController {
 
 
 	@PostMapping("/register")
-	public ResponseEntity<AuthenticationResponse> register(@RequestBody UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, AddressLengthException, IllegalMobileNoException, UsernameLengthException, NameLengthException, InvalidEmailException, InvalidPasswordException {
+	public ResponseEntity<AuthenticationResponse> register(@RequestBody UserDTO request) throws PasswordLengthException, MobileNoExistsException, UserNameExistsExecption, AddressLengthException, IllegalMobileNoException, UsernameLengthException, NameLengthException, InvalidEmailException, InvalidPasswordException, EmailExistsException, InvalidNameException {
         System.out.println("Got the request"+request.getEmail());
 		return ResponseEntity.ok(authService.register(request));
 	}

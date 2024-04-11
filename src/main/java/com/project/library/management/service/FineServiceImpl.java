@@ -7,6 +7,7 @@ import com.project.library.management.entity.Fine;
 import com.project.library.management.exception.NoFineFoundException;
 import com.project.library.management.repository.BookIssueRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,8 @@ import java.util.List;
 @Component
 public class FineServiceImpl implements FineService{
 
+    @Value("${fine.amount.perday}")
+    private int fineAmountPerDay;
     public FinePaginationDTO viewFine(int pageNumber, int pageSize, String sortBy, String sortDir, String username) throws NoFineFoundException {
         Sort sort = (sortDir.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
@@ -63,7 +66,7 @@ public class FineServiceImpl implements FineService{
                 bookIssue.setFineStatus(Fine.valueOf("UNPAID"));
                 long diff = currentDate.getTime() - bookIssue.getDueDate().getTime();
                 long diffDays = diff / (24 * 60 * 60 * 1000);
-                    bookIssue.setFine(Math.min(((int) diffDays * 10), Integer.MAX_VALUE));
+                    bookIssue.setFine(Math.min(((int) diffDays * fineAmountPerDay), Integer.MAX_VALUE));
 
             }
         });
@@ -72,7 +75,7 @@ public class FineServiceImpl implements FineService{
         bookIssueListUnPaid.forEach(bookIssue -> {
             long diff = currentDate.getTime() - bookIssue.getDueDate().getTime();
             long diffDays = diff / (24 * 60 * 60 * 1000);
-            bookIssue.setFine(Math.min(((int) diffDays * 10), Integer.MAX_VALUE));
+            bookIssue.setFine(Math.min(((int) diffDays * fineAmountPerDay), Integer.MAX_VALUE));
         });
         bookIssueRepository.saveAll(bookIssueListUnPaid);
 
