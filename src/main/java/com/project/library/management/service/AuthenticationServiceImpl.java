@@ -48,10 +48,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new NameLengthException();
         }
 
-        if(!validateName(request.getName())){
-            throw new InvalidNameException("Name should contain only alphabets and dots");
-        }
-
         if(userRepository.existsByUsername(request.getUsername())){
             throw new UserNameExistsExecption("Username already exists");
         }
@@ -118,10 +114,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+{}|<>?]).{8,20}$";
         return Pattern.matches(regex, email);
     }
-    public boolean validateName (String name) {
-        String regex = "^[a-zA-Z\\\\s.]+$";
-        return Pattern.matches(regex, name);
-    }
+
 
 
     public AuthenticationResponse authenticate(LoginDTO request) throws InvalidCredentialException {

@@ -58,7 +58,7 @@ public class UserController {
     }
 
     @PutMapping("/update-user")
-    protected ResponseEntity<UserProfile> updateUser(HttpServletRequest request,@RequestBody UserProfile userProfile) throws UserNotFoundException, IllegalMobileNoException, MobileNoExistsException, NothingToUpdateException, AddressLengthException {
+    protected ResponseEntity<UserProfile> updateUser(HttpServletRequest request,@RequestBody UserProfile userProfile) throws UserNotFoundException, IllegalMobileNoException, MobileNoExistsException, NothingToUpdateException, AddressLengthException, InvalidNameException, NameLengthException {
         String username=request.getUserPrincipal().getName();
         System.out.println("username: "+username);
         System.out.println("userProfile: "+userProfile);
