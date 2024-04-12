@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -161,8 +162,10 @@ public class UserServiceImpl implements UserService{
             throw new AddressLengthException();
         }
 
-     
-        if (userProfile.getName().length() <= 3 || userProfile.getName().length() >= 100) {
+        if(!validateName(userProfile.getName())){
+            throw new InvalidNameException("Name should contain only alphabets and dots");
+        }
+        if (userProfile.getName().length() < 3 || userProfile.getName().length() > 100) {
             throw new NameLengthException();
         }
 
@@ -178,5 +181,8 @@ public class UserServiceImpl implements UserService{
 
         return userProfile;
     }
-
+    public boolean validateName (String name) {
+        String regex = "^[a-zA-Z.\\s]+$";
+        return Pattern.matches(regex, name);
+    }
 }

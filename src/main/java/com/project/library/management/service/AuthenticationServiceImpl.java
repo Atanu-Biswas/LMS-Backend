@@ -40,11 +40,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (request.getPassword().length() < 8 || request.getPassword().length() > 20) {
             throw new PasswordLengthException("Password length should be between 8 and 20 characters.");
         }
-        if (request.getUsername().length() <= 3 || request.getUsername().length() > 10) {
+        if (request.getUsername().length() < 3 || request.getUsername().length() > 10) {
             throw new UsernameLengthException();
         }
 
-        if (request.getName().length() <= 3 || request.getName().length() >= 100) {
+        if (request.getName().length() < 3 || request.getName().length() > 100) {
             throw new NameLengthException();
         }
 
@@ -64,7 +64,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new IllegalMobileNoException();
         }
 
-        if(request.getAddress().length()>=100){
+        if(request.getAddress().length()>100){
             throw new AddressLengthException();
         }
 
