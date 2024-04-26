@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@CrossOrigin("*")
+@CrossOrigin("https://lms-frontend-lac.vercel.app")
 @RequestMapping("/auth")
 
 public class AuthenticationController {

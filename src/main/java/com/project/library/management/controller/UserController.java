@@ -33,7 +33,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin("http://localhost:4200")
+@CrossOrigin("https://lms-frontend-lac.vercel.app")
 @RequiredArgsConstructor
 public class UserController {
     private static final Logger logger = LogManager.getLogger(UserController.class);

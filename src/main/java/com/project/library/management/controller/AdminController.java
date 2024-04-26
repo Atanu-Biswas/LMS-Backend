@@ -24,7 +24,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
-@CrossOrigin("http://localhost:4200")
+@CrossOrigin("https://lms-frontend-lac.vercel.app")
 //@RequiredArgsConstructor
 public class AdminController {
     private final BookRequestService bookRequestService;
