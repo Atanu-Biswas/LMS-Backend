@@ -165,6 +165,10 @@ public class UserServiceImpl implements UserService{
         if(!validateName(userProfile.getName())){
             throw new InvalidNameException("Name should contain only alphabets and dots");
         }
+
+        if(!validateMobile(userProfile.getMobileNo() )){
+            throw new IllegalMobileNoException("Mobile number should contain only digits");
+        }
         if (userProfile.getName().length() < 3 || userProfile.getName().length() > 100) {
             throw new NameLengthException();
         }
@@ -184,5 +188,10 @@ public class UserServiceImpl implements UserService{
     public boolean validateName (String name) {
         String regex = "^[a-zA-Z.\\s]+$";
         return Pattern.matches(regex, name);
+    }
+
+    public boolean validateMobile (String Mobile) {
+        String regex = "^\\d{10}$";
+        return Pattern.matches(regex, Mobile);
     }
 }
