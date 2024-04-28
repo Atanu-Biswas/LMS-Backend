@@ -23,8 +23,8 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin")
 @CrossOrigin("*")
+@RequestMapping("/admin")
 //@RequiredArgsConstructor
 public class AdminController {
     private final BookRequestService bookRequestService;
