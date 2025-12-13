@@ -1,10 +1,10 @@
 # Library Management System
 
 ## 📘 Project Overview
-This project revolutionizes traditional library management by embracing modern technology to streamline library operations. Designed with a focus on user-friendly solutions, the system manages everything from user registration to book issuances and returns[cite: 16]. The primary goal is to enhance librarian efficiency and provide users with a seamless borrowing experience, ultimately fostering a culture of learning and knowledge dissemination.
+This project revolutionizes traditional library management by embracing modern technology to streamline library operations. Designed with a focus on user-friendly solutions, the system manages everything from user registration to book issuances and returns. The primary goal is to enhance librarian efficiency and provide users with a seamless borrowing experience, ultimately fostering a culture of learning and knowledge dissemination.
 
 ## 🛠 Tech Stack
-The project utilizes a comprehensive modern technology stack[cite: 133]:
+The project utilizes a comprehensive modern technology stack:
 * **Backend:** Java, Spring Boot
 * **Frontend:** Angular, TypeScript, Bootstrap
 * **Database:** Oracle Database
@@ -16,7 +16,7 @@ The project utilizes a comprehensive modern technology stack[cite: 133]:
 * **Real-Time Availability:** Efficient monitoring of book availability in real-time.
 * **Security:** Enhanced security using JWT authentication and encrypted password protection.
 * **Notifications:**
-    * **Email Alerts:** Automated emails for user registration, book issuance, and returns[cite: 39].
+    * **Email Alerts:** Automated emails for user registration, book issuance, and returns.
     * **New Arrivals:** Dashboard updates for new book additions, keeping users informed for two weeks after a book is added.
 
 ### 👤 User Module
@@ -29,14 +29,14 @@ Designed for a seamless user experience with a centralized dashboard.
 ### 🛡️ Admin Module
 Empowers administrators to oversee the library's inventory and users.
 * **Book Management:** Simplified addition of new books and control over book availability and details.
-* **Request Handling:** Review and approve or reject borrowing requests[cite: 117].
+* **Request Handling:** Review and approve or reject borrowing requests.
 * **User Oversight:** Visibility into user accounts, including their fines and currently borrowed books.
 * **Dashboard:** A central hub to monitor key metrics, track user interactions, and access reports.
 
 ## 📊 Reporting Module
 The system generates comprehensive reports to aid in management and decision-making.
 
-**Admin Reports[cite: 124]:**
+**Admin Reports:**
 * Book Request Report
 * Book Issuance Report
 * Book Return Report
